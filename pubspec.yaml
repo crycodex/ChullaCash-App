@@ -11,7 +11,8 @@ dependencies:
     sdk: flutter
   #splash screen
   flutter_native_splash: ^2.4.0
-
+  #firebasecore
+  firebase_core: ^2.20.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

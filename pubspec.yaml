@@ -1,6 +1,6 @@
 name: chulla_cash
-description: "A new Flutter project."
-publish_to: 'none'
+description: "The only app that gets your money into shape Manage money on the go in the app"
+publish_to: 'Playstore and Appstore'
 version: 0.1.0
 
 environment:
@@ -9,11 +9,30 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  #splash screen
+  flutter_native_splash: ^2.4.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  #icons
+  flutter_launcher_icons: ^0.14.2
+
+#icons
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "lib/assets/icons/icon.jpg"
+  min_sdk_android: 21
+
+#splash screen
+flutter_native_splash:
+  image: lib/assets/icons/icon.jpg
+  color: "#FFFFFF"
+  fullscreen: true
 
 flutter:
   uses-material-design: true
+  assets:
+    - lib/assets/icons/

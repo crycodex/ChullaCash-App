@@ -13,12 +13,22 @@ dependencies:
   flutter_native_splash: ^2.4.0
   #firebasecore
   firebase_core: ^2.20.0
+  #firebase auth
+  firebase_auth: ^4.20.0
+  #firebase storage
+  firebase_storage: ^11.2.0
+  #firebase firestore
+  cloud_firestore: ^4.10.0
+  #getX
+  get: ^4.6.6
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
   #icons
   flutter_launcher_icons: ^0.14.2
+
 
 #icons
 flutter_launcher_icons:

@@ -11,7 +11,7 @@ class AnimatedWavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white
+      ..color = AppColors.background
       ..style = PaintingStyle.fill;
 
     final path = Path();
@@ -121,7 +121,7 @@ class WelcomePage extends StatelessWidget {
                 height: 120,
                 width: 120,
                 child: Image.asset(
-                  'lib/assets/icons/icon.jpg',
+                  'lib/assets/icons/ icon_removebg.png',
                   fit: BoxFit.contain,
                 ),
               ),

@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
+import 'dart:math' as math;
 
-// Curva personalizada
-class WavePainter extends CustomPainter {
+// Curva personalizada animada
+class AnimatedWavePainter extends CustomPainter {
+  final Animation<double> animation;
+
+  AnimatedWavePainter(this.animation) : super(repaint: animation);
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -13,18 +18,21 @@ class WavePainter extends CustomPainter {
     path.moveTo(0, 0);
     path.lineTo(0, size.height * 0.65);
 
+    // Animación de la curva
+    final animValue = math.sin(animation.value * 2 * math.pi) * 0.01;
+
     // Primera curva (superior)
     path.quadraticBezierTo(
-      size.width * 0.25,
-      size.height * 0.45,
+      size.width * (0.25 + animValue),
+      size.height * (0.45 - animValue),
       size.width * 0.5,
       size.height * 0.65,
     );
 
     // Segunda curva (inferior)
     path.quadraticBezierTo(
-      size.width * 0.75,
-      size.height * 0.85,
+      size.width * (0.75 - animValue),
+      size.height * (0.85 + animValue),
       size.width,
       size.height * 0.65,
     );
@@ -36,7 +44,44 @@ class WavePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
+class AnimatedWave extends StatefulWidget {
+  final double height;
+
+  const AnimatedWave({super.key, required this.height});
+
+  @override
+  State<AnimatedWave> createState() => _AnimatedWaveState();
+}
+
+class _AnimatedWaveState extends State<AnimatedWave>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 3),
+      vsync: this,
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: AnimatedWavePainter(_controller),
+      size: Size(double.infinity, widget.height),
+    );
+  }
 }
 
 class WelcomePage extends StatelessWidget {
@@ -60,15 +105,12 @@ class WelcomePage extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            // Curva superior
+            // Curva superior animada
             Positioned(
               top: 0,
               left: 0,
               right: 0,
-              height: size.height * 0.4,
-              child: CustomPaint(
-                painter: WavePainter(),
-              ),
+              child: AnimatedWave(height: size.height * 0.4),
             ),
 
             // Logo sobre la curva
@@ -137,8 +179,8 @@ class WelcomePage extends StatelessWidget {
                           // TODO: Implementar navegación a login
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: const Color(0xFF1A237E),
+                          backgroundColor: AppColors.primaryBlue,
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -181,6 +223,7 @@ class WelcomePage extends StatelessWidget {
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline,
+                              color: AppColors.primaryBlue,
                             ),
                           ),
                         ),

@@ -3,6 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:get/get.dart';
 import 'presentation/routes/routes.dart';
+//theme
+import 'presentation/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +21,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
       initialRoute: Routes.welcome,
       getPages: [
         GetPage(name: Routes.welcome, page: () => Pages.welcome),

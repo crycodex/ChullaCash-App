@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/app_colors.dart';
 
 // Curva personalizada
 class WavePainter extends CustomPainter {
@@ -47,13 +48,13 @@ class WelcomePage extends StatelessWidget {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF8BC34A), // Verde principal
-              Color(0xFF689F38), // Verde más oscuro
+              AppColors.primaryGreen,
+              AppColors.primaryGreenDark,
             ],
           ),
         ),
@@ -73,7 +74,7 @@ class WelcomePage extends StatelessWidget {
             // Logo sobre la curva
             Positioned(
               top: 50,
-              left: 24,
+              left: (size.width - 120) / 2, // Centrado horizontalmente
               child: SizedBox(
                 height: 120,
                 width: 120,
@@ -90,7 +91,7 @@ class WelcomePage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Spacer(),
+                    SizedBox(height: size.height * 0.35),
 
                     // Título principal con estilo mejorado
                     const Text(
@@ -98,16 +99,9 @@ class WelcomePage extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        height: 1.2,
-                        shadows: [
-                          Shadow(
-                            offset: Offset(0, 2),
-                            blurRadius: 4,
-                            color: Color.fromRGBO(0, 0, 0, 0.25),
-                          ),
-                        ],
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primaryBlue,
+                        height: 1,
                       ),
                     ),
 
@@ -124,7 +118,7 @@ class WelcomePage extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 150),
 
                     // Botón de inicio de sesión con diseño mejorado
                     Container(

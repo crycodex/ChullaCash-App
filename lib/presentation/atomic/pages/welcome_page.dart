@@ -1,103 +1,205 @@
 import 'package:flutter/material.dart';
 
+// Curva personalizada
+class WavePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    path.moveTo(0, 0);
+    path.lineTo(0, size.height * 0.65);
+
+    // Primera curva (superior)
+    path.quadraticBezierTo(
+      size.width * 0.25,
+      size.height * 0.45,
+      size.width * 0.5,
+      size.height * 0.65,
+    );
+
+    // Segunda curva (inferior)
+    path.quadraticBezierTo(
+      size.width * 0.75,
+      size.height * 0.85,
+      size.width,
+      size.height * 0.65,
+    );
+
+    path.lineTo(size.width, 0);
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Logo en la parte superior
-              Align(
-                alignment: Alignment.topLeft,
-                child: SizedBox(
-                  height: 50,
-                  child: Image.asset(
-                    'lib/assets/icons/icon.jpg',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-
-              const Spacer(),
-
-              // Título principal
-              const Text(
-                'Lleva el control de tu dinero sin esfuerzo',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A237E), // Azul oscuro
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Texto descriptivo
-              const Text(
-                'Gestiona tus finanzas fácilmente con nuestra interfaz intuitiva y amigable. Establece metas financieras, controla tu presupuesto y haz un seguimiento de tus gastos en un solo lugar.',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black87,
-                  height: 1.5,
-                ),
-              ),
-
-              const Spacer(),
-
-              // Botón de inicio de sesión
-              ElevatedButton(
-                onPressed: () {
-                  // TODO: Implementar navegación a login
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: const Color(0xFF1A237E),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  'Iniciar Sesión',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Texto de registro
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'No tienes una cuenta? ',
-                    style: TextStyle(color: Colors.black87),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      // TODO: Implementar navegación a registro
-                    },
-                    child: const Text(
-                      'Regístrate Gratis!',
-                      style: TextStyle(
-                        color: Color(0xFF1A237E),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF8BC34A), // Verde principal
+              Color(0xFF689F38), // Verde más oscuro
             ],
           ),
         ),
+        child: Stack(
+          children: [
+            // Curva superior
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              height: size.height * 0.4,
+              child: CustomPaint(
+                painter: WavePainter(),
+              ),
+            ),
+
+            // Logo sobre la curva
+            Positioned(
+              top: 50,
+              left: 24,
+              child: SizedBox(
+                height: 120,
+                width: 120,
+                child: Image.asset(
+                  'lib/assets/icons/icon.jpg',
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Spacer(),
+
+                    // Título principal con estilo mejorado
+                    const Text(
+                      'Lleva el control de tu dinero sin esfuerzo',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        height: 1.2,
+                        shadows: [
+                          Shadow(
+                            offset: Offset(0, 2),
+                            blurRadius: 4,
+                            color: Color.fromRGBO(0, 0, 0, 0.25),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Texto descriptivo con mejor contraste
+                    const Text(
+                      'Gestiona tus finanzas fácilmente con nuestra interfaz intuitiva y amigable. Establece metas financieras, controla tu presupuesto y haz un seguimiento de tus gastos en un solo lugar.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        height: 1.5,
+                      ),
+                    ),
+
+                    const SizedBox(height: 40),
+
+                    // Botón de inicio de sesión con diseño mejorado
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // TODO: Implementar navegación a login
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: const Color(0xFF1A237E),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Text(
+                          'Iniciar Sesión',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Texto de registro con mejor contraste
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          '¿No tienes una cuenta? ',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            // TODO: Implementar navegación a registro
+                          },
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text(
+                            '¡Regístrate Gratis!',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
-      backgroundColor: const Color(0xFF8BC34A), // Color verde de fondo
     );
   }
 }

@@ -1,4 +1,3 @@
-import 'package:get/get.dart';
 //welcome page
 import '../atomic/pages/welcome_page.dart';
 

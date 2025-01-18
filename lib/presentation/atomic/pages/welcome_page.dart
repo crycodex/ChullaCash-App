@@ -154,13 +154,13 @@ class WelcomePage extends StatelessWidget {
                       'Gestiona tus finanzas fácilmente con nuestra interfaz intuitiva y amigable. Establece metas financieras, controla tu presupuesto y haz un seguimiento de tus gastos en un solo lugar.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 18,
                         color: Colors.white,
                         height: 1.5,
                       ),
                     ),
 
-                    const SizedBox(height: 150),
+                    const SizedBox(height: 120),
 
                     // Botón de inicio de sesión con diseño mejorado
                     Container(

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import 'dart:math' as math;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+//idioma
+import 'package:provider/provider.dart';
+import '../../../change_notifier.dart';
 
 // Curva personalizada animada
 class AnimatedWavePainter extends CustomPainter {
@@ -127,6 +131,56 @@ class WelcomePage extends StatelessWidget {
               ),
             ),
 
+            // Botón de idioma
+            Positioned(
+              top: 40,
+              right: 20,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: PopupMenuButton<Locale>(
+                  icon: Icon(Icons.language,
+                      color: AppColors.primaryBlue, size: 32),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  onSelected: (Locale locale) {
+                    final provider =
+                        Provider.of<LocaleProvider>(context, listen: false);
+                    provider.setLocale(locale);
+                  },
+                  itemBuilder: (BuildContext context) => [
+                    PopupMenuItem(
+                      value: const Locale('es'),
+                      child: Row(
+                        children: const [
+                          Text('🇪🇸  Español', style: TextStyle(fontSize: 16)),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: const Locale('en'),
+                      child: Row(
+                        children: const [
+                          Text('🇺🇸  English', style: TextStyle(fontSize: 16)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
             SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -136,8 +190,8 @@ class WelcomePage extends StatelessWidget {
                     SizedBox(height: size.height * 0.35),
 
                     // Título principal con estilo mejorado
-                    const Text(
-                      'Lleva el control de tu dinero sin esfuerzo',
+                    Text(
+                      AppLocalizations.of(context)!.welcomeTitle,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 32,
@@ -150,8 +204,8 @@ class WelcomePage extends StatelessWidget {
                     const SizedBox(height: 24),
 
                     // Texto descriptivo con mejor contraste
-                    const Text(
-                      'Gestiona tus finanzas fácilmente con nuestra interfaz intuitiva y amigable. Establece metas financieras, controla tu presupuesto y haz un seguimiento de tus gastos en un solo lugar.',
+                    Text(
+                      AppLocalizations.of(context)!.welcomeDescription,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 18,

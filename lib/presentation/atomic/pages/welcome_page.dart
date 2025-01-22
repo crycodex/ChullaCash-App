@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import 'dart:math' as math;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 //idioma
 import 'package:provider/provider.dart';
 import '../../../change_notifier.dart';
+
+//controllers
+import 'package:get/get.dart';
 
 // Curva personalizada animada
 class AnimatedWavePainter extends CustomPainter {
@@ -230,7 +234,7 @@ class WelcomePage extends StatelessWidget {
                       ),
                       child: ElevatedButton(
                         onPressed: () {
-                          // TODO: Implementar navegación a login
+                          Get.toNamed('/login');
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryBlue,

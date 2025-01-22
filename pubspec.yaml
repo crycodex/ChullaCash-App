@@ -56,3 +56,6 @@ flutter:
   assets:
     - lib/assets/icons/
     - lib/assets/icons/icon_removebg.png
+    #img login
+    - lib/assets/icons/others/apple.png
+    - lib/assets/icons/others/googleIcon.png

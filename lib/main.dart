@@ -31,24 +31,29 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      locale: Provider.of<LocaleProvider>(context).locale,
-      initialRoute: Routes.welcome,
-      getPages: [
-        GetPage(name: Routes.welcome, page: () => Pages.welcome),
-      ],
-      localizationsDelegates: [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: [
-        Locale('es', 'ES'),
-        Locale('en', 'US'),
-      ],
+    return Consumer<LocaleProvider>(
+      builder: (context, localeProvider, child) {
+        return GetMaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          locale: localeProvider.locale,
+          fallbackLocale: const Locale('es'),
+          initialRoute: Routes.welcome,
+          getPages: [
+            GetPage(name: Routes.welcome, page: () => Pages.welcome),
+          ],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('es'),
+            Locale('en'),
+          ],
+        );
+      },
     );
   }
 }

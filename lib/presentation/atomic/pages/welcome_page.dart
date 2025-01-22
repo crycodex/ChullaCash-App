@@ -125,7 +125,7 @@ class WelcomePage extends StatelessWidget {
                 height: 120,
                 width: 120,
                 child: Image.asset(
-                  'lib/assets/icons/ icon_removebg.png',
+                  'lib/assets/icons/icon_removebg.png',
                   fit: BoxFit.contain,
                 ),
               ),
@@ -241,9 +241,9 @@ class WelcomePage extends StatelessWidget {
                           ),
                           elevation: 0,
                         ),
-                        child: const Text(
-                          'Iniciar Sesión',
-                          style: TextStyle(
+                        child: Text(
+                          AppLocalizations.of(context)!.welcomeButton,
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -257,9 +257,9 @@ class WelcomePage extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          '¿No tienes una cuenta? ',
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context)!.welcomeNoAccount,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
                           ),
@@ -271,9 +271,9 @@ class WelcomePage extends StatelessWidget {
                           style: TextButton.styleFrom(
                             foregroundColor: Colors.white,
                           ),
-                          child: const Text(
-                            '¡Regístrate Gratis!',
-                            style: TextStyle(
+                          child: Text(
+                            AppLocalizations.of(context)!.welcomeRegister,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               decoration: TextDecoration.underline,

@@ -311,28 +311,75 @@ class WelcomePage extends StatelessWidget {
   }
 
   Widget _buildFloatingCard(BuildContext context, {required Widget child}) {
-    return GestureDetector(
-      onTap: () => Get.find<AuthController>().closeAll(),
-      child: Container(
-        color: Colors.black54,
-        child: Center(
-          child: GestureDetector(
-            onTap: () {}, // Evita que el tap se propague al fondo
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 10,
-                    spreadRadius: 5,
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+      tween: Tween(begin: 1.0, end: 0.0),
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, MediaQuery.of(context).size.height * value * 0.3),
+          child: child,
+        );
+      },
+      child: GestureDetector(
+        onTap: () => Get.find<AuthController>().closeAll(),
+        child: Container(
+          color: Colors.black38,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              GestureDetector(
+                onTap: () {}, // Evita que el tap se propague al fondo
+                onVerticalDragUpdate: (details) {
+                  // Si el usuario desliza hacia abajo más de 50 pixels
+                  if (details.delta.dy > 0 && details.primaryDelta! > 0.5) {
+                    Get.find<AuthController>().closeAll();
+                  }
+                },
+                child: Container(
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                        spreadRadius: 5,
+                      ),
+                    ],
                   ),
-                ],
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Indicador de arrastre
+                      GestureDetector(
+                        onVerticalDragUpdate: (details) {
+                          // Si el usuario desliza hacia abajo más de 50 pixels
+                          if (details.delta.dy > 0 &&
+                              details.primaryDelta! > 0.5) {
+                            Get.find<AuthController>().closeAll();
+                          }
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(vertical: 12),
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
+                      child,
+                    ],
+                  ),
+                ),
               ),
-              child: child,
-            ),
+            ],
           ),
         ),
       ),

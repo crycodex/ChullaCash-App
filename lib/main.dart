@@ -42,6 +42,7 @@ class MainApp extends StatelessWidget {
           getPages: [
             GetPage(name: Routes.welcome, page: () => Pages.welcome),
             GetPage(name: Routes.login, page: () => Pages.login),
+            GetPage(name: Routes.register, page: () => Pages.register),
           ],
           localizationsDelegates: const [
             AppLocalizations.delegate,

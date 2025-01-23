@@ -9,6 +9,9 @@ import '../../../change_notifier.dart';
 
 //controllers
 import 'package:get/get.dart';
+import '../../controllers/Login/auth_controller.dart';
+import './Login/content/login_content.dart';
+import './Login/content/register_content.dart';
 
 // Curva personalizada animada
 class AnimatedWavePainter extends CustomPainter {
@@ -98,201 +101,239 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final authController = Get.put(AuthController());
 
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppColors.primaryGreen,
-              AppColors.primaryGreenDark,
-            ],
-          ),
-        ),
-        child: Stack(
-          children: [
-            // Curva superior animada
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: AnimatedWave(height: size.height * 0.4),
-            ),
-
-            // Logo sobre la curva
-            Positioned(
-              top: 50,
-              left: (size.width - 120) / 2, // Centrado horizontalmente
-              child: SizedBox(
-                height: 120,
-                width: 120,
-                child: Image.asset(
-                  'lib/assets/icons/icon_removebg.png',
-                  fit: BoxFit.contain,
-                ),
+      body: Stack(
+        children: [
+          // Fondo con gradiente
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppColors.primaryGreen,
+                  AppColors.primaryGreenDark,
+                ],
               ),
             ),
-
-            // Botón de idioma
-            Positioned(
-              top: 40,
-              right: 20,
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+            child: Stack(
+              children: [
+                // Curva superior animada
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: AnimatedWave(height: size.height * 0.4),
                 ),
-                child: PopupMenuButton<Locale>(
-                  icon: Icon(Icons.language,
-                      color: AppColors.primaryBlue, size: 32),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+
+                // Logo sobre la curva
+                Positioned(
+                  top: 50,
+                  left: (size.width - 120) / 2,
+                  child: SizedBox(
+                    height: 120,
+                    width: 120,
+                    child: Image.asset(
+                      'lib/assets/icons/icon_removebg.png',
+                      fit: BoxFit.contain,
+                    ),
                   ),
-                  onSelected: (Locale locale) {
-                    final provider =
-                        Provider.of<LocaleProvider>(context, listen: false);
-                    provider.setLocale(locale);
-                  },
-                  itemBuilder: (BuildContext context) => [
-                    PopupMenuItem(
-                      value: const Locale('es'),
-                      child: Row(
-                        children: const [
-                          Text('🇪🇸  Español', style: TextStyle(fontSize: 16)),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: const Locale('en'),
-                      child: Row(
-                        children: const [
-                          Text('🇺🇸  English', style: TextStyle(fontSize: 16)),
-                        ],
-                      ),
-                    ),
-                  ],
                 ),
-              ),
-            ),
 
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(height: size.height * 0.35),
-
-                    // Título principal con estilo mejorado
-                    Text(
-                      AppLocalizations.of(context)!.welcomeTitle,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.primaryBlue,
-                        height: 1,
-                      ),
+                // Botón de idioma
+                Positioned(
+                  top: 40,
+                  right: 20,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-
-                    const SizedBox(height: 24),
-
-                    // Texto descriptivo con mejor contraste
-                    Text(
-                      AppLocalizations.of(context)!.welcomeDescription,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                        height: 1.5,
-                      ),
-                    ),
-
-                    const SizedBox(height: 120),
-
-                    // Botón de inicio de sesión con diseño mejorado
-                    Container(
-                      decoration: BoxDecoration(
+                    child: PopupMenuButton<Locale>(
+                      icon: Icon(Icons.language,
+                          color: AppColors.primaryBlue, size: 32),
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
                       ),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Get.toNamed('/login');
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryBlue,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: Text(
-                          AppLocalizations.of(context)!.welcomeButton,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                      onSelected: (Locale locale) {
+                        final provider =
+                            Provider.of<LocaleProvider>(context, listen: false);
+                        provider.setLocale(locale);
+                      },
+                      itemBuilder: (BuildContext context) => [
+                        PopupMenuItem(
+                          value: const Locale('es'),
+                          child: Row(
+                            children: const [
+                              Text('🇪🇸  Español',
+                                  style: TextStyle(fontSize: 16)),
+                            ],
                           ),
                         ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Texto de registro con mejor contraste
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)!.welcomeNoAccount,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            // TODO: Implementar navegación a registro
-                          },
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.white,
-                          ),
-                          child: Text(
-                            AppLocalizations.of(context)!.welcomeRegister,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
-                              color: AppColors.primaryBlue,
-                            ),
+                        PopupMenuItem(
+                          value: const Locale('en'),
+                          child: Row(
+                            children: const [
+                              Text('🇺🇸  English',
+                                  style: TextStyle(fontSize: 16)),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                  ],
+                  ),
                 ),
-              ),
+
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(height: size.height * 0.35),
+                        Text(
+                          AppLocalizations.of(context)!.welcomeTitle,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primaryBlue,
+                            height: 1,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          AppLocalizations.of(context)!.welcomeDescription,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                            height: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 120),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () => authController.toggleLogin(),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryBlue,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: Text(
+                              AppLocalizations.of(context)!.welcomeButton,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              AppLocalizations.of(context)!.welcomeNoAccount,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => authController.toggleRegister(),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.white,
+                              ),
+                              child: Text(
+                                AppLocalizations.of(context)!.welcomeRegister,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                  color: AppColors.primaryBlue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
+
+          // Cards flotantes
+          Obx(() {
+            if (authController.showLogin.value) {
+              return _buildFloatingCard(
+                context,
+                child: LoginContent(onClose: authController.closeAll),
+              );
+            }
+            if (authController.showRegister.value) {
+              return _buildFloatingCard(
+                context,
+                child: RegisterContent(onClose: authController.closeAll),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFloatingCard(BuildContext context, {required Widget child}) {
+    return GestureDetector(
+      onTap: () => Get.find<AuthController>().closeAll(),
+      child: Container(
+        color: Colors.black54,
+        child: Center(
+          child: GestureDetector(
+            onTap: () {}, // Evita que el tap se propague al fondo
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 10,
+                    spreadRadius: 5,
+                  ),
+                ],
+              ),
+              child: child,
+            ),
+          ),
         ),
       ),
     );

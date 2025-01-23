@@ -7,7 +7,7 @@
     "@welcomeDescription": {
         "description": "Descripción de la página de bienvenida"
     },
-    "welcomeButton": "Iniciar Sesión",
+    "welcomeButton": "Empezar",
     "@welcomeButton": {
         "description": "Texto del botón de inicio de sesión"
     },

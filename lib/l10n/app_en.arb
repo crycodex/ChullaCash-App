@@ -7,7 +7,7 @@
     "@welcomeDescription": {
         "description": "Welcome page description"
     },
-    "welcomeButton": "Sign In",
+    "welcomeButton": "Start",
     "@welcomeButton": {
         "description": "Sign in button text"
     },

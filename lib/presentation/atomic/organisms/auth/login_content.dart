@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../theme/app_colors.dart';
 import 'package:get/get.dart';
-import '../../../../controllers/Login/auth_controller.dart';
+import '.../../../../../theme/app_colors.dart';
+import '.../../../../../controllers/Login/auth_controller.dart';
 
 class LoginContent extends StatefulWidget {
   final VoidCallback onClose;
@@ -18,7 +18,7 @@ class _LoginContentState extends State<LoginContent> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -101,7 +101,10 @@ class _LoginContentState extends State<LoginContent> {
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
-              onPressed: () {},
+              onPressed: () {
+                final controller = Get.find<AuthController>();
+                controller.toggleForgotPassword();
+              },
               child: Text(
                 '¿Olvidaste tu contraseña?',
                 style: TextStyle(

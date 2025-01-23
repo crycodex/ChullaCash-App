@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../theme/app_colors.dart';
+import '../../../theme/app_colors.dart';
 import 'package:get/get.dart';
-import '../../../../controllers/Login/auth_controller.dart';
+import '../../../controllers/Login/auth_controller.dart';
 
 class RegisterContent extends StatefulWidget {
   final VoidCallback onClose;

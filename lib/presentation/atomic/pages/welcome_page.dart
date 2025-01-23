@@ -10,8 +10,9 @@ import '../../../change_notifier.dart';
 //controllers
 import 'package:get/get.dart';
 import '../../controllers/Login/auth_controller.dart';
-import './Login/content/login_content.dart';
-import './Login/content/register_content.dart';
+import '../organisms/auth/login_content.dart';
+import '../organisms/auth/register_content.dart';
+import '../organisms/auth/forgot_password_content.dart';
 import '../molecules/Login/bottom_sheet/custom_bottom_sheet.dart';
 
 // Curva personalizada animada
@@ -302,6 +303,12 @@ class WelcomePage extends StatelessWidget {
               return CustomBottomSheet(
                 onClose: authController.closeAll,
                 child: RegisterContent(onClose: authController.closeAll),
+              );
+            }
+            if (authController.showForgotPassword.value) {
+              return CustomBottomSheet(
+                onClose: authController.closeAll,
+                child: ForgotPasswordContent(onClose: authController.closeAll),
               );
             }
             return const SizedBox.shrink();

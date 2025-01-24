@@ -21,13 +21,20 @@ dependencies:
   cloud_firestore: ^4.10.0
   #getX
   get: ^4.6.6
-  
+  #idioma
+  intl: 0.19.0
+  #flutter localizations
+  flutter_localizations:
+    sdk: flutter
+  provider: ^6.1.2
+    
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
   #icons
   flutter_launcher_icons: ^0.14.2
+  flutter_gen_runner: ^5.8.0
 
 
 #icons
@@ -44,6 +51,11 @@ flutter_native_splash:
   fullscreen: true
 
 flutter:
+  generate: true
   uses-material-design: true
   assets:
     - lib/assets/icons/
+    - lib/assets/icons/icon_removebg.png
+    #img login
+    - lib/assets/icons/others/apple.png
+    - lib/assets/icons/others/googleIcon.png

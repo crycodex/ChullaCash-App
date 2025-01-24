@@ -1,0 +1,22 @@
+{
+    "welcomeTitle": "Take control of your money effortlessly",
+    "@welcomeTitle": {
+        "description": "Welcome page title"
+    },
+    "welcomeDescription": "Manage your finances easily with our intuitive and friendly interface. Set financial goals, control your budget and track your expenses in one place.",
+    "@welcomeDescription": {
+        "description": "Welcome page description"
+    },
+    "welcomeButton": "Start",
+    "@welcomeButton": {
+        "description": "Sign in button text"
+    },
+    "welcomeNoAccount": "Don't have an account?",
+    "@welcomeNoAccount": {
+        "description": "Text for users without account"
+    },
+    "welcomeRegister": "Register for Free!",
+    "@welcomeRegister": {
+        "description": "Register button text"
+    }
+}

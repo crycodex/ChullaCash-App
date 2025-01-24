@@ -39,9 +39,7 @@ class MainApp extends StatelessWidget {
           locale: localeProvider.locale,
           fallbackLocale: const Locale('es'),
           initialRoute: Routes.welcome,
-          getPages: [
-            GetPage(name: Routes.welcome, page: () => Pages.welcome),
-          ],
+          getPages: Routes.routes,
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,

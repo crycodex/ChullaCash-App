@@ -25,6 +25,7 @@ class _ForgotPasswordContentState extends State<ForgotPasswordContent> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<AuthController>();
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       child: Column(
@@ -63,29 +64,17 @@ class _ForgotPasswordContentState extends State<ForgotPasswordContent> {
           CustomButton(
             text: 'Enviar instrucciones',
             onPressed: () {
-              // TODO: Implementar lógica de recuperación
-              if (_emailController.text.isNotEmpty) {
-                // Mostrar mensaje de éxito
-                Get.snackbar(
-                  'Correo enviado',
-                  'Se han enviado las instrucciones a tu correo electrónico',
-                  backgroundColor: AppColors.primaryGreen.withOpacity(0.1),
-                  colorText: AppColors.primaryGreen,
-                  snackPosition: SnackPosition.BOTTOM,
-                  margin: const EdgeInsets.all(20),
-                );
-                widget.onClose();
-              } else {
-                // Mostrar error
-                Get.snackbar(
-                  'Error',
-                  'Por favor ingresa un correo electrónico válido',
-                  backgroundColor: Colors.red.withOpacity(0.1),
-                  colorText: Colors.red,
-                  snackPosition: SnackPosition.BOTTOM,
-                  margin: const EdgeInsets.all(20),
-                );
-              }
+              controller.recoverPassword(
+                email: _emailController.text,
+                onSuccess: () {
+                  Get.snackbar('Correo de recuperación enviado',
+                      'Se ha enviado un correo de recuperación a su correo electrónico.');
+                },
+                onError: (error) {
+                  Get.snackbar('Error', error,
+                      backgroundColor: Colors.red, colorText: Colors.white);
+                },
+              );
             },
           ),
 
@@ -101,7 +90,6 @@ class _ForgotPasswordContentState extends State<ForgotPasswordContent> {
               ),
               TextButton(
                 onPressed: () {
-                  final controller = Get.find<AuthController>();
                   controller.toggleLogin();
                 },
                 child: Text(

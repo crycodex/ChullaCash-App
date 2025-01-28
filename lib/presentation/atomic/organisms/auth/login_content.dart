@@ -38,22 +38,23 @@ class _LoginContentState extends State<LoginContent> {
     required Function onSuccess,
     required Function(String) onError,
   }) async {
-    print('LoginContent: Iniciando login con email: $email'); // Debug log
+    debugPrint('LoginContent: Iniciando login con email: $email');
     try {
       await _authController.login(
         email: email,
         password: password,
         onSuccess: () {
-          print('LoginContent: Login exitoso'); // Debug log
+          debugPrint('LoginContent: Login exitoso, navegando a home');
+          Get.offAllNamed('/home');
           onSuccess();
         },
         onError: (error) {
-          print('LoginContent: Error en login - $error'); // Debug log
+          debugPrint('LoginContent: Error en login - $error');
           onError(error);
         },
       );
     } catch (e) {
-      print('LoginContent: Error inesperado - $e'); // Debug log
+      debugPrint('LoginContent: Error inesperado - $e');
       onError(e.toString());
     }
   }
@@ -103,8 +104,7 @@ class _LoginContentState extends State<LoginContent> {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () {
-                final controller = Get.find<AuthController>();
-                controller.toggleForgotPassword();
+                _authController.toggleForgotPassword();
               },
               child: Text(
                 '¿Olvidaste tu contraseña?',
@@ -199,8 +199,7 @@ class _LoginContentState extends State<LoginContent> {
               ),
               TextButton(
                 onPressed: () {
-                  final controller = Get.find<AuthController>();
-                  controller.toggleRegister();
+                  _authController.toggleRegister();
                 },
                 child: Text(
                   'Regístrate',

@@ -1,32 +1,31 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class UserModel {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
   String name;
   String email;
   String theme;
-  String profilePicture;
+  String photoUrl;
   String language;
+  String userType;
 
   UserModel({
     required this.name,
     required this.email,
     required this.theme,
-    required this.profilePicture,
+    required this.photoUrl,
     required this.language,
+    required this.userType,
   });
 
-
-  //factory para crear un objeto UserModel a partir de un JSON
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      name: json['name'],
-      email: json['email'],
-      theme: json['theme'],
-      profilePicture: json['profilePicture'],
-      language: json['language'],
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      theme: json['theme'] ?? '',
+      photoUrl: json['photoUrl'] ?? '',
+      language: json['language'] ?? '',
+      userType: json['userType'] ?? '',
     );
   }
 }
+
+

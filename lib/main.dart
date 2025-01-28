@@ -12,22 +12,32 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'change_notifier.dart';
 //provider
 import 'package:provider/provider.dart';
+//firebase
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Verificar si hay un usuario autenticado
+  final User? currentUser = FirebaseAuth.instance.currentUser;
+  final String initialRoute =
+      currentUser?.emailVerified == true ? Routes.home : Routes.welcome;
+
   runApp(
     ChangeNotifierProvider(
       create: (context) => LocaleProvider(),
-      child: const MainApp(),
+      child: MainApp(initialRoute: initialRoute),
     ),
   );
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  final String initialRoute;
+
+  const MainApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +48,7 @@ class MainApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           locale: localeProvider.locale,
           fallbackLocale: const Locale('es'),
-          initialRoute: Routes.welcome,
+          initialRoute: initialRoute,
           getPages: Routes.routes,
           localizationsDelegates: const [
             AppLocalizations.delegate,

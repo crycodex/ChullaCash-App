@@ -70,15 +70,19 @@ class ProfileContent extends StatelessWidget {
             _SettingsItem(
               icon: Icons.language,
               title: 'Idioma',
-              trailing: 'Español',
+              trailing: const Text('Español'),
               onTap: () {},
             ),
-            _SettingsItem(
-              icon: Icons.dark_mode_outlined,
-              title: 'Tema',
-              trailing: 'Claro',
-              onTap: () {},
-            ),
+            Obx(() => _SettingsItem(
+                  icon: Icons.dark_mode_outlined,
+                  title: 'Tema oscuro',
+                  trailing: Switch(
+                    value: authController.isDarkMode.value,
+                    onChanged: (value) => authController.toggleTheme(),
+                    activeColor: AppColors.primaryGreen,
+                  ),
+                  onTap: () => authController.toggleTheme(),
+                )),
 
             const SizedBox(height: 24),
 
@@ -141,7 +145,7 @@ class _SectionTitle extends StatelessWidget {
 class _SettingsItem extends StatelessWidget {
   final IconData icon;
   final String title;
-  final String? trailing;
+  final Widget? trailing;
   final VoidCallback onTap;
 
   const _SettingsItem({
@@ -158,12 +162,7 @@ class _SettingsItem extends StatelessWidget {
       child: ListTile(
         leading: Icon(icon, color: AppColors.primaryGreen),
         title: Text(title),
-        trailing: trailing != null
-            ? Text(
-                trailing!,
-                style: const TextStyle(color: AppColors.textSecondary),
-              )
-            : const Icon(Icons.arrow_forward_ios, size: 16),
+        trailing: trailing ?? const Icon(Icons.arrow_forward_ios, size: 16),
         onTap: onTap,
       ),
     );

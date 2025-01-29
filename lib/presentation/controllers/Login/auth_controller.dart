@@ -13,6 +13,56 @@ class AuthController extends GetxController {
   final RxBool showLogin = false.obs;
   final RxBool showRegister = false.obs;
   final RxBool showForgotPassword = false.obs;
+  final RxBool isDarkMode = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _initializeAuth();
+  }
+
+  void _initializeAuth() async {
+    try {
+      final currentUser = _auth.currentUser;
+      if (currentUser != null) {
+        uid.value = currentUser.uid;
+        await _loadTheme();
+      }
+    } catch (e) {
+      debugPrint('Error al inicializar auth: $e');
+    }
+  }
+
+  Future<void> _loadTheme() async {
+    try {
+      if (uid.value.isEmpty) return;
+
+      final userDoc = await _firestore.collection('users').doc(uid.value).get();
+      if (userDoc.exists) {
+        final darkMode = userDoc.data()?['isDarkMode'];
+        isDarkMode.value = darkMode == true || darkMode == "true";
+        Get.changeThemeMode(
+            isDarkMode.value ? ThemeMode.dark : ThemeMode.light);
+      }
+    } catch (e) {
+      debugPrint('Error al cargar el tema: $e');
+    }
+  }
+
+  void toggleTheme() async {
+    try {
+      isDarkMode.value = !isDarkMode.value;
+      Get.changeThemeMode(isDarkMode.value ? ThemeMode.dark : ThemeMode.light);
+
+      if (uid.value.isNotEmpty) {
+        await _firestore.collection('users').doc(uid.value).update({
+          'isDarkMode': isDarkMode.value,
+        });
+      }
+    } catch (e) {
+      debugPrint('Error al cambiar el tema: $e');
+    }
+  }
 
   void toggleLogin() {
     showLogin.value = !showLogin.value;
@@ -159,6 +209,7 @@ class AuthController extends GetxController {
       'email': user.email?.toLowerCase(),
       'photoUrl': '',
       'userType': 'free',
+      'isDarkMode': false,
     });
   }
 

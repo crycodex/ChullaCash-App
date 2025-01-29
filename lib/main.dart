@@ -14,6 +14,7 @@ import 'change_notifier.dart';
 import 'package:provider/provider.dart';
 //firebase
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,23 +22,50 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Verificar si hay un usuario autenticado
+  // Verificar si hay un usuario autenticado y su tema
   final User? currentUser = FirebaseAuth.instance.currentUser;
-  final String initialRoute =
-      currentUser?.emailVerified == true ? Routes.home : Routes.welcome;
+  String initialRoute = Routes.welcome;
+  ThemeMode initialThemeMode = ThemeMode.light;
+
+  if (currentUser?.emailVerified == true) {
+    initialRoute = Routes.home;
+    // Cargar tema del usuario
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser?.uid)
+          .get();
+      if (userDoc.exists) {
+        final darkMode = userDoc.data()?['isDarkMode'];
+        initialThemeMode = (darkMode == true || darkMode == "true")
+            ? ThemeMode.dark
+            : ThemeMode.light;
+      }
+    } catch (e) {
+      debugPrint('Error al cargar el tema: $e');
+    }
+  }
 
   runApp(
     ChangeNotifierProvider(
       create: (context) => LocaleProvider(),
-      child: MainApp(initialRoute: initialRoute),
+      child: MainApp(
+        initialRoute: initialRoute,
+        initialThemeMode: initialThemeMode,
+      ),
     ),
   );
 }
 
 class MainApp extends StatelessWidget {
   final String initialRoute;
+  final ThemeMode initialThemeMode;
 
-  const MainApp({super.key, required this.initialRoute});
+  const MainApp({
+    super.key,
+    required this.initialRoute,
+    required this.initialThemeMode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +74,8 @@ class MainApp extends StatelessWidget {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: initialThemeMode,
           locale: localeProvider.locale,
           fallbackLocale: const Locale('es'),
           initialRoute: initialRoute,

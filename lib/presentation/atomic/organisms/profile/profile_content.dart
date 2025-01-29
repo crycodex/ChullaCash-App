@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_colors.dart';
-import '../atoms/buttons/custom_button.dart';
+import '../../../theme/app_colors.dart';
+import '../../atoms/buttons/custom_button.dart';
 
 class ProfileContent extends StatelessWidget {
   const ProfileContent({super.key});

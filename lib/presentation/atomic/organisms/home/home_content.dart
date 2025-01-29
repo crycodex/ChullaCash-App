@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_colors.dart';
+import '../../../theme/app_colors.dart';
 
 class HomeContent extends StatelessWidget {
   const HomeContent({super.key});
@@ -14,7 +14,7 @@ class HomeContent extends StatelessWidget {
           children: [
             // Welcome section
             const Text(
-              'Welcome back,',
+              'Bienvenido de nuevo,',
               style: TextStyle(
                 fontSize: 16,
                 color: AppColors.textSecondary,
@@ -29,7 +29,7 @@ class HomeContent extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            
+
             // Balance section
             Container(
               padding: const EdgeInsets.all(20),
@@ -64,14 +64,14 @@ class HomeContent extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Time period selector
                   Row(),
                 ],
               ),
             ),
             const SizedBox(height: 24),
-            
+
             // Recent transactions section
             const Text(
               'Transacciones recientes',
@@ -91,7 +91,8 @@ class HomeContent extends StatelessWidget {
                     child: ListTile(
                       leading: const CircleAvatar(
                         backgroundColor: AppColors.lightGray,
-                        child: Icon(Icons.payment, color: AppColors.primaryGreen),
+                        child:
+                            Icon(Icons.payment, color: AppColors.primaryGreen),
                       ),
                       title: Text(
                         'Transacción ${index + 1}',

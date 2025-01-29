@@ -321,4 +321,10 @@ class AuthController extends GetxController {
       onError(e.toString());
     }
   }
+
+  //logout
+  Future<void> logout() async {
+    await _auth.signOut();
+    Get.offAllNamed('/welcome');
+  }
 }

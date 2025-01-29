@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../theme/app_colors.dart';
 import '../../atoms/buttons/custom_button.dart';
+//controllers
+import '../../../controllers/Login/auth_controller.dart';
 
 class ProfileContent extends StatelessWidget {
   const ProfileContent({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final authController = Get.put(AuthController());
+
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -95,9 +100,13 @@ class ProfileContent extends StatelessWidget {
             // Logout Button
             CustomButton(
               text: 'Cerrar sesión',
-              onPressed: () {},
+              onPressed: () {
+                authController.logout();
+              },
               backgroundColor: Colors.red,
             ),
+
+            const SizedBox(height: 60),
           ],
         ),
       ),

@@ -18,7 +18,7 @@ class _HomePageState extends State<HomePage> {
   final PageController _pageController = PageController();
 
   final List<Widget> _pages = [
-    const HomeContent(),
+    HomeContent(),
     const WalletContent(),
     const RegisterContent(),
     const HistoryContent(),

@@ -9,6 +9,9 @@ class AppColors {
   //Colores Secundarios
   static const Color secondaryBlue = Color(0xFF3B7DDB);
   static const Color secondaryGreen = Color(0xFFB8E5AF);
+
+  //Colores mddo oscuro
+  static const Color darkSurface = Color(0xFF2D2D2D);
   // Colores neutros
   static const Color lightGray = Color(0xFFF2F2F2);
   static const Color darkGray = Color(0xFF181818);

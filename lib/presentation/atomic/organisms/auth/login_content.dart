@@ -167,7 +167,9 @@ class _LoginContentState extends State<LoginContent> {
               const SizedBox(width: 16),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    _authController.loginWithApple();
+                  },
                   icon: Image.asset(
                     'lib/assets/icons/others/apple.png',
                     height: 24,

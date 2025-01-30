@@ -1,12 +1,14 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-//google sign in
-import 'package:google_sign_in/google_sign_in.dart';
 //firebase
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 //models
 import '../../../data/models/user_model.dart';
+//google sign in
+import 'package:google_sign_in/google_sign_in.dart';
+//apple sign in
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 enum AuthStatus { checking, authenticated, unauthenticated, error }
 
@@ -406,6 +408,101 @@ class AuthController extends GetxController {
         //ir a la pantalla de home
         Get.offAllNamed('/home');
       }
+    }
+  }
+
+  //* Login con Apple
+  Future<void> loginWithApple() async {
+    try {
+      debugPrint('Iniciando login con Apple...');
+
+      // Verificar si el servicio está disponible
+      final isAvailable = await SignInWithApple.isAvailable();
+      if (!isAvailable) {
+        throw Exception(
+            'El inicio de sesión con Apple no está disponible en este dispositivo');
+      }
+
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      debugPrint('Credencial de Apple obtenida');
+
+      // Crear credencial de Firebase
+      final oAuthProvider = OAuthProvider('apple.com');
+      final authCredential = oAuthProvider.credential(
+        idToken: credential.identityToken,
+        accessToken: credential.authorizationCode,
+      );
+
+      // Iniciar sesión en Firebase
+      final userCredential = await _auth.signInWithCredential(authCredential);
+      final user = userCredential.user;
+
+      if (user == null) {
+        throw Exception('Error al iniciar sesión con Apple');
+      }
+
+      debugPrint('Usuario autenticado con Firebase');
+
+      // Verificar si el usuario existe en Firestore
+      final userDoc = await _firestore.collection('users').doc(user.uid).get();
+      if (!userDoc.exists) {
+        // Crear documento del usuario si no existe
+        await _createUserDocument(user);
+        debugPrint('Documento de usuario creado en Firestore');
+      }
+
+      // Actualizar datos observables
+      uid.value = user.uid;
+      email.value = user.email ?? '';
+      name.value = user.displayName ?? '';
+      profilePicture.value = user.photoURL ?? '';
+
+      debugPrint('Login con Apple exitoso');
+      Get.offAllNamed('/home');
+    } on SignInWithAppleAuthorizationException catch (e) {
+      String errorMessage;
+      switch (e.code) {
+        case AuthorizationErrorCode.canceled:
+          errorMessage = 'Inicio de sesión cancelado por el usuario';
+          break;
+        case AuthorizationErrorCode.failed:
+          errorMessage = 'Error de autenticación: ${e.message}';
+          break;
+        case AuthorizationErrorCode.invalidResponse:
+          errorMessage = 'Respuesta inválida del servidor de Apple';
+          break;
+        case AuthorizationErrorCode.notHandled:
+          errorMessage = 'La solicitud no pudo ser manejada';
+          break;
+        case AuthorizationErrorCode.unknown:
+          errorMessage = 'Error desconocido al iniciar sesión con Apple';
+          break;
+        default:
+          errorMessage = 'Error al iniciar sesión con Apple';
+      }
+      debugPrint('Error en login con Apple: $errorMessage');
+      Get.snackbar(
+        'Error',
+        errorMessage,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (e) {
+      debugPrint('Error inesperado en login con Apple: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo completar el inicio de sesión con Apple',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 }

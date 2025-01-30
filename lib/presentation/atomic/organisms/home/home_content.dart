@@ -57,7 +57,7 @@ class HomeContent extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                   color: isDarkMode
                                       ? Colors.white
-                                      : AppColors.lightGray,
+                                      : AppColors.textPrimary,
                                 ),
                               ));
                         },
@@ -73,8 +73,8 @@ class HomeContent extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: isDarkMode
-                      ? Colors.white
-                      : AppColors.darkSurface.withOpacity(0.8),
+                      ? AppColors.darkSurface.withOpacity(0.8)
+                      : Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
@@ -105,7 +105,7 @@ class HomeContent extends StatelessWidget {
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                         color:
-                            isDarkMode ? AppColors.textPrimary : Colors.white,
+                            isDarkMode ? Colors.white : AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -132,8 +132,8 @@ class HomeContent extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return Card(
                       color: isDarkMode
-                          ? Colors.white
-                          : AppColors.darkSurface.withOpacity(0.8),
+                          ? AppColors.darkSurface.withOpacity(0.8)
+                          : Colors.white,
                       margin: const EdgeInsets.only(bottom: 8),
                       child: ListTile(
                         leading: CircleAvatar(

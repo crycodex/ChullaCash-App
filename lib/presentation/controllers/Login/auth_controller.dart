@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+//google sign in
+import 'package:google_sign_in/google_sign_in.dart';
 //firebase
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -377,5 +379,33 @@ class AuthController extends GetxController {
   Future<void> logout() async {
     await _auth.signOut();
     Get.offAllNamed('/welcome');
+  }
+
+  //* Login con Google
+  Future<void> loginWithGoogle() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    if (googleUser != null) {
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
+      final User? user = userCredential.user;
+      if (user == null) {
+        throw Exception('Error al iniciar sesión con Google');
+      }
+
+      final userDoc = await _firestore.collection('users').doc(user.uid).get();
+      if (!userDoc.exists) {
+        await _createUserDocument(user);
+        //ir a la pantalla de home
+        Get.offAllNamed('/home');
+      }
+    }
   }
 }

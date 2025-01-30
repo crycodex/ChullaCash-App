@@ -143,7 +143,9 @@ class _LoginContentState extends State<LoginContent> {
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    _authController.loginWithGoogle();
+                  },
                   icon: Image.asset(
                     'lib/assets/icons/others/googleIcon.png',
                     height: 24,

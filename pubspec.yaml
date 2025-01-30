@@ -27,7 +27,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   provider: ^6.1.2
-    
+  #google sign in
+  google_sign_in: ^6.2.2
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

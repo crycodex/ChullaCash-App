@@ -1,14 +1,16 @@
+//get
+import 'package:get/get.dart';
 //welcome page
 import '../atomic/pages/welcome_page.dart';
-
-class Pages {
-  //welcome page
-  static const welcome = WelcomePage();
-
-}
+//home page
+import '../atomic/pages/home_page.dart';
 
 class Routes {
   //welcome page
-  static const welcome = '/welcome';
-  static const home = '/';
+  static const String welcome = '/welcome';
+  static const String home = '/home';
+  static final List<GetPage> routes = [
+    GetPage(name: Routes.welcome, page: () => WelcomePage()),
+    GetPage(name: Routes.home, page: () => HomePage()),
+  ];
 }

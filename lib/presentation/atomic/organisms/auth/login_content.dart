@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '.../../../../../theme/app_colors.dart';
-import '.../../../../../controllers/Login/auth_controller.dart';
+import '../../../theme/app_colors.dart';
+import '../../../controllers/Login/auth_controller.dart';
+//molecules
+import '../../molecules/Login/login_form.dart';
 
 class LoginContent extends StatefulWidget {
   final VoidCallback onClose;
@@ -13,7 +15,49 @@ class LoginContent extends StatefulWidget {
 }
 
 class _LoginContentState extends State<LoginContent> {
-  bool _obscureText = true;
+  //controllers
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final AuthController _authController = Get.find<AuthController>();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleLogin({
+    required String email,
+    required String password,
+    required Function onSuccess,
+    required Function(String) onError,
+  }) async {
+    debugPrint('LoginContent: Iniciando login con email: $email');
+    try {
+      await _authController.login(
+        email: email,
+        password: password,
+        onSuccess: () {
+          debugPrint('LoginContent: Login exitoso, navegando a home');
+          Get.offAllNamed('/home');
+          onSuccess();
+        },
+        onError: (error) {
+          debugPrint('LoginContent: Error en login - $error');
+          onError(error);
+        },
+      );
+    } catch (e) {
+      debugPrint('LoginContent: Error inesperado - $e');
+      onError(e.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,56 +87,14 @@ class _LoginContentState extends State<LoginContent> {
           ),
           const SizedBox(height: 24),
 
-          // Campo de correo
-          TextField(
-            style: TextStyle(color: AppColors.textPrimary),
-            decoration: InputDecoration(
-              labelText: 'Correo electrónico',
-              labelStyle: TextStyle(color: AppColors.textSecondary),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppColors.lightGray),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppColors.primaryBlue),
-              ),
-              filled: true,
-              fillColor: AppColors.surfaceLight,
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Campo de contraseña
-          TextField(
-            obscureText: _obscureText,
-            style: TextStyle(color: AppColors.textPrimary),
-            decoration: InputDecoration(
-              labelText: 'Contraseña',
-              labelStyle: TextStyle(color: AppColors.textSecondary),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppColors.lightGray),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppColors.primaryBlue),
-              ),
-              filled: true,
-              fillColor: AppColors.surfaceLight,
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscureText ? Icons.visibility_off : Icons.visibility,
-                  color: AppColors.textSecondary,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _obscureText = !_obscureText;
-                  });
-                },
-              ),
-            ),
+          //login form
+          LoginForm(
+            emailController: _emailController,
+            passwordController: _passwordController,
+            emailFocusNode: _emailFocusNode,
+            passwordFocusNode: _passwordFocusNode,
+            formKey: _formKey,
+            onSubmit: _handleLogin,
           ),
 
           const SizedBox(height: 8),
@@ -102,8 +104,7 @@ class _LoginContentState extends State<LoginContent> {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () {
-                final controller = Get.find<AuthController>();
-                controller.toggleForgotPassword();
+                _authController.toggleForgotPassword();
               },
               child: Text(
                 '¿Olvidaste tu contraseña?',
@@ -117,28 +118,6 @@ class _LoginContentState extends State<LoginContent> {
 
           const SizedBox(height: 24),
 
-          // Botón de Iniciar sesión
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryGreen,
-              foregroundColor: AppColors.textLight,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 0,
-            ),
-            child: const Text(
-              'Iniciar sesión',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 24),
           // O inicia sesión con
           Row(
             children: [
@@ -164,7 +143,9 @@ class _LoginContentState extends State<LoginContent> {
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    _authController.loginWithGoogle();
+                  },
                   icon: Image.asset(
                     'lib/assets/icons/others/googleIcon.png',
                     height: 24,
@@ -186,7 +167,9 @@ class _LoginContentState extends State<LoginContent> {
               const SizedBox(width: 16),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    _authController.loginWithApple();
+                  },
                   icon: Image.asset(
                     'lib/assets/icons/others/apple.png',
                     height: 24,
@@ -208,6 +191,8 @@ class _LoginContentState extends State<LoginContent> {
             ],
           ),
 
+          const SizedBox(height: 24),
+
           // Enlace de registro
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -218,8 +203,7 @@ class _LoginContentState extends State<LoginContent> {
               ),
               TextButton(
                 onPressed: () {
-                  final controller = Get.find<AuthController>();
-                  controller.toggleRegister();
+                  _authController.toggleRegister();
                 },
                 child: Text(
                   'Regístrate',

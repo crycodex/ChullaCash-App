@@ -12,22 +12,60 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'change_notifier.dart';
 //provider
 import 'package:provider/provider.dart';
+//firebase
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Verificar si hay un usuario autenticado y su tema
+  final User? currentUser = FirebaseAuth.instance.currentUser;
+  String initialRoute = Routes.welcome;
+  ThemeMode initialThemeMode = ThemeMode.light;
+
+  if (currentUser?.emailVerified == true) {
+    initialRoute = Routes.home;
+    // Cargar tema del usuario
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser?.uid)
+          .get();
+      if (userDoc.exists) {
+        final darkMode = userDoc.data()?['isDarkMode'];
+        initialThemeMode = (darkMode == true || darkMode == "true")
+            ? ThemeMode.dark
+            : ThemeMode.light;
+      }
+    } catch (e) {
+      debugPrint('Error al cargar el tema: $e');
+    }
+  }
+
   runApp(
     ChangeNotifierProvider(
       create: (context) => LocaleProvider(),
-      child: const MainApp(),
+      child: MainApp(
+        initialRoute: initialRoute,
+        initialThemeMode: initialThemeMode,
+      ),
     ),
   );
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  final String initialRoute;
+  final ThemeMode initialThemeMode;
+
+  const MainApp({
+    super.key,
+    required this.initialRoute,
+    required this.initialThemeMode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -36,12 +74,12 @@ class MainApp extends StatelessWidget {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: initialThemeMode,
           locale: localeProvider.locale,
           fallbackLocale: const Locale('es'),
-          initialRoute: Routes.welcome,
-          getPages: [
-            GetPage(name: Routes.welcome, page: () => Pages.welcome),
-          ],
+          initialRoute: initialRoute,
+          getPages: Routes.routes,
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,

@@ -4,11 +4,15 @@ import '../../../theme/app_colors.dart';
 import 'package:get/get.dart';
 //controllers
 import '../../../controllers/user_controller.dart';
+import '../../../controllers/finance_controller.dart';
+import '../../../controllers/movement_controller.dart';
 
 class HomeContent extends StatelessWidget {
   HomeContent({super.key});
 
   final UserController userController = Get.put(UserController());
+  final FinanceController financeController = Get.find<FinanceController>();
+  final MovementController movementController = Get.put(MovementController());
 
   Color _textColor(BuildContext context) {
     return userController.isDarkMode.value
@@ -99,15 +103,17 @@ class HomeContent extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      '\$43,323.44',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color:
-                            isDarkMode ? Colors.white : AppColors.textPrimary,
-                      ),
-                    ),
+                    //balance total
+                    Obx(() => Text(
+                          '\$${financeController.allTimeBalance.value.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode
+                                ? Colors.white
+                                : AppColors.textPrimary,
+                          ),
+                        )),
                     const SizedBox(height: 24),
                     // Time period selector
                     Row(),
@@ -127,50 +133,119 @@ class HomeContent extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Expanded(
-                child: ListView.builder(
-                  itemCount: 5,
-                  itemBuilder: (context, index) {
-                    return Card(
-                      color: isDarkMode
-                          ? AppColors.darkSurface.withOpacity(0.8)
-                          : Colors.white,
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: isDarkMode
-                              ? AppColors.primaryGreen.withOpacity(0.2)
-                              : AppColors.lightGray,
-                          child: Icon(Icons.payment,
-                              color: isDarkMode
-                                  ? AppColors.primaryGreen
-                                  : AppColors.primaryGreen),
-                        ),
-                        title: Text(
-                          'Movimiento ${index + 1}',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            color: _textColor(context),
-                          ),
-                        ),
-                        subtitle: Text('Hace 2 horas',
-                            style: TextStyle(
-                              color: isDarkMode
-                                  ? Colors.white70
-                                  : AppColors.textSecondary,
-                            )),
-                        trailing: Text(
-                          '\$50.00',
-                          style: TextStyle(
-                            color: isDarkMode
-                                ? Colors.white
-                                : AppColors.textPrimary,
-                            fontWeight: FontWeight.bold,
-                          ),
+                child: Obx(() {
+                  final movements = movementController.currentMonthMovements;
+                  if (movements.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No hay movimientos este mes',
+                        style: TextStyle(
+                          color: isDarkMode
+                              ? Colors.white70
+                              : AppColors.textSecondary,
                         ),
                       ),
                     );
-                  },
-                ),
+                  }
+                  return ListView.builder(
+                    itemCount: movements.length,
+                    itemBuilder: (context, index) {
+                      final movement = movements[index];
+                      final isIncome = movement['type'] == 'income';
+                      return Dismissible(
+                        key: Key(movement['id']),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 20.0),
+                          color: Colors.red,
+                          child: const Icon(
+                            Icons.delete,
+                            color: Colors.white,
+                          ),
+                        ),
+                        confirmDismiss: (direction) async {
+                          return await showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Confirmar eliminación'),
+                                content: const Text(
+                                    '¿Estás seguro de que quieres eliminar este movimiento?'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(false),
+                                    child: const Text('Cancelar'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(true),
+                                    child: const Text('Eliminar',
+                                        style: TextStyle(color: Colors.red)),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        onDismissed: (direction) {
+                          movementController.deleteMovement(movement['id']);
+                        },
+                        child: Card(
+                          color: isDarkMode
+                              ? AppColors.darkSurface.withOpacity(0.8)
+                              : Colors.white,
+                          margin: const EdgeInsets.only(bottom: 8),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: isDarkMode
+                                  ? (isIncome
+                                          ? AppColors.primaryGreen
+                                          : Colors.red)
+                                      .withOpacity(0.2)
+                                  : (isIncome
+                                          ? AppColors.primaryGreen
+                                          : Colors.red)
+                                      .withOpacity(0.1),
+                              child: Icon(
+                                isIncome ? Icons.add : Icons.remove,
+                                color: isIncome
+                                    ? AppColors.primaryGreen
+                                    : Colors.red,
+                              ),
+                            ),
+                            title: Text(
+                              movement['description'],
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: _textColor(context),
+                              ),
+                            ),
+                            subtitle: Text(
+                              movementController
+                                  .getTimeAgo(movement['timestamp']),
+                              style: TextStyle(
+                                color: isDarkMode
+                                    ? Colors.white70
+                                    : AppColors.textSecondary,
+                              ),
+                            ),
+                            trailing: Text(
+                              '${isIncome ? '+' : '-'}\$${movement['amount'].toStringAsFixed(2)}',
+                              style: TextStyle(
+                                color: isIncome
+                                    ? AppColors.primaryGreen
+                                    : Colors.red,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }),
               ),
             ],
           ),

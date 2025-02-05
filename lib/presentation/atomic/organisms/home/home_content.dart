@@ -11,7 +11,7 @@ class HomeContent extends StatelessWidget {
   HomeContent({super.key});
 
   final UserController userController = Get.put(UserController());
-  final FinanceController financeController = Get.find<FinanceController>();
+  final FinanceController financeController = Get.put(FinanceController());
   final MovementController movementController = Get.put(MovementController());
 
   Color _textColor(BuildContext context) {

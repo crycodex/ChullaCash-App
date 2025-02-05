@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../controllers/finance_controller.dart';
+
 class MovementController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -10,20 +11,19 @@ class MovementController extends GetxController {
   final RxList<Map<String, dynamic>> currentMonthMovements =
       <Map<String, dynamic>>[].obs;
 
+  final FinanceController _financeController = Get.find<FinanceController>();
+
   @override
   void onInit() {
     super.onInit();
-    loadCurrentMonthMovements();
+    final now = DateTime.now();
+    loadMovementsForMonth(now.year, now.month);
   }
 
-  Future<void> loadCurrentMonthMovements() async {
+  Future<void> loadMovementsForMonth(int year, int month) async {
     try {
       final userId = _auth.currentUser?.uid;
       if (userId == null) return;
-
-      final now = DateTime.now();
-      final year = now.year;
-      final month = now.month;
 
       final snapshot = await _firestore
           .collection('users')
@@ -34,18 +34,13 @@ class MovementController extends GetxController {
           .orderBy('timestamp', descending: true)
           .get();
 
-      currentMonthMovements.value =
-          snapshot.docs.where((doc) => doc.id != 'info').map((doc) {
-        final data = doc.data();
-        return {
-          'id': doc.id,
-          'type': data['type'],
-          'amount': data['amount'],
-          'description': data['description'],
-          'timestamp': (data['timestamp'] as Timestamp).toDate(),
-          'created_at': (data['created_at'] as Timestamp).toDate(),
-        };
-      }).toList();
+      currentMonthMovements.value = snapshot.docs
+          .where((doc) => doc.id != 'info')
+          .map((doc) => {
+                'id': doc.id,
+                ...doc.data(),
+              })
+          .toList();
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -56,7 +51,18 @@ class MovementController extends GetxController {
     }
   }
 
-  String getTimeAgo(DateTime date) {
+  String getTimeAgo(dynamic timestamp) {
+    if (timestamp == null) return '';
+
+    DateTime date;
+    if (timestamp is Timestamp) {
+      date = timestamp.toDate();
+    } else if (timestamp is DateTime) {
+      date = timestamp;
+    } else {
+      return '';
+    }
+
     final now = DateTime.now();
     final difference = now.difference(date);
 
@@ -93,8 +99,7 @@ class MovementController extends GetxController {
       currentMonthMovements.removeWhere((movement) => movement['id'] == id);
 
       // Actualizar el balance total
-      final financeController = Get.find<FinanceController>();
-      await financeController.getTotalBalance();
+      _financeController.getTotalBalance();
 
       Get.snackbar(
         'Éxito',

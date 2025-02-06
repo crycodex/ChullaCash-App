@@ -3,7 +3,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:get/get.dart';
 import '../../../controllers/movement_controller.dart';
 import '../../../theme/app_colors.dart';
-import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FinanceCharts extends StatelessWidget {

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../theme/app_colors.dart';
 import '../../atoms/buttons/custom_button.dart';
+import 'package:get/get.dart';
+import '../../../controllers/finance_controller.dart';
 
 class RegisterContent extends StatefulWidget {
   const RegisterContent({super.key});
@@ -12,12 +14,49 @@ class RegisterContent extends StatefulWidget {
 class _RegisterContentState extends State<RegisterContent> {
   String _amount = '0';
   bool _isIncome = true;
+  String? _selectedCategory;
+  final TextEditingController _descriptionController = TextEditingController();
+  final FinanceController _financeController = Get.find<FinanceController>();
+
+  final Map<String, List<String>> _categories = {
+    'income': [
+      'Sueldo',
+      'Regalo',
+      'Inversión',
+      'Venta',
+      'Préstamo',
+      'Reembolso',
+      'Otro',
+    ],
+    'expense': [
+      'Comida',
+      'Transporte',
+      'Servicios',
+      'Entretenimiento',
+      'Salud',
+      'Ropa',
+      'Educación',
+      'Otro',
+    ],
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedCategory = _categories['income']![0];
+  }
 
   void _updateAmount(String value) {
     setState(() {
-      if (_amount == '0') {
+      if (_amount == '0' && value != '.') {
         _amount = value;
+      } else if (_amount.contains('.') && value == '.') {
+        return;
       } else {
+        if (_amount.contains('.')) {
+          final decimalPlaces = _amount.split('.')[1].length;
+          if (decimalPlaces >= 2) return;
+        }
         _amount = _amount + value;
       }
     });
@@ -33,17 +72,121 @@ class _RegisterContentState extends State<RegisterContent> {
     });
   }
 
-  void _toggleTransactionType() {
-    setState(() {
-      _isIncome = !_isIncome;
-    });
+  void _handleSubmit() {
+    if (double.parse(_amount) > 0) {
+      final amount = double.parse(_amount);
+      final description = _selectedCategory == 'Otro'
+          ? _descriptionController.text.isEmpty
+              ? 'Otro'
+              : _descriptionController.text
+          : _selectedCategory ?? 'Sin categoría';
+
+      if (_isIncome) {
+        _financeController.addIncome(amount, description);
+      } else {
+        _financeController.addExpense(amount, description);
+      }
+
+      _descriptionController.clear();
+      setState(() {
+        _amount = '0';
+      });
+
+      Get.snackbar(
+        'Éxito',
+        _isIncome ? 'Ingreso registrado' : 'Egreso registrado',
+        backgroundColor: _isIncome ? AppColors.primaryGreen : Colors.red,
+        colorText: Colors.white,
+      );
+    } else {
+      Get.snackbar(
+        'Error',
+        'El monto debe ser mayor a 0',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 
-  void _handleSubmit() {
-    // TODO: Implement transaction submission logic
-    final double amount = double.parse(_amount);
-    final transactionType = _isIncome ? 'Income' : 'Expense';
-    print('Submitting $transactionType: \$$amount');
+  Widget _buildCategorySelector() {
+    final currentCategories =
+        _isIncome ? _categories['income']! : _categories['expense']!;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Categoría',
+            style: TextStyle(
+              color: _isIncome ? AppColors.primaryGreen : Colors.red,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: _isIncome ? AppColors.primaryGreen : Colors.red,
+                width: 1,
+              ),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _selectedCategory,
+                isExpanded: true,
+                icon: Icon(
+                  Icons.arrow_drop_down,
+                  color: _isIncome ? AppColors.primaryGreen : Colors.red,
+                ),
+                items: currentCategories.map((String category) {
+                  return DropdownMenuItem<String>(
+                    value: category,
+                    child: Text(category),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedCategory = newValue;
+                  });
+                },
+              ),
+            ),
+          ),
+          if (_selectedCategory == 'Otro') ...[
+            const SizedBox(height: 16),
+            TextField(
+              controller: _descriptionController,
+              style: const TextStyle(fontSize: 16),
+              decoration: InputDecoration(
+                hintText: 'Descripción personalizada',
+                prefixIcon: Icon(
+                  Icons.edit_outlined,
+                  color: _isIncome ? AppColors.primaryGreen : Colors.red,
+                ),
+                filled: true,
+                fillColor: Colors.grey[100],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: _isIncome ? AppColors.primaryGreen : Colors.red,
+                    width: 2,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
   }
 
   @override
@@ -52,110 +195,93 @@ class _RegisterContentState extends State<RegisterContent> {
       child: Column(
         children: [
           // Amount Display
-          Expanded(
-            flex: 2,
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${_amount}',
-                        style: const TextStyle(
-                          fontSize: 48,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
+          Container(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '\$$_amount',
+                      style: TextStyle(
+                        fontSize: 48,
+                        fontWeight: FontWeight.bold,
+                        color: _isIncome ? AppColors.primaryGreen : Colors.red,
                       ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                // Toggle Button
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildToggleButton(true),
+                      _buildToggleButton(false),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Available balance: \$43,323.44',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  // Toggle Button
-                  ElevatedButton(
-                    onPressed: _toggleTransactionType,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _isIncome ? AppColors.primaryGreen : Colors.red,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: Text(
-                      _isIncome ? 'Income' : 'Expense',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 16),
+                // Category Selector
+                _buildCategorySelector(),
+              ],
             ),
           ),
+          const Spacer(),
           // Numeric Keypad
-          Expanded(
-            flex: 4,
-            child: Container(
-              color: Colors.grey[100],
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        _buildKeypadButton('1'),
-                        _buildKeypadButton('2'),
-                        _buildKeypadButton('3'),
-                      ],
-                    ),
+          Container(
+            margin: const EdgeInsets.only(bottom: 80),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    _buildKeypadButton('1'),
+                    _buildKeypadButton('2'),
+                    _buildKeypadButton('3'),
+                  ],
+                ),
+                Row(
+                  children: [
+                    _buildKeypadButton('4'),
+                    _buildKeypadButton('5'),
+                    _buildKeypadButton('6'),
+                  ],
+                ),
+                Row(
+                  children: [
+                    _buildKeypadButton('7'),
+                    _buildKeypadButton('8'),
+                    _buildKeypadButton('9'),
+                  ],
+                ),
+                Row(
+                  children: [
+                    _buildKeypadButton('.'),
+                    _buildKeypadButton('0'),
+                    _buildKeypadButton('⌫', onTap: _deleteLastDigit),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: CustomButton(
+                    text: _isIncome ? 'Registrar Ingreso' : 'Registrar Egreso',
+                    onPressed: _handleSubmit,
+                    backgroundColor:
+                        _isIncome ? AppColors.primaryGreen : Colors.red,
                   ),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        _buildKeypadButton('4'),
-                        _buildKeypadButton('5'),
-                        _buildKeypadButton('6'),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        _buildKeypadButton('7'),
-                        _buildKeypadButton('8'),
-                        _buildKeypadButton('9'),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        _buildKeypadButton('.'),
-                        _buildKeypadButton('0'),
-                        _buildKeypadButton('⌫', onTap: _deleteLastDigit),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: CustomButton(
-                      text: 'Register',
-                      onPressed: _handleSubmit,
-                      backgroundColor: _isIncome ? AppColors.primaryGreen : Colors.red,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
@@ -163,20 +289,60 @@ class _RegisterContentState extends State<RegisterContent> {
     );
   }
 
+  Widget _buildToggleButton(bool isIncome) {
+    final isSelected = _isIncome == isIncome;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _isIncome = isIncome;
+          // Actualizar la categoría seleccionada al cambiar el tipo
+          _selectedCategory = _categories[isIncome ? 'income' : 'expense']![0];
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? (isIncome ? AppColors.primaryGreen : Colors.red)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Text(
+          isIncome ? 'Ingreso' : 'Egreso',
+          style: TextStyle(
+            color: isSelected ? Colors.white : Colors.grey,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildKeypadButton(String text, {VoidCallback? onTap}) {
     return Expanded(
-      child: InkWell(
-        onTap: onTap ?? () => _updateAmount(text),
+      child: AspectRatio(
+        aspectRatio: 1.5,
         child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey[300]!),
-          ),
-          child: Center(
-            child: Text(
-              text,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+          margin: const EdgeInsets.all(8),
+          child: InkWell(
+            onTap: onTap ?? () => _updateAmount(text),
+            borderRadius: BorderRadius.circular(12),
+            splashColor: AppColors.textSecondary.withOpacity(0.1),
+            highlightColor: AppColors.textSecondary.withOpacity(0.2),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w300,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
               ),
             ),
           ),

@@ -1,132 +1,220 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../theme/app_colors.dart';
+import '../../../controllers/movement_controller.dart';
+import '../../../controllers/finance_controller.dart';
+import '../../../controllers/user_controller.dart';
+import '../../molecules/charts/finance_charts.dart';
 
-class WalletContent extends StatelessWidget {
+class WalletContent extends StatefulWidget {
   const WalletContent({super.key});
 
   @override
+  State<WalletContent> createState() => _WalletContentState();
+}
+
+class _WalletContentState extends State<WalletContent>
+    with SingleTickerProviderStateMixin {
+  final MovementController _movementController = Get.find<MovementController>();
+  final FinanceController _financeController = Get.find<FinanceController>();
+  final UserController _userController = Get.find<UserController>();
+  late AnimationController _colorAnimationController;
+  late Animation<Color?> _colorAnimation;
+  late Animation<Color?> _textColorAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _colorAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+
+    _setupAnimations();
+    _financeController.allTimeBalance.listen((_) {
+      _setupAnimations();
+      _colorAnimationController.forward(from: 0);
+    });
+  }
+
+  void _setupAnimations() {
+    final bool isPositive = _financeController.allTimeBalance.value >= 0;
+    _colorAnimation = ColorTween(
+      begin: _userController.isDarkMode.value
+          ? AppColors.darkSurface
+          : Colors.white,
+      end: isPositive
+          ? AppColors.primaryGreen.withOpacity(0.1)
+          : Colors.red.withOpacity(0.1),
+    ).animate(_colorAnimationController);
+
+    _textColorAnimation = ColorTween(
+      begin: _userController.isDarkMode.value
+          ? Colors.white
+          : AppColors.textPrimary,
+      end: isPositive ? AppColors.primaryGreen : Colors.red,
+    ).animate(_colorAnimationController);
+  }
+
+  @override
+  void dispose() {
+    _colorAnimationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Balance Overview
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  const Text(
-                    'Balance Total',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    '\$2,345.67',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildQuickAction(
-                        icon: Icons.add,
-                        label: 'Agregar',
-                        color: AppColors.primaryGreen,
-                        onTap: () {},
+    return Obx(() {
+      final bool isDarkMode = _userController.isDarkMode.value;
+      return SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Balance Overview
+                AnimatedBuilder(
+                  animation: _colorAnimationController,
+                  builder: (context, child) {
+                    return Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: isDarkMode
+                            ? AppColors.darkSurface.withOpacity(0.8)
+                            : _colorAnimation.value,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDarkMode
+                                ? Colors.black.withOpacity(0.5)
+                                : Colors.grey.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                        border: Border.all(
+                          color: isDarkMode
+                              ? Colors.white.withOpacity(0.1)
+                              : Colors.transparent,
+                          width: 1,
+                        ),
                       ),
-                      _buildQuickAction(
-                        icon: Icons.send,
-                        label: 'Enviar',
-                        color: AppColors.primaryGreen,
-                        onTap: () {},
+                      child: Column(
+                        children: [
+                          Text(
+                            'Balance Total',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: isDarkMode
+                                  ? Colors.white70
+                                  : AppColors.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Obx(() => Text(
+                                '\$${_financeController.allTimeBalance.value.toStringAsFixed(2)}',
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: _textColorAnimation.value,
+                                ),
+                              )),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _buildQuickAction(
+                                icon: Icons.add,
+                                label: 'Agregar',
+                                color: isDarkMode
+                                    ? Colors.white
+                                    : AppColors.primaryGreen,
+                                onTap: () {
+                                  Get.toNamed('/register');
+                                },
+                              ),
+                              _buildQuickAction(
+                                icon: Icons.history,
+                                label: 'Historial',
+                                color: isDarkMode
+                                    ? Colors.white
+                                    : AppColors.primaryGreen,
+                                onTap: () {
+                                  Get.toNamed('/history');
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                      _buildQuickAction(
-                        icon: Icons.history,
-                        label: 'Historial',
-                        color: AppColors.primaryGreen,
-                        onTap: () {},
+                    );
+                  },
+                ),
+                const SizedBox(height: 24),
+
+                // Gráficas
+                Container(
+                  decoration: BoxDecoration(
+                    color: isDarkMode
+                        ? AppColors.darkSurface.withOpacity(0.8)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDarkMode
+                            ? Colors.black.withOpacity(0.5)
+                            : Colors.grey.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
                     ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Recent Activity
-            const Text(
-              'Actividad Reciente',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                itemCount: 10,
-                itemBuilder: (context, index) {
-                  final bool isIncome = index % 2 == 0;
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: isIncome
-                            ? AppColors.primaryGreen.withOpacity(0.1)
-                            : AppColors.lightGray,
-                        child: Icon(
-                          isIncome ? Icons.add : Icons.remove,
-                          color: isIncome
-                              ? AppColors.primaryGreen
-                              : AppColors.textSecondary,
-                        ),
-                      ),
-                      title: Text(
-                        isIncome ? 'Depósito' : 'Retiro',
-                        style: const TextStyle(fontWeight: FontWeight.w500),
-                      ),
-                      subtitle: Text(
-                        '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
-                      ),
-                      trailing: Text(
-                        isIncome ? '+\$100.00' : '-\$50.00',
-                        style: TextStyle(
-                          color: isIncome
-                              ? AppColors.primaryGreen
-                              : AppColors.textPrimary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                    border: Border.all(
+                      color: isDarkMode
+                          ? Colors.white.withOpacity(0.1)
+                          : Colors.transparent,
+                      width: 1,
                     ),
+                  ),
+                  child: FinanceCharts(
+                    movementController: _movementController,
+                    selectedDate: DateTime.now(),
+                    selectedFilter: 'Todos',
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Resumen del mes actual
+                Obx(() {
+                  final totalIncome = _calculateIncome();
+                  final totalExpense = _calculateExpenses();
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildSummaryCard(
+                        'Ingresos del Mes',
+                        totalIncome,
+                        isDarkMode ? Colors.green : AppColors.primaryGreen,
+                        Icons.arrow_upward,
+                        isDarkMode,
+                      ),
+                      _buildSummaryCard(
+                        'Gastos del Mes',
+                        totalExpense,
+                        Colors.red,
+                        Icons.arrow_downward,
+                        isDarkMode,
+                      ),
+                    ],
                   );
-                },
-              ),
+                }),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget _buildQuickAction({
@@ -135,6 +223,7 @@ class WalletContent extends StatelessWidget {
     required Color color,
     required VoidCallback onTap,
   }) {
+    final bool isDarkMode = _userController.isDarkMode.value;
     return InkWell(
       onTap: onTap,
       child: Column(
@@ -142,7 +231,9 @@ class WalletContent extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: isDarkMode
+                  ? Colors.white.withOpacity(0.1)
+                  : color.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color),
@@ -159,5 +250,79 @@ class WalletContent extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildSummaryCard(
+    String title,
+    double amount,
+    Color color,
+    IconData icon,
+    bool isDarkMode,
+  ) {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.43,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDarkMode
+            ? AppColors.darkSurface.withOpacity(0.8)
+            : color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDarkMode
+              ? Colors.white.withOpacity(0.1)
+              : color.withOpacity(0.3),
+          width: 1,
+        ),
+        boxShadow: isDarkMode
+            ? [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.5),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : null,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: color, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white70 : color,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '\$${amount.toStringAsFixed(2)}',
+            style: TextStyle(
+              color: color,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  double _calculateIncome() {
+    return _movementController.currentMonthMovements
+        .where((movement) => movement['type'] == 'income')
+        .fold(0.0, (sum, movement) => sum + (movement['amount'] as double));
+  }
+
+  double _calculateExpenses() {
+    return _movementController.currentMonthMovements
+        .where((movement) => movement['type'] == 'expense')
+        .fold(0.0, (sum, movement) => sum + (movement['amount'] as double));
   }
 }

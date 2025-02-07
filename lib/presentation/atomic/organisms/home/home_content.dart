@@ -60,8 +60,8 @@ class HomeContent extends StatelessWidget {
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                   color: isDarkMode
-                                      ? Colors.white
-                                      : AppColors.lightGray,
+                                      ? Colors.white70
+                                      : AppColors.textSecondary,
                                 ),
                               ));
                         },
@@ -201,7 +201,7 @@ class HomeContent extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : AppColors.lightGray,
+                  color: isDarkMode ? Colors.white70 : AppColors.textSecondary,
                 ),
               ),
               const SizedBox(height: 16),

@@ -4,15 +4,36 @@ import '../../../theme/app_colors.dart';
 import '../../../controllers/Login/auth_controller.dart';
 //local auth
 import 'package:local_auth/local_auth.dart';
+//auth controller
+import '../../../controllers/Login/auth_controller.dart';
 
 class SecurityContent extends StatelessWidget {
-  const SecurityContent({super.key});
+  SecurityContent({super.key});
+
+  final LocalAuthentication localAuth = LocalAuthentication();
+  final authController = Get.find<AuthController>();
+
+  Future<void> _checkBiometricAvailability() async {
+    try {
+      final bool canCheckBiometrics = await localAuth.canCheckBiometrics;
+      final bool canAuthenticate = await localAuth.isDeviceSupported();
+
+      if (!canCheckBiometrics || !canAuthenticate) {
+        Get.snackbar(
+          'No disponible',
+          'Tu dispositivo no soporta autenticación biométrica',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        await authController.toggleBiometric(false);
+      }
+    } catch (e) {
+      debugPrint('Error al verificar biometría: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final authController = Get.find<AuthController>();
-    final LocalAuthentication auth = LocalAuthentication();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Seguridad'),
@@ -47,22 +68,22 @@ class SecurityContent extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             FutureBuilder<bool>(
-                              future: auth.canCheckBiometrics,
+                              future: localAuth.canCheckBiometrics,
                               builder: (context, snapshot) {
                                 if (snapshot.hasData && snapshot.data == true) {
-                                  return Column(
-                                    children: [
-                                      Obx(() => _buildSwitchTile(
-                                            title: 'Usar biometría',
-                                            subtitle:
-                                                'Huella digital o Face ID',
-                                            value: authController
-                                                .isBiometricEnabled.value,
-                                            onChanged: (value) => authController
-                                                .toggleBiometric(value),
-                                          )),
-                                    ],
-                                  );
+                                  return Obx(() => _buildSwitchTile(
+                                        title: 'Usar biometría',
+                                        subtitle: 'Huella digital o Face ID',
+                                        value: authController
+                                            .isBiometricEnabled.value,
+                                        onChanged: (value) async {
+                                          await authController
+                                              .toggleBiometric(value);
+                                          if (value) {
+                                            await _checkBiometricAvailability();
+                                          }
+                                        },
+                                      ));
                                 }
                                 return const SizedBox.shrink();
                               },

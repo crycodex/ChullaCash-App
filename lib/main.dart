@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 //controllers
 import 'presentation/controllers/user_controller.dart';
+import 'presentation/controllers/Login/auth_controller.dart';
 
 Future<void> main() async {
   try {
@@ -35,7 +36,17 @@ Future<void> main() async {
     String initialRoute = Routes.welcome;
 
     if (currentUser?.emailVerified == true) {
-      initialRoute = Routes.home;
+      // Obtener el controlador de autenticación
+      final authController = Get.put(AuthController());
+
+      // Si el bloqueo está activado y hay un PIN configurado o biometría habilitada
+      if (authController.isAppLockEnabled.value &&
+          (authController.pin.value.isNotEmpty ||
+              authController.isBiometricEnabled.value)) {
+        initialRoute = Routes.appLock;
+      } else {
+        initialRoute = Routes.home;
+      }
     }
 
     runApp(

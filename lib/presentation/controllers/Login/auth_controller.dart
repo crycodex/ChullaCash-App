@@ -42,6 +42,7 @@ class AuthController extends GetxController {
       if (currentUser != null) {
         uid.value = currentUser.uid;
         await _loadTheme();
+        await _loadSecuritySettings();
       }
     } catch (e) {
       debugPrint('Error al inicializar auth: $e');
@@ -581,6 +582,28 @@ class AuthController extends GetxController {
     }
   }
 
+  Future<void> _loadSecuritySettings() async {
+    try {
+      if (uid.value.isEmpty) return;
+
+      final userDoc = await _firestore.collection('users').doc(uid.value).get();
+      if (userDoc.exists) {
+        final data = userDoc.data()!;
+        isAppLockEnabled.value = data['isAppLockEnabled'] ?? false;
+        isBiometricEnabled.value = data['isBiometricEnabled'] ?? false;
+        pin.value = data['pin'] ?? '';
+        lockTimeout.value = data['lockTimeout'] ?? 'immediately';
+
+        // Si hay PIN configurado, redirigir a la pantalla de verificación
+        if (isAppLockEnabled.value && pin.value.isNotEmpty) {
+          Get.offAllNamed('/app-lock');
+        }
+      }
+    } catch (e) {
+      debugPrint('Error al cargar configuración de seguridad: $e');
+    }
+  }
+
   Future<void> toggleAppLock(bool value) async {
     try {
       isAppLockEnabled.value = value;
@@ -613,8 +636,9 @@ class AuthController extends GetxController {
                 child: const Text('Cancelar'),
               ),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
                   if (pin.value.length == 4) {
+                    await _saveSecuritySettings();
                     Get.back();
                   }
                 },
@@ -623,9 +647,9 @@ class AuthController extends GetxController {
             ],
           ),
         );
+      } else {
+        await _saveSecuritySettings();
       }
-
-      // Aquí implementarías la lógica para guardar en Firebase/local storage
     } catch (e) {
       debugPrint('Error al cambiar estado de bloqueo: $e');
       Get.snackbar(
@@ -637,10 +661,27 @@ class AuthController extends GetxController {
     }
   }
 
+  Future<void> _saveSecuritySettings() async {
+    if (uid.value.isEmpty) return;
+
+    await _firestore.collection('users').doc(uid.value).update({
+      'isAppLockEnabled': isAppLockEnabled.value,
+      'isBiometricEnabled': isBiometricEnabled.value,
+      'pin': pin.value,
+      'lockTimeout': lockTimeout.value,
+    });
+  }
+
   Future<void> toggleBiometric(bool value) async {
     try {
       isBiometricEnabled.value = value;
-      // Aquí implementarías la lógica para guardar en Firebase/local storage
+      await _saveSecuritySettings();
+      Get.snackbar(
+        'Éxito',
+        value ? 'Biometría activada' : 'Biometría desactivada',
+        backgroundColor: AppColors.primaryGreen,
+        colorText: Colors.white,
+      );
     } catch (e) {
       debugPrint('Error al cambiar estado de biometría: $e');
       Get.snackbar(

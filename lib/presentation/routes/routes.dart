@@ -10,6 +10,8 @@ import '../atomic/organisms/history/history_content.dart';
 import '../atomic/organisms/profile/personal_info_content.dart';
 //security page
 import '../atomic/organisms/profile/security_content.dart';
+//app lock screen
+import '../atomic/organisms/auth/app_lock_screen.dart';
 
 class Routes {
   //welcome page
@@ -18,6 +20,7 @@ class Routes {
   static const String history = '/history';
   static const String personalInfo = '/personal-info';
   static const String security = '/security';
+  static const String appLock = '/app-lock';
 
   static final List<GetPage> routes = [
     GetPage(name: Routes.welcome, page: () => WelcomePage()),
@@ -25,5 +28,6 @@ class Routes {
     GetPage(name: Routes.history, page: () => HistoryContent()),
     GetPage(name: Routes.personalInfo, page: () => PersonalInfoContent()),
     GetPage(name: Routes.security, page: () => SecurityContent()),
+    GetPage(name: Routes.appLock, page: () => AppLockScreen()),
   ];
 }

@@ -18,6 +18,10 @@
 			</dict>
 		</array>
 		<!-- End of the Google Sign-in Section -->
+		<!-- local auth -->
+		<key>NSFaceIDUsageDescription</key>
+		<string>Para proteger tus datos, necesitamos autenticar tu identidad.</string>
+		<!-- end of local auth -->
 
 		<key>CADisableMinimumFrameDurationOnPhone</key>
 		<true/>

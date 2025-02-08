@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import '../../../controllers/user_controller.dart';
 import '../../../controllers/finance_controller.dart';
 import '../../../controllers/movement_controller.dart';
+import '../../../controllers/Login/auth_controller.dart';
 
 class HomeContent extends StatefulWidget {
   const HomeContent({super.key});
@@ -18,8 +19,8 @@ class _HomeContentState extends State<HomeContent>
     with AutomaticKeepAliveClientMixin {
   final UserController userController = Get.put(UserController());
   final FinanceController financeController = Get.put(FinanceController());
-  final MovementController movementController =
-      Get.put(MovementController());
+  final MovementController movementController = Get.put(MovementController());
+  final AuthController authController = Get.put(AuthController());
 
   @override
   bool get wantKeepAlive => true;
@@ -60,14 +61,14 @@ class _HomeContentState extends State<HomeContent>
                       ),
                       const SizedBox(height: 4),
                       Obx(() => Text(
-                            userController.name.value,
+                            authController.userName.value,
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 0.5,
                               color: isDarkMode
-                                  ? Colors.white
-                                  : AppColors.textPrimary,
+                                  ? const Color(0xFFE0E0E0)
+                                  : AppColors.textSecondary,
                             ),
                           )),
                     ],

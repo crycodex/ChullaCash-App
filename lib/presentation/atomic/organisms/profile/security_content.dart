@@ -4,8 +4,6 @@ import '../../../theme/app_colors.dart';
 import '../../../controllers/Login/auth_controller.dart';
 //local auth
 import 'package:local_auth/local_auth.dart';
-//auth controller
-import '../../../controllers/Login/auth_controller.dart';
 
 class SecurityContent extends StatelessWidget {
   SecurityContent({super.key});

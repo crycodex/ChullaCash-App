@@ -178,6 +178,7 @@ class _RegisterContentState extends State<RegisterContent>
   Widget _buildCategorySelector() {
     final currentCategories =
         _isIncome ? _categories['income']! : _categories['expense']!;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -187,7 +188,8 @@ class _RegisterContentState extends State<RegisterContent>
           Text(
             'Categoría',
             style: TextStyle(
-              color: _isIncome ? AppColors.primaryGreen : Colors.red,
+              color: (_isIncome ? AppColors.primaryGreen : Colors.red)
+                  .withOpacity(isDarkMode ? 0.9 : 1),
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -195,43 +197,79 @@ class _RegisterContentState extends State<RegisterContent>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color: isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey[100],
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: _isIncome ? AppColors.primaryGreen : Colors.red,
+                color: _isIncome
+                    ? AppColors.primaryGreen.withOpacity(isDarkMode ? 0.5 : 1)
+                    : Colors.red.withOpacity(isDarkMode ? 0.5 : 1),
                 width: 1,
               ),
+              boxShadow: isDarkMode
+                  ? [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      )
+                    ]
+                  : null,
             ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: _selectedCategory,
-                isExpanded: true,
-                icon: Icon(
-                  Icons.arrow_drop_down,
-                  color: _isIncome ? AppColors.primaryGreen : Colors.red,
+            child: Theme(
+              data: Theme.of(context).copyWith(
+                canvasColor:
+                    isDarkMode ? const Color(0xFF2C2C2C) : Colors.white,
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: _selectedCategory,
+                  isExpanded: true,
+                  icon: Icon(
+                    Icons.arrow_drop_down,
+                    color: _isIncome
+                        ? AppColors.primaryGreen
+                            .withOpacity(isDarkMode ? 0.7 : 1)
+                        : Colors.red.withOpacity(isDarkMode ? 0.7 : 1),
+                  ),
+                  dropdownColor:
+                      isDarkMode ? const Color(0xFF2C2C2C) : Colors.white,
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white : AppColors.textPrimary,
+                    fontSize: 16,
+                  ),
+                  items: currentCategories.map((String category) {
+                    return DropdownMenuItem<String>(
+                      value: category,
+                      child: Row(
+                        children: [
+                          Icon(
+                            _categoryIcons[category] ?? Icons.more_horiz,
+                            color: _isIncome
+                                ? AppColors.primaryGreen
+                                    .withOpacity(isDarkMode ? 0.7 : 1)
+                                : Colors.red.withOpacity(isDarkMode ? 0.7 : 1),
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            category,
+                            style: TextStyle(
+                              color: isDarkMode
+                                  ? Colors.white
+                                  : AppColors.textPrimary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedCategory = newValue;
+                    });
+                  },
                 ),
-                items: currentCategories.map((String category) {
-                  return DropdownMenuItem<String>(
-                    value: category,
-                    child: Row(
-                      children: [
-                        Icon(
-                          _categoryIcons[category] ?? Icons.more_horiz,
-                          color:
-                              _isIncome ? AppColors.primaryGreen : Colors.red,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(category),
-                      ],
-                    ),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedCategory = newValue;
-                  });
-                },
               ),
             ),
           ),
@@ -239,22 +277,31 @@ class _RegisterContentState extends State<RegisterContent>
             const SizedBox(height: 16),
             TextField(
               controller: _descriptionController,
-              style: const TextStyle(fontSize: 16),
+              style: TextStyle(
+                fontSize: 16,
+                color: isDarkMode ? Colors.white : AppColors.textPrimary,
+              ),
               decoration: InputDecoration(
                 hintText: 'Descripción personalizada',
+                hintStyle: TextStyle(
+                  color: isDarkMode
+                      ? Colors.white60
+                      : AppColors.textSecondary.withOpacity(0.7),
+                ),
                 prefixIcon: Icon(
                   Icons.description_outlined,
-                  color: _isIncome ? AppColors.primaryGreen : Colors.red,
+                  color: (_isIncome ? AppColors.primaryGreen : Colors.red)
+                      .withOpacity(isDarkMode ? 0.7 : 1),
                 ),
                 suffixIcon: Icon(
                   Icons.edit,
-                  color: _isIncome
-                      ? AppColors.primaryGreen.withOpacity(0.5)
-                      : Colors.red.withOpacity(0.5),
+                  color: (_isIncome ? AppColors.primaryGreen : Colors.red)
+                      .withOpacity(isDarkMode ? 0.4 : 0.5),
                   size: 18,
                 ),
                 filled: true,
-                fillColor: Colors.grey[100],
+                fillColor:
+                    isDarkMode ? const Color(0xFF2C2C2C) : Colors.grey[100],
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -262,8 +309,17 @@ class _RegisterContentState extends State<RegisterContent>
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(
-                    color: _isIncome ? AppColors.primaryGreen : Colors.red,
+                    color: (_isIncome ? AppColors.primaryGreen : Colors.red)
+                        .withOpacity(isDarkMode ? 0.7 : 1),
                     width: 2,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: (_isIncome ? AppColors.primaryGreen : Colors.red)
+                        .withOpacity(isDarkMode ? 0.3 : 0.2),
+                    width: 1,
                   ),
                 ),
               ),
@@ -436,5 +492,4 @@ class _RegisterContentState extends State<RegisterContent>
       ),
     );
   }
-
 }

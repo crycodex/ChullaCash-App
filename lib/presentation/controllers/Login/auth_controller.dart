@@ -42,11 +42,28 @@ class AuthController extends GetxController {
       final currentUser = _auth.currentUser;
       if (currentUser != null) {
         uid.value = currentUser.uid;
+        await _loadUserData();
         await _loadTheme();
         await _loadSecuritySettings();
       }
     } catch (e) {
       debugPrint('Error al inicializar auth: $e');
+    }
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      if (uid.value.isEmpty) return;
+
+      final userDoc = await _firestore.collection('users').doc(uid.value).get();
+      if (userDoc.exists) {
+        final userData = userDoc.data()!;
+        userName.value = userData['name'] ?? 'Usuario';
+        userEmail.value = userData['email'] ?? 'usuario@example.com';
+        profileImage.value = userData['photoUrl'];
+      }
+    } catch (e) {
+      debugPrint('Error al cargar datos del usuario: $e');
     }
   }
 
@@ -561,18 +578,23 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> updateUserName(String name) async {
+  Future<void> updateUserName(String newName) async {
     try {
-      // Aquí implementarías la lógica para actualizar el nombre en Firestore
-      // Por ahora solo actualizamos el estado local
-      userName.value = name;
+      if (uid.value.isEmpty) return;
+
+      await _firestore.collection('users').doc(uid.value).update({
+        'name': newName,
+      });
+
+      userName.value = newName;
       Get.snackbar(
         'Éxito',
-        'Nombre actualizado',
+        'Nombre actualizado correctamente',
         backgroundColor: AppColors.primaryGreen,
         colorText: Colors.white,
       );
     } catch (e) {
+      debugPrint('Error al actualizar nombre: $e');
       Get.snackbar(
         'Error',
         'No se pudo actualizar el nombre',

@@ -39,20 +39,29 @@ class ProfileContent extends StatelessWidget {
         child: Column(
           children: [
             // Profile Header
-            Obx(() => CircleAvatar(
-                  radius: 50,
-                  backgroundColor: AppColors.lightGray,
-                  backgroundImage: authController.profileImage.value != null
-                      ? NetworkImage(authController.profileImage.value!)
-                      : null,
-                  child: authController.profileImage.value == null
-                      ? const Icon(
-                          Icons.person,
-                          size: 50,
-                          color: AppColors.primaryGreen,
-                        )
-                      : null,
-                )),
+            Obx(() {
+              final hasValidImage = authController.profileImage.value != null &&
+                  authController.profileImage.value!.isNotEmpty;
+
+              return CircleAvatar(
+                radius: 50,
+                backgroundColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF2C2C2C)
+                    : AppColors.lightGray,
+                backgroundImage: hasValidImage
+                    ? NetworkImage(authController.profileImage.value!)
+                    : null,
+                child: !hasValidImage
+                    ? Icon(
+                        Icons.person,
+                        size: 50,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white70
+                            : AppColors.primaryGreen,
+                      )
+                    : null,
+              );
+            }),
             const SizedBox(height: 16),
 
             // Nombre del usuario
@@ -61,7 +70,7 @@ class ProfileContent extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: AppColors.textSecondary,
                   ),
                 )),
             Obx(() => Text(
@@ -180,7 +189,7 @@ class _SectionTitle extends StatelessWidget {
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: AppColors.textSecondary,
           ),
         ),
       ),

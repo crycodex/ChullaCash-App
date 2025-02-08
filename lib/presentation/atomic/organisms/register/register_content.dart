@@ -41,6 +41,23 @@ class _RegisterContentState extends State<RegisterContent>
     ],
   };
 
+  final Map<String, IconData> _categoryIcons = {
+    'Sueldo': Icons.work,
+    'Regalo': Icons.card_giftcard,
+    'Inversión': Icons.trending_up,
+    'Venta': Icons.store,
+    'Préstamo': Icons.account_balance,
+    'Reembolso': Icons.replay,
+    'Comida': Icons.restaurant,
+    'Transporte': Icons.directions_car,
+    'Servicios': Icons.home,
+    'Entretenimiento': Icons.sports_esports,
+    'Salud': Icons.medical_services,
+    'Ropa': Icons.shopping_bag,
+    'Educación': Icons.school,
+    'Otro': Icons.more_horiz,
+  };
+
   @override
   bool get wantKeepAlive => true;
 
@@ -196,7 +213,18 @@ class _RegisterContentState extends State<RegisterContent>
                 items: currentCategories.map((String category) {
                   return DropdownMenuItem<String>(
                     value: category,
-                    child: Text(category),
+                    child: Row(
+                      children: [
+                        Icon(
+                          _categoryIcons[category] ?? Icons.more_horiz,
+                          color:
+                              _isIncome ? AppColors.primaryGreen : Colors.red,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(category),
+                      ],
+                    ),
                   );
                 }).toList(),
                 onChanged: (String? newValue) {
@@ -215,8 +243,15 @@ class _RegisterContentState extends State<RegisterContent>
               decoration: InputDecoration(
                 hintText: 'Descripción personalizada',
                 prefixIcon: Icon(
-                  Icons.edit_outlined,
+                  Icons.description_outlined,
                   color: _isIncome ? AppColors.primaryGreen : Colors.red,
+                ),
+                suffixIcon: Icon(
+                  Icons.edit,
+                  color: _isIncome
+                      ? AppColors.primaryGreen.withOpacity(0.5)
+                      : Colors.red.withOpacity(0.5),
+                  size: 18,
                 ),
                 filled: true,
                 fillColor: Colors.grey[100],
@@ -241,6 +276,7 @@ class _RegisterContentState extends State<RegisterContent>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return SafeArea(
       child: Column(
         children: [
@@ -400,4 +436,5 @@ class _RegisterContentState extends State<RegisterContent>
       ),
     );
   }
+
 }

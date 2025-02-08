@@ -15,8 +15,7 @@ class WalletContent extends StatefulWidget {
 
 class _WalletContentState extends State<WalletContent>
     with SingleTickerProviderStateMixin {
-  final MovementController _movementController =
-      Get.put(MovementController());
+  final MovementController _movementController = Get.put(MovementController());
   final FinanceController _financeController = Get.put(FinanceController());
   final UserController _userController = Get.put(UserController());
   late AnimationController _colorAnimationController;
@@ -109,50 +108,61 @@ class _WalletContentState extends State<WalletContent>
                       ),
                       child: Column(
                         children: [
-                          Text(
-                            'Balance Total',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: isDarkMode
-                                  ? Colors.white70
-                                  : AppColors.textSecondary,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Balance Total',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                  color: isDarkMode
+                                      ? Colors.white70
+                                      : AppColors.textSecondary,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: isDarkMode
+                                      ? Colors.white.withOpacity(0.1)
+                                      : AppColors.primaryGreen.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.account_balance_wallet,
+                                      size: 16,
+                                      color: isDarkMode
+                                          ? Colors.white70
+                                          : AppColors.primaryGreen,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Mi Billetera',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: isDarkMode
+                                            ? Colors.white70
+                                            : AppColors.primaryGreen,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 16),
                           Obx(() => Text(
                                 '\$${_financeController.allTimeBalance.value.toStringAsFixed(2)}',
                                 style: TextStyle(
-                                  fontSize: 32,
+                                  fontSize: 40,
                                   fontWeight: FontWeight.bold,
                                   color: _textColorAnimation.value,
                                 ),
                               )),
-                          const SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              _buildQuickAction(
-                                icon: Icons.add,
-                                label: 'Agregar',
-                                color: isDarkMode
-                                    ? Colors.white
-                                    : AppColors.primaryGreen,
-                                onTap: () {
-                                  Get.toNamed('/register');
-                                },
-                              ),
-                              _buildQuickAction(
-                                icon: Icons.history,
-                                label: 'Historial',
-                                color: isDarkMode
-                                    ? Colors.white
-                                    : AppColors.primaryGreen,
-                                onTap: () {
-                                  Get.toNamed('/history');
-                                },
-                              ),
-                            ],
-                          ),
                         ],
                       ),
                     );
@@ -224,41 +234,6 @@ class _WalletContentState extends State<WalletContent>
     });
   }
 
-  Widget _buildQuickAction({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    final bool isDarkMode = _userController.isDarkMode.value;
-    return InkWell(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: isDarkMode
-                  ? Colors.white.withOpacity(0.1)
-                  : color.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: color),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildSummaryCard(
     String title,
     double amount,
@@ -268,51 +243,54 @@ class _WalletContentState extends State<WalletContent>
   ) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.43,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: isDarkMode
             ? AppColors.darkSurface.withOpacity(0.8)
             : color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDarkMode
               ? Colors.white.withOpacity(0.1)
               : color.withOpacity(0.3),
           width: 1,
         ),
-        boxShadow: isDarkMode
-            ? [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : null,
+        boxShadow: [
+          BoxShadow(
+            color: isDarkMode
+                ? Colors.black.withOpacity(0.5)
+                : color.withOpacity(0.1),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(icon, color: color, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  color: isDarkMode ? Colors.white70 : color,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: TextStyle(
+              color: isDarkMode ? Colors.white70 : AppColors.textSecondary,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             '\$${amount.toStringAsFixed(2)}',
             style: TextStyle(
-              color: color,
-              fontSize: 20,
+              color: isDarkMode ? Colors.white : color,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),

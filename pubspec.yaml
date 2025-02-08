@@ -32,6 +32,8 @@ dependencies:
   #apple sign in
   sign_in_with_apple: ^6.1.4
   fl_chart: ^0.65.0
+  #image picker
+  image_picker: ^1.1.2
   
 dev_dependencies:
   flutter_test:

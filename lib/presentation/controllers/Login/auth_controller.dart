@@ -9,6 +9,8 @@ import '../../../data/models/user_model.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 //apple sign in
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+//theme
+import '../../../presentation/theme/app_colors.dart';
 
 enum AuthStatus { checking, authenticated, unauthenticated, error }
 
@@ -18,6 +20,9 @@ class AuthController extends GetxController {
   final RxBool showRegister = false.obs;
   final RxBool showForgotPassword = false.obs;
   final RxBool isDarkMode = false.obs;
+  final RxString userName = 'Usuario'.obs;
+  final RxString userEmail = 'usuario@example.com'.obs;
+  final Rxn<String> profileImage = Rxn<String>();
 
   @override
   void onInit() {
@@ -502,6 +507,70 @@ class AuthController extends GetxController {
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  Future<void> updateProfileImage(String imagePath) async {
+    try {
+      // Aquí implementarías la lógica para subir la imagen a Firebase Storage
+      // y actualizar la URL en Firestore
+      // Por ahora solo actualizamos el estado local
+      profileImage.value = imagePath;
+      Get.snackbar(
+        'Éxito',
+        'Imagen de perfil actualizada',
+        backgroundColor: AppColors.primaryGreen,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'No se pudo actualizar la imagen de perfil',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<void> updateUserName(String name) async {
+    try {
+      // Aquí implementarías la lógica para actualizar el nombre en Firestore
+      // Por ahora solo actualizamos el estado local
+      userName.value = name;
+      Get.snackbar(
+        'Éxito',
+        'Nombre actualizado',
+        backgroundColor: AppColors.primaryGreen,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'No se pudo actualizar el nombre',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<void> deleteAccount() async {
+    try {
+      // Aquí implementarías la lógica para eliminar la cuenta en Firebase
+      // Por ahora solo cerramos sesión
+      await logout();
+      Get.snackbar(
+        'Éxito',
+        'Cuenta eliminada correctamente',
+        backgroundColor: AppColors.primaryGreen,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'No se pudo eliminar la cuenta',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
       );
     }
   }

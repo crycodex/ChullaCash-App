@@ -6,15 +6,20 @@ import '../atomic/pages/welcome_page.dart';
 import '../atomic/pages/home_page.dart';
 //history page
 import '../atomic/organisms/history/history_content.dart';
+//personal info page
+import '../atomic/organisms/profile/personal_info_content.dart';
 
 class Routes {
   //welcome page
   static const String welcome = '/welcome';
   static const String home = '/home';
   static const String history = '/history';
+  static const String personalInfo = '/personal-info';
+
   static final List<GetPage> routes = [
     GetPage(name: Routes.welcome, page: () => WelcomePage()),
     GetPage(name: Routes.home, page: () => HomePage()),
     GetPage(name: Routes.history, page: () => HistoryContent()),
+    GetPage(name: Routes.personalInfo, page: () => PersonalInfoContent()),
   ];
 }

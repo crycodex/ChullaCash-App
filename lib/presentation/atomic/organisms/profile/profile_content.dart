@@ -4,9 +4,39 @@ import '../../../theme/app_colors.dart';
 import '../../atoms/buttons/custom_button.dart';
 //controllers
 import '../../../controllers/Login/auth_controller.dart';
+//image picker
+import 'package:image_picker/image_picker.dart';
 
 class ProfileContent extends StatelessWidget {
   const ProfileContent({super.key});
+
+  void _showDeleteAccountDialog(
+      BuildContext context, AuthController authController) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar cuenta'),
+        content: const Text(
+            '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () {
+              authController.deleteAccount();
+              Navigator.pop(context);
+            },
+            child: const Text(
+              'Eliminar',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,31 +48,38 @@ class ProfileContent extends StatelessWidget {
         child: Column(
           children: [
             // Profile Header
-            const CircleAvatar(
-              radius: 50,
-              backgroundColor: AppColors.lightGray,
-              child: Icon(
-                Icons.person,
-                size: 50,
-                color: AppColors.primaryGreen,
-              ),
-            ),
+            Obx(() => CircleAvatar(
+                  radius: 50,
+                  backgroundColor: AppColors.lightGray,
+                  backgroundImage: authController.profileImage.value != null
+                      ? NetworkImage(authController.profileImage.value!)
+                      : null,
+                  child: authController.profileImage.value == null
+                      ? const Icon(
+                          Icons.person,
+                          size: 50,
+                          color: AppColors.primaryGreen,
+                        )
+                      : null,
+                )),
             const SizedBox(height: 16),
-            const Text(
-              'Juan Pérez',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const Text(
-              'juan.perez@example.com',
-              style: TextStyle(
-                fontSize: 16,
-                color: AppColors.textSecondary,
-              ),
-            ),
+
+            // Nombre del usuario
+            Obx(() => Text(
+                  authController.userName.value,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                )),
+            Obx(() => Text(
+                  authController.userEmail.value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: AppColors.textSecondary,
+                  ),
+                )),
             const SizedBox(height: 32),
 
             // Account Settings
@@ -50,7 +87,7 @@ class ProfileContent extends StatelessWidget {
             _SettingsItem(
               icon: Icons.person_outline,
               title: 'Información personal',
-              onTap: () {},
+              onTap: () => Get.toNamed('/personal-info'),
             ),
             _SettingsItem(
               icon: Icons.lock_outline,
@@ -116,6 +153,42 @@ class ProfileContent extends StatelessWidget {
       ),
     );
   }
+
+  void _showEditNameDialog(
+      BuildContext context, AuthController authController) {
+    final TextEditingController nameController = TextEditingController(
+      text: authController.userName.value,
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Editar nombre'),
+        content: TextField(
+          controller: nameController,
+          decoration: const InputDecoration(
+            labelText: 'Nombre',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (nameController.text.isNotEmpty) {
+                authController.updateUserName(nameController.text);
+                Navigator.pop(context);
+              }
+            },
+            child: const Text('Guardar'),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _SectionTitle extends StatelessWidget {
@@ -147,12 +220,14 @@ class _SettingsItem extends StatelessWidget {
   final String title;
   final Widget? trailing;
   final VoidCallback onTap;
+  final Color? color;
 
   const _SettingsItem({
     required this.icon,
     required this.title,
     this.trailing,
     required this.onTap,
+    this.color,
   });
 
   @override
@@ -160,8 +235,13 @@ class _SettingsItem extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
-        leading: Icon(icon, color: AppColors.primaryGreen),
-        title: Text(title),
+        leading: Icon(icon, color: color ?? AppColors.primaryGreen),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: color ?? AppColors.textPrimary,
+          ),
+        ),
         trailing: trailing ?? const Icon(Icons.arrow_forward_ios, size: 16),
         onTap: onTap,
       ),

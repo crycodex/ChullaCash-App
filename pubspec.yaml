@@ -34,6 +34,8 @@ dependencies:
   fl_chart: ^0.65.0
   #image picker
   image_picker: ^1.1.2
+  #local auth
+  local_auth: ^2.3.0
   
 dev_dependencies:
   flutter_test:

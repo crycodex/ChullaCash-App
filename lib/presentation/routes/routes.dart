@@ -8,6 +8,8 @@ import '../atomic/pages/home_page.dart';
 import '../atomic/organisms/history/history_content.dart';
 //personal info page
 import '../atomic/organisms/profile/personal_info_content.dart';
+//security page
+import '../atomic/organisms/profile/security_content.dart';
 
 class Routes {
   //welcome page
@@ -15,11 +17,13 @@ class Routes {
   static const String home = '/home';
   static const String history = '/history';
   static const String personalInfo = '/personal-info';
+  static const String security = '/security';
 
   static final List<GetPage> routes = [
     GetPage(name: Routes.welcome, page: () => WelcomePage()),
     GetPage(name: Routes.home, page: () => HomePage()),
     GetPage(name: Routes.history, page: () => HistoryContent()),
     GetPage(name: Routes.personalInfo, page: () => PersonalInfoContent()),
+    GetPage(name: Routes.security, page: () => SecurityContent()),
   ];
 }

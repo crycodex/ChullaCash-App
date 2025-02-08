@@ -4,39 +4,9 @@ import '../../../theme/app_colors.dart';
 import '../../atoms/buttons/custom_button.dart';
 //controllers
 import '../../../controllers/Login/auth_controller.dart';
-//image picker
-import 'package:image_picker/image_picker.dart';
 
 class ProfileContent extends StatelessWidget {
   const ProfileContent({super.key});
-
-  void _showDeleteAccountDialog(
-      BuildContext context, AuthController authController) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Eliminar cuenta'),
-        content: const Text(
-            '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () {
-              authController.deleteAccount();
-              Navigator.pop(context);
-            },
-            child: const Text(
-              'Eliminar',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +62,7 @@ class ProfileContent extends StatelessWidget {
             _SettingsItem(
               icon: Icons.lock_outline,
               title: 'Seguridad',
-              onTap: () {},
+              onTap: () => Get.toNamed('/security'),
             ),
             _SettingsItem(
               icon: Icons.notifications_outlined,

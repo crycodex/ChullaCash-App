@@ -24,6 +24,12 @@ class AuthController extends GetxController {
   final RxString userEmail = 'usuario@example.com'.obs;
   final Rxn<String> profileImage = Rxn<String>();
 
+  // Seguridad
+  final RxBool isAppLockEnabled = false.obs;
+  final RxBool isBiometricEnabled = false.obs;
+  final RxString lockTimeout = 'immediately'.obs;
+  final RxString pin = ''.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -569,6 +575,113 @@ class AuthController extends GetxController {
       Get.snackbar(
         'Error',
         'No se pudo eliminar la cuenta',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<void> toggleAppLock(bool value) async {
+    try {
+      isAppLockEnabled.value = value;
+      if (value && pin.value.isEmpty) {
+        // Si se activa el bloqueo y no hay PIN, mostrar diálogo para configurarlo
+        Get.dialog(
+          AlertDialog(
+            title: const Text('Configurar PIN'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  keyboardType: TextInputType.number,
+                  maxLength: 4,
+                  obscureText: true,
+                  onChanged: (value) => pin.value = value,
+                  decoration: const InputDecoration(
+                    labelText: 'PIN (4 dígitos)',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  isAppLockEnabled.value = false;
+                  Get.back();
+                },
+                child: const Text('Cancelar'),
+              ),
+              TextButton(
+                onPressed: () {
+                  if (pin.value.length == 4) {
+                    Get.back();
+                  }
+                },
+                child: const Text('Guardar'),
+              ),
+            ],
+          ),
+        );
+      }
+
+      // Aquí implementarías la lógica para guardar en Firebase/local storage
+    } catch (e) {
+      debugPrint('Error al cambiar estado de bloqueo: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo cambiar el estado del bloqueo',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<void> toggleBiometric(bool value) async {
+    try {
+      isBiometricEnabled.value = value;
+      // Aquí implementarías la lógica para guardar en Firebase/local storage
+    } catch (e) {
+      debugPrint('Error al cambiar estado de biometría: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo cambiar el estado de la biometría',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<void> updatePin(String newPin) async {
+    try {
+      pin.value = newPin;
+      // Aquí implementarías la lógica para guardar en Firebase/local storage
+      Get.snackbar(
+        'Éxito',
+        'PIN actualizado correctamente',
+        backgroundColor: AppColors.primaryGreen,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      debugPrint('Error al actualizar PIN: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo actualizar el PIN',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<void> setLockTimeout(String timeout) async {
+    try {
+      lockTimeout.value = timeout;
+      // Aquí implementarías la lógica para guardar en Firebase/local storage
+    } catch (e) {
+      debugPrint('Error al cambiar tiempo de bloqueo: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo cambiar el tiempo de bloqueo',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );

@@ -16,7 +16,7 @@ class _RegisterContentState extends State<RegisterContent> {
   bool _obscureText = true;
   bool _obscureConfirmText = true;
   final _formKey = GlobalKey<FormState>();
-  final AuthController _authController = Get.find<AuthController>();
+  final AuthController _authController = Get.put(AuthController());
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();

@@ -15,12 +15,14 @@ class WalletContent extends StatefulWidget {
 
 class _WalletContentState extends State<WalletContent>
     with SingleTickerProviderStateMixin {
-  final MovementController _movementController = Get.find<MovementController>();
-  final FinanceController _financeController = Get.find<FinanceController>();
-  final UserController _userController = Get.find<UserController>();
+  final MovementController _movementController =
+      Get.put(MovementController());
+  final FinanceController _financeController = Get.put(FinanceController());
+  final UserController _userController = Get.put(UserController());
   late AnimationController _colorAnimationController;
   late Animation<Color?> _colorAnimation;
   late Animation<Color?> _textColorAnimation;
+  bool _disposed = false;
 
   @override
   void initState() {
@@ -32,12 +34,16 @@ class _WalletContentState extends State<WalletContent>
 
     _setupAnimations();
     _financeController.allTimeBalance.listen((_) {
-      _setupAnimations();
-      _colorAnimationController.forward(from: 0);
+      if (!_disposed) {
+        _setupAnimations();
+        _colorAnimationController.forward(from: 0);
+      }
     });
   }
 
   void _setupAnimations() {
+    if (_disposed) return;
+
     final bool isPositive = _financeController.allTimeBalance.value >= 0;
     _colorAnimation = ColorTween(
       begin: _userController.isDarkMode.value
@@ -58,6 +64,7 @@ class _WalletContentState extends State<WalletContent>
 
   @override
   void dispose() {
+    _disposed = true;
     _colorAnimationController.dispose();
     super.dispose();
   }

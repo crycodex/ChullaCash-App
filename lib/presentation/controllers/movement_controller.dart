@@ -11,7 +11,7 @@ class MovementController extends GetxController {
   final RxList<Map<String, dynamic>> currentMonthMovements =
       <Map<String, dynamic>>[].obs;
 
-  final FinanceController _financeController = Get.find<FinanceController>();
+  final FinanceController _financeController = Get.put(FinanceController());
 
   @override
   void onInit() {

@@ -7,21 +7,32 @@ import '../../../controllers/user_controller.dart';
 import '../../../controllers/finance_controller.dart';
 import '../../../controllers/movement_controller.dart';
 
-class HomeContent extends StatelessWidget {
-  HomeContent({super.key});
+class HomeContent extends StatefulWidget {
+  const HomeContent({super.key});
 
+  @override
+  State<HomeContent> createState() => _HomeContentState();
+}
+
+class _HomeContentState extends State<HomeContent>
+    with AutomaticKeepAliveClientMixin {
   final UserController userController = Get.put(UserController());
   final FinanceController financeController = Get.put(FinanceController());
-  final MovementController movementController = Get.put(MovementController());
+  final MovementController movementController =
+      Get.put(MovementController());
 
-  Color _textColor(BuildContext context) {
-    return userController.isDarkMode.value
-        ? Colors.white
-        : Theme.of(context).textTheme.bodyLarge!.color!;
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    financeController.getTotalBalance();
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Obx(() {
       final bool isDarkMode = userController.isDarkMode.value;
 
@@ -43,29 +54,22 @@ class HomeContent extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16,
                           color: isDarkMode
-                              ? Colors.white70
+                              ? const Color(0xFFE0E0E0)
                               : AppColors.textSecondary,
                         ),
                       ),
-                      FutureBuilder(
-                        future: userController.userName(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const CircularProgressIndicator();
-                          }
-                          return Obx(() => Text(
-                                userController.name.value,
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDarkMode
-                                      ? Colors.white70
-                                      : AppColors.textSecondary,
-                                ),
-                              ));
-                        },
-                      ),
+                      const SizedBox(height: 4),
+                      Obx(() => Text(
+                            userController.name.value,
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                              color: isDarkMode
+                                  ? Colors.white
+                                  : AppColors.textPrimary,
+                            ),
+                          )),
                     ],
                   ),
                 ],
@@ -106,8 +110,9 @@ class HomeContent extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 16,
                             color: isDarkMode
-                                ? Colors.white70
+                                ? const Color(0xFFE0E0E0)
                                 : AppColors.textSecondary,
+                            letterSpacing: 0.5,
                           ),
                         ),
                         Obx(() {
@@ -180,16 +185,13 @@ class HomeContent extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 14,
                               color: isDarkMode
-                                  ? Colors.white70
+                                  ? const Color(0xFFE0E0E0)
                                   : AppColors.textSecondary,
                             ),
                           ),
                         ],
                       );
                     }),
-                    const SizedBox(height: 24),
-                    // Time period selector
-                    Row(),
                   ],
                 ),
               ),
@@ -199,9 +201,12 @@ class HomeContent extends StatelessWidget {
               Text(
                 'Movimientos recientes',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white70 : AppColors.textSecondary,
+                  letterSpacing: 0.5,
+                  color: isDarkMode
+                      ? const Color(0xFFE0E0E0)
+                      : AppColors.textSecondary,
                 ),
               ),
               const SizedBox(height: 16),
@@ -210,17 +215,32 @@ class HomeContent extends StatelessWidget {
                   final movements = movementController.currentMonthMovements;
                   if (movements.isEmpty) {
                     return Center(
-                      child: Text(
-                        'No hay movimientos este mes',
-                        style: TextStyle(
-                          color: isDarkMode
-                              ? Colors.white70
-                              : AppColors.textSecondary,
-                        ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.account_balance_wallet_outlined,
+                            size: 48,
+                            color: isDarkMode
+                                ? Colors.white.withOpacity(0.5)
+                                : AppColors.textSecondary.withOpacity(0.5),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No hay movimientos este mes',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: isDarkMode
+                                  ? const Color(0xFFE0E0E0)
+                                  : AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
                       ),
                     );
                   }
                   return ListView.builder(
+                    physics: const BouncingScrollPhysics(),
                     itemCount: movements.length,
                     itemBuilder: (context, index) {
                       final movement = movements[index];
@@ -303,10 +323,8 @@ class HomeContent extends StatelessWidget {
                             color: isDarkMode
                                 ? const Color(0xFF252525)
                                 : isIncome
-                                    ? const Color(
-                                        0xFFE8F5E9) // Verde pastel claro
-                                    : const Color(
-                                        0xFFFFEBEE), // Rojo pastel claro
+                                    ? const Color(0xFFE8F5E9)
+                                    : const Color(0xFFFFEBEE),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: isDarkMode
@@ -316,15 +334,6 @@ class HomeContent extends StatelessWidget {
                                       : Colors.red.withOpacity(0.1),
                               width: 1,
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: isDarkMode
-                                    ? Colors.black.withOpacity(0.2)
-                                    : Colors.grey.withOpacity(0.05),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
                           ),
                           child: ListTile(
                             contentPadding: const EdgeInsets.symmetric(

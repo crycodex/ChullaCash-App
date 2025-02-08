@@ -17,17 +17,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
-  final PageController _pageController = PageController();
+  final PageController _pageController = PageController(keepPage: true);
   late final FinanceController financeController;
 
-  @override
-  void initState() {
-    super.initState();
-    financeController = Get.put(FinanceController(), permanent: true);
-  }
-
   final List<Widget> _pages = [
-    HomeContent(),
+    const HomeContent(),
     const WalletContent(),
     const RegisterContent(),
     const HistoryContent(),
@@ -35,19 +29,34 @@ class _HomePageState extends State<HomePage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    financeController = Get.put(FinanceController());
+    Get.put(_pageController, permanent: true);
+    _initializeControllers();
+  }
+
+  void _initializeControllers() async {
+    await financeController.loadTransactions();
+    await financeController.getTotalBalance();
+    await financeController.updateBalance();
+  }
+
+  @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
   }
 
-  void _onPageChanged(int index) {
+  void _onPageChanged(int index) async {
     setState(() {
       _currentIndex = index;
     });
     // Actualizar datos al cambiar de página
-    if (index == 0) {
-      // Si vuelve a Home
-      financeController.getTotalBalance();
+    if (index == 0 || index == 1 || index == 3) {
+      await financeController.loadTransactions();
+      await financeController.getTotalBalance();
+      await financeController.updateBalance();
     }
   }
 
@@ -61,20 +70,29 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          PageView(
-            controller: _pageController,
-            onPageChanged: _onPageChanged,
-            physics: const BouncingScrollPhysics(),
-            children: _pages,
-          ),
-          BottomNavBar(
-            currentIndex: _currentIndex,
-            onTap: _onNavItemTapped,
-          ),
-        ],
+    return WillPopScope(
+      onWillPop: () async {
+        if (_currentIndex != 0) {
+          _onNavItemTapped(0);
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            PageView(
+              controller: _pageController,
+              onPageChanged: _onPageChanged,
+              physics: const BouncingScrollPhysics(),
+              children: _pages,
+            ),
+            BottomNavBar(
+              currentIndex: _currentIndex,
+              onTap: _onNavItemTapped,
+            ),
+          ],
+        ),
       ),
     );
   }

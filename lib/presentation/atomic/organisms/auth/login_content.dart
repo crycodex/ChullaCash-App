@@ -21,7 +21,7 @@ class _LoginContentState extends State<LoginContent> {
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final AuthController _authController = Get.find<AuthController>();
+  final AuthController _authController = Get.put(AuthController());
 
   @override
   void dispose() {

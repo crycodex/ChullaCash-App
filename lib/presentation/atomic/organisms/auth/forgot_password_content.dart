@@ -25,7 +25,7 @@ class _ForgotPasswordContentState extends State<ForgotPasswordContent> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<AuthController>();
+    final controller = Get.put(AuthController());
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       child: Column(

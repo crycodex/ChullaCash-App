@@ -14,57 +14,59 @@ import 'change_notifier.dart';
 import 'package:provider/provider.dart';
 //firebase
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+//controllers
+import 'presentation/controllers/user_controller.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+Future<void> main() async {
+  try {
+    // Asegurarse de que Flutter esté inicializado
+    WidgetsFlutterBinding.ensureInitialized();
 
-  // Verificar si hay un usuario autenticado y su tema
-  final User? currentUser = FirebaseAuth.instance.currentUser;
-  String initialRoute = Routes.welcome;
-  ThemeMode initialThemeMode = ThemeMode.light;
+    // Inicializar Firebase
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
 
-  if (currentUser?.emailVerified == true) {
-    initialRoute = Routes.home;
-    // Cargar tema del usuario
-    try {
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(currentUser?.uid)
-          .get();
-      if (userDoc.exists) {
-        final darkMode = userDoc.data()?['isDarkMode'];
-        initialThemeMode = (darkMode == true || darkMode == "true")
-            ? ThemeMode.dark
-            : ThemeMode.light;
-      }
-    } catch (e) {
-      debugPrint('Error al cargar el tema: $e');
+    // Inicializar el controlador de usuario
+    Get.put(UserController(), permanent: true);
+
+    // Verificar si hay un usuario autenticado
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+    String initialRoute = Routes.welcome;
+
+    if (currentUser?.emailVerified == true) {
+      initialRoute = Routes.home;
     }
-  }
 
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => LocaleProvider(),
-      child: MainApp(
-        initialRoute: initialRoute,
-        initialThemeMode: initialThemeMode,
+    runApp(
+      ChangeNotifierProvider(
+        create: (context) => LocaleProvider(),
+        child: MainApp(
+          initialRoute: initialRoute,
+        ),
       ),
-    ),
-  );
+    );
+  } catch (e) {
+    debugPrint('Error en la inicialización: $e');
+    // Ejecutar la app con una pantalla de error si algo falla
+    runApp(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Text('Error al iniciar la aplicación: $e'),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class MainApp extends StatelessWidget {
   final String initialRoute;
-  final ThemeMode initialThemeMode;
 
   const MainApp({
     super.key,
     required this.initialRoute,
-    required this.initialThemeMode,
   });
 
   @override
@@ -75,7 +77,9 @@ class MainApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
-          themeMode: initialThemeMode,
+          themeMode: Get.put(UserController()).isDarkMode.value
+              ? ThemeMode.dark
+              : ThemeMode.light,
           locale: localeProvider.locale,
           fallbackLocale: const Locale('es'),
           initialRoute: initialRoute,

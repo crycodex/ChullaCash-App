@@ -11,12 +11,13 @@ class RegisterContent extends StatefulWidget {
   State<RegisterContent> createState() => _RegisterContentState();
 }
 
-class _RegisterContentState extends State<RegisterContent> {
+class _RegisterContentState extends State<RegisterContent>
+    with AutomaticKeepAliveClientMixin {
   String _amount = '0';
   bool _isIncome = true;
   String? _selectedCategory;
   final TextEditingController _descriptionController = TextEditingController();
-  final FinanceController _financeController = Get.find<FinanceController>();
+  final FinanceController _financeController = Get.put(FinanceController());
 
   final Map<String, List<String>> _categories = {
     'income': [
@@ -41,9 +42,18 @@ class _RegisterContentState extends State<RegisterContent> {
   };
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   void initState() {
     super.initState();
     _selectedCategory = _categories['income']![0];
+  }
+
+  @override
+  void dispose() {
+    _descriptionController.dispose();
+    super.dispose();
   }
 
   void _updateAmount(String value) {
@@ -72,8 +82,20 @@ class _RegisterContentState extends State<RegisterContent> {
     });
   }
 
-  void _handleSubmit() {
-    if (double.parse(_amount) > 0) {
+  void _handleSubmit() async {
+    try {
+      if (double.parse(_amount) <= 0) {
+        Get.snackbar(
+          'Error',
+          'El monto debe ser mayor a 0',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+          snackPosition: SnackPosition.TOP,
+        );
+        return;
+      }
+
       final amount = double.parse(_amount);
       final description = _selectedCategory == 'Otro'
           ? _descriptionController.text.isEmpty
@@ -81,29 +103,57 @@ class _RegisterContentState extends State<RegisterContent> {
               : _descriptionController.text
           : _selectedCategory ?? 'Sin categoría';
 
-      if (_isIncome) {
-        _financeController.addIncome(amount, description);
-      } else {
-        _financeController.addExpense(amount, description);
-      }
-
-      _descriptionController.clear();
-      setState(() {
-        _amount = '0';
-      });
-
-      Get.snackbar(
-        'Éxito',
-        _isIncome ? 'Ingreso registrado' : 'Egreso registrado',
-        backgroundColor: _isIncome ? AppColors.primaryGreen : Colors.red,
-        colorText: Colors.white,
+      // Mostrar indicador de carga
+      Get.dialog(
+        const Center(
+          child: CircularProgressIndicator(),
+        ),
+        barrierDismissible: false,
       );
-    } else {
+
+      try {
+        // Registrar la transacción
+        if (_isIncome) {
+          await _financeController.addIncome(amount, description);
+        } else {
+          await _financeController.addExpense(amount, description);
+        }
+
+        // Cerrar el indicador de carga
+        Get.back();
+
+        // Limpiar el formulario
+        _descriptionController.clear();
+        setState(() {
+          _amount = '0';
+        });
+
+        // Navegar a la página de inicio
+        final pageController = Get.put(PageController());
+        pageController.jumpToPage(0);
+
+        // Mostrar mensaje de éxito
+        Get.snackbar(
+          'Éxito',
+          _isIncome ? 'Ingreso registrado' : 'Egreso registrado',
+          backgroundColor: _isIncome ? AppColors.primaryGreen : Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+          snackPosition: SnackPosition.TOP,
+        );
+      } catch (e) {
+        // Cerrar el indicador de carga si hay error
+        Get.back();
+        rethrow;
+      }
+    } catch (e) {
       Get.snackbar(
         'Error',
-        'El monto debe ser mayor a 0',
+        'No se pudo registrar la transacción: $e',
         backgroundColor: Colors.red,
         colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+        snackPosition: SnackPosition.TOP,
       );
     }
   }

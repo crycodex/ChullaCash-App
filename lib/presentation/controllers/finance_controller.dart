@@ -18,10 +18,6 @@ class FinanceController extends GetxController {
     super.onInit();
     loadTransactions();
     getTotalBalance();
-    // Iniciar escucha de cambios
-    ever(transactions, (_) {
-      getTotalBalance();
-    });
     // Escuchar cambios en tiempo real
     _listenToTransactions();
   }
@@ -38,9 +34,10 @@ class FinanceController extends GetxController {
         .doc('${now.year}')
         .collection('${now.month}')
         .snapshots()
-        .listen((snapshot) {
-      loadTransactions();
-      getTotalBalance();
+        .listen((snapshot) async {
+      await loadTransactions();
+      await getTotalBalance();
+      await updateBalance();
     });
   }
 
@@ -76,7 +73,7 @@ class FinanceController extends GetxController {
   Future<void> addIncome(double amount, String description) async {
     try {
       final userId = _auth.currentUser?.uid;
-      if (userId == null) return;
+      if (userId == null) throw Exception('Usuario no autenticado');
 
       final now = DateTime.now();
       final year = now.year;
@@ -85,6 +82,7 @@ class FinanceController extends GetxController {
       // Aseguramos que existan los documentos de año y mes
       await _ensureYearMonthExists(userId, year, month);
 
+      // Primero guardamos la transacción
       await _firestore
           .collection('users')
           .doc(userId)
@@ -100,10 +98,13 @@ class FinanceController extends GetxController {
         'updated_at': now,
       });
 
-      await updateBalance();
+      // Luego actualizamos los balances en orden
       await loadTransactions();
+      await updateBalance();
+      await getTotalBalance();
     } catch (e) {
-      Get.snackbar('Error', 'No se pudo registrar el ingreso: $e');
+      print('Error al agregar ingreso: $e');
+      rethrow;
     }
   }
 
@@ -111,7 +112,7 @@ class FinanceController extends GetxController {
   Future<void> addExpense(double amount, String description) async {
     try {
       final userId = _auth.currentUser?.uid;
-      if (userId == null) return;
+      if (userId == null) throw Exception('Usuario no autenticado');
 
       final now = DateTime.now();
       final year = now.year;
@@ -120,6 +121,7 @@ class FinanceController extends GetxController {
       // Aseguramos que existan los documentos de año y mes
       await _ensureYearMonthExists(userId, year, month);
 
+      // Primero guardamos la transacción
       await _firestore
           .collection('users')
           .doc(userId)
@@ -135,10 +137,13 @@ class FinanceController extends GetxController {
         'updated_at': now,
       });
 
-      await updateBalance();
+      // Luego actualizamos los balances en orden
       await loadTransactions();
+      await updateBalance();
+      await getTotalBalance();
     } catch (e) {
-      Get.snackbar('Error', 'No se pudo registrar el egreso: $e');
+      print('Error al agregar egreso: $e');
+      rethrow;
     }
   }
 
@@ -203,14 +208,15 @@ class FinanceController extends GetxController {
         if (doc.id == 'info') continue; // Saltamos el documento info
         final data = doc.data();
         if (data['type'] == 'income') {
-          balance += data['amount'];
-        } else {
-          balance -= data['amount'];
+          balance += (data['amount'] as num).toDouble();
+        } else if (data['type'] == 'expense') {
+          balance -= (data['amount'] as num).toDouble();
         }
       }
 
       totalBalance.value = balance;
     } catch (e) {
+      print('Error al actualizar balance: $e');
       Get.snackbar('Error', 'No se pudo actualizar el balance: $e');
     }
   }
@@ -221,14 +227,14 @@ class FinanceController extends GetxController {
       final userId = _auth.currentUser?.uid;
       if (userId == null) return;
 
+      double total = 0.0;
+
       // Obtener todos los años
       final yearsSnapshot = await _firestore
           .collection('users')
           .doc(userId)
           .collection('transactions')
           .get();
-
-      double totalBalance = 0.0;
 
       // Recorrer cada año
       for (var yearDoc in yearsSnapshot.docs) {
@@ -248,17 +254,18 @@ class FinanceController extends GetxController {
 
             final data = doc.data();
             if (data['type'] == 'income') {
-              totalBalance += data['amount'] as double;
+              total += (data['amount'] as num).toDouble();
             } else if (data['type'] == 'expense') {
-              totalBalance -= data['amount'] as double;
+              total -= (data['amount'] as num).toDouble();
             }
           }
         }
       }
 
       // Actualizar el balance total observable
-      allTimeBalance.value = totalBalance;
+      allTimeBalance.value = total;
     } catch (e) {
+      print('Error al calcular balance total: $e');
       Get.snackbar(
         'Error',
         'No se pudo calcular el balance total: $e',

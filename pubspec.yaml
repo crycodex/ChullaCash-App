@@ -12,15 +12,15 @@ dependencies:
   #splash screen
   flutter_native_splash: ^2.4.0
   #firebasecore
-  firebase_core: ^2.20.0
+  firebase_core: ^2.24.2
   #firebase auth
-  firebase_auth: ^4.20.0
+  firebase_auth: ^4.15.3
   #firebase storage
   firebase_storage: ^11.2.0
   #firebase firestore
-  cloud_firestore: ^4.10.0
+  cloud_firestore: ^4.13.6
   #getX
-  get: ^4.6.6
+  get: ^4.6.5
   #idioma
   intl: 0.19.0
   #flutter localizations
@@ -28,14 +28,15 @@ dependencies:
     sdk: flutter
   provider: ^6.1.2
   #google sign in
-  google_sign_in: ^6.2.2
+  google_sign_in: ^6.1.6
   #apple sign in
-  sign_in_with_apple: ^6.1.4
+  sign_in_with_apple: ^5.0.0
   fl_chart: ^0.65.0
   #image picker
   image_picker: ^1.1.2
   #local auth
-  local_auth: ^2.3.0
+  local_auth: ^2.1.7
+  url_launcher: ^6.2.4
   
 dev_dependencies:
   flutter_test:

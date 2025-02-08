@@ -16,6 +16,12 @@
 					<string>com.googleusercontent.apps.647797593454-80v71i5sjphqi5mtfobtnihfnam0o9mb</string>
 				</array>
 			</dict>
+			<dict>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>mailto</string>
+				</array>
+			</dict>
 		</array>
 		<!-- End of the Google Sign-in Section -->
 		<!-- local auth -->
@@ -70,5 +76,9 @@
 		<true/>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
+		<key>LSApplicationQueriesSchemes</key>
+		<array>
+			<string>mailto</string>
+		</array>
 	</dict>
 </plist>

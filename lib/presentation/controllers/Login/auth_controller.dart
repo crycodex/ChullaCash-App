@@ -11,6 +11,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 //theme
 import '../../../presentation/theme/app_colors.dart';
+import '../../../presentation/theme/app_theme.dart';
 
 enum AuthStatus { checking, authenticated, unauthenticated, error }
 
@@ -57,26 +58,46 @@ class AuthController extends GetxController {
       if (userDoc.exists) {
         final darkMode = userDoc.data()?['isDarkMode'];
         isDarkMode.value = darkMode == true || darkMode == "true";
-        Get.changeThemeMode(
-            isDarkMode.value ? ThemeMode.dark : ThemeMode.light);
+        _applyTheme();
       }
     } catch (e) {
       debugPrint('Error al cargar el tema: $e');
     }
   }
 
+  void _applyTheme() {
+    Get.changeThemeMode(isDarkMode.value ? ThemeMode.dark : ThemeMode.light);
+    Get.changeTheme(
+        isDarkMode.value ? AppTheme.darkTheme : AppTheme.lightTheme);
+  }
+
   void toggleTheme() async {
     try {
       isDarkMode.value = !isDarkMode.value;
-      Get.changeThemeMode(isDarkMode.value ? ThemeMode.dark : ThemeMode.light);
+      _applyTheme();
 
       if (uid.value.isNotEmpty) {
         await _firestore.collection('users').doc(uid.value).update({
           'isDarkMode': isDarkMode.value,
         });
       }
+
+      Get.snackbar(
+        'Tema cambiado',
+        isDarkMode.value ? 'Modo oscuro activado' : 'Modo claro activado',
+        backgroundColor:
+            isDarkMode.value ? const Color(0xFF1E1E1E) : Colors.white,
+        colorText: isDarkMode.value ? Colors.white : AppColors.textPrimary,
+        duration: const Duration(seconds: 2),
+      );
     } catch (e) {
       debugPrint('Error al cambiar el tema: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo cambiar el tema',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     }
   }
 

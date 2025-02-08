@@ -435,29 +435,48 @@ class AuthController extends GetxController {
 
   //* Login con Google
   Future<void> loginWithGoogle() async {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
-    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-    if (googleUser != null) {
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser != null) {
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
 
-      final UserCredential userCredential =
-          await _auth.signInWithCredential(credential);
-      final User? user = userCredential.user;
-      if (user == null) {
-        throw Exception('Error al iniciar sesión con Google');
-      }
+        final UserCredential userCredential =
+            await _auth.signInWithCredential(credential);
+        final User? user = userCredential.user;
+        if (user == null) {
+          throw Exception('Error al iniciar sesión con Google');
+        }
 
-      final userDoc = await _firestore.collection('users').doc(user.uid).get();
-      if (!userDoc.exists) {
-        await _createUserDocument(user);
-        //ir a la pantalla de home
+        final userDoc =
+            await _firestore.collection('users').doc(user.uid).get();
+        if (!userDoc.exists) {
+          await _createUserDocument(user);
+        }
+
+        // Actualizar datos observables
+        uid.value = user.uid;
+        email.value = user.email ?? '';
+        name.value = user.displayName ?? '';
+        profilePicture.value = user.photoURL ?? '';
+
+        debugPrint('Login con Google exitoso, redirigiendo a home');
         Get.offAllNamed('/home');
       }
+    } catch (e) {
+      debugPrint('Error en login con Google: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo completar el inicio de sesión con Google',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 

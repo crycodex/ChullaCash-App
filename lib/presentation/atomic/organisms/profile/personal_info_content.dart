@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../theme/app_colors.dart';
 import '../../atoms/buttons/custom_button.dart';
 import '../../../controllers/Login/auth_controller.dart';
+import '../../../controllers/user_controller.dart';
 import 'package:image_picker/image_picker.dart';
 
 class PersonalInfoContent extends StatelessWidget {
@@ -10,7 +11,8 @@ class PersonalInfoContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authController = Get.find<AuthController>();
+    final authController = Get.put(AuthController());
+    final userController = Get.put(UserController());
 
     return Scaffold(
       appBar: AppBar(
@@ -30,22 +32,29 @@ class PersonalInfoContent extends StatelessWidget {
                   Obx(() => CircleAvatar(
                         radius: 60,
                         backgroundColor: AppColors.lightGray,
-                        backgroundImage: authController.profileImage.value !=
-                                null
-                            ? NetworkImage(authController.profileImage.value!)
-                            : null,
-                        child: authController.profileImage.value == null
-                            ? const Icon(
-                                Icons.person,
-                                size: 60,
-                                color: AppColors.primaryGreen,
+                        backgroundImage:
+                            userController.photoUrl.value.isNotEmpty
+                                ? NetworkImage(userController.photoUrl.value)
+                                : null,
+                        child: userController.isLoading.value
+                            ? const CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    AppColors.primaryGreen),
                               )
-                            : null,
+                            : (userController.photoUrl.value.isEmpty
+                                ? const Icon(
+                                    Icons.person,
+                                    size: 60,
+                                    color: AppColors.primaryGreen,
+                                  )
+                                : null),
                       )),
                   Positioned(
                     bottom: 0,
                     right: 0,
-                    child: _buildImagePickerButton(authController),
+                    child: Obx(() => userController.isLoading.value
+                        ? const SizedBox.shrink()
+                        : _buildImagePickerButton(userController)),
                   ),
                 ],
               ),
@@ -89,7 +98,7 @@ class PersonalInfoContent extends StatelessWidget {
     );
   }
 
-  Widget _buildImagePickerButton(AuthController controller) {
+  Widget _buildImagePickerButton(UserController controller) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.primaryGreen,
@@ -106,6 +115,7 @@ class PersonalInfoContent extends StatelessWidget {
               source: source,
               maxWidth: 512,
               maxHeight: 512,
+              imageQuality: 85,
             );
             if (image != null) {
               controller.updateProfileImage(image.path);

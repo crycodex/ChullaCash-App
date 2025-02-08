@@ -4,6 +4,7 @@ import '../../../theme/app_colors.dart';
 import '../../atoms/buttons/custom_button.dart';
 //controllers
 import '../../../controllers/Login/auth_controller.dart';
+import '../../../controllers/user_controller.dart';
 //url launcher
 import 'package:url_launcher/url_launcher.dart';
 
@@ -32,6 +33,7 @@ class ProfileContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authController = Get.put(AuthController());
+    final userController = Get.put(UserController());
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -40,8 +42,7 @@ class ProfileContent extends StatelessWidget {
           children: [
             // Profile Header
             Obx(() {
-              final hasValidImage = authController.profileImage.value != null &&
-                  authController.profileImage.value!.isNotEmpty;
+              final hasValidImage = userController.photoUrl.value.isNotEmpty;
 
               return CircleAvatar(
                 radius: 50,
@@ -49,24 +50,32 @@ class ProfileContent extends StatelessWidget {
                     ? const Color(0xFF2C2C2C)
                     : AppColors.lightGray,
                 backgroundImage: hasValidImage
-                    ? NetworkImage(authController.profileImage.value!)
+                    ? NetworkImage(userController.photoUrl.value)
                     : null,
-                child: !hasValidImage
-                    ? Icon(
-                        Icons.person,
-                        size: 50,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white70
-                            : AppColors.primaryGreen,
+                child: userController.isLoading.value
+                    ? const CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.primaryGreen),
                       )
-                    : null,
+                    : (!hasValidImage
+                        ? Icon(
+                            Icons.person,
+                            size: 50,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white70
+                                    : AppColors.primaryGreen,
+                          )
+                        : null),
               );
             }),
             const SizedBox(height: 16),
 
             // Nombre del usuario
             Obx(() => Text(
-                  authController.userName.value,
+                  userController.name.value.isEmpty
+                      ? 'Usuario'
+                      : userController.name.value,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -74,7 +83,7 @@ class ProfileContent extends StatelessWidget {
                   ),
                 )),
             Obx(() => Text(
-                  authController.userEmail.value,
+                  userController.email.value,
                   style: const TextStyle(
                     fontSize: 16,
                     color: AppColors.textSecondary,

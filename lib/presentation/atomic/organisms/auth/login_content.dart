@@ -164,30 +164,32 @@ class _LoginContentState extends State<LoginContent> {
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    _authController.loginWithApple();
-                  },
-                  icon: Image.asset(
-                    'lib/assets/icons/others/apple.png',
-                    height: 24,
-                  ),
-                  label: Text(
-                    'Apple',
-                    style: TextStyle(color: AppColors.textPrimary),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    side: BorderSide(color: AppColors.lightGray),
-                    backgroundColor: AppColors.surfaceLight,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              if (GetPlatform.isIOS) ...[
+                const SizedBox(width: 16),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      _authController.loginWithApple();
+                    },
+                    icon: Image.asset(
+                      'lib/assets/icons/others/apple.png',
+                      height: 24,
+                    ),
+                    label: Text(
+                      'Apple',
+                      style: TextStyle(color: AppColors.textPrimary),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      side: BorderSide(color: AppColors.lightGray),
+                      backgroundColor: AppColors.surfaceLight,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ],
           ),
 

@@ -77,5 +77,4 @@ flutter:
     - lib/assets/icons/others/apple.png
     - lib/assets/icons/others/googleIcon.png
     #sounds
-    - assets/sounds/
     - assets/sounds/success.mp3

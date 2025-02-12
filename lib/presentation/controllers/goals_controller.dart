@@ -47,7 +47,7 @@ class GoalsController extends GetxController {
   Future<void> _initAudioPlayer() async {
     try {
       _audioPlayer = AudioPlayer();
-      await _audioPlayer?.setSource(AssetSource('assets/sounds/success.mp3'));
+      await _audioPlayer?.setSource(AssetSource('sounds/success.mp3'));
     } catch (e) {
       print('Error inicializando audio player: $e');
     }

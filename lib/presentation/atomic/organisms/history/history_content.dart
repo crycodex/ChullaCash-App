@@ -47,7 +47,8 @@ class _HistoryContentState extends State<HistoryContent> {
       setState(() {
         _selectedDate = picked;
       });
-      _movementController.loadMovementsForMonth(picked.year, picked.month);
+      _movementController.setupMovementsStream(
+          _selectedDate.year, _selectedDate.month);
     }
   }
 

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,28 +13,30 @@ class MovementController extends GetxController {
       <Map<String, dynamic>>[].obs;
 
   final FinanceController _financeController = Get.put(FinanceController());
+  StreamSubscription? _movementsSubscription;
 
   @override
   void onInit() {
     super.onInit();
     final now = DateTime.now();
-    loadMovementsForMonth(now.year, now.month);
+    setupMovementsStream(now.year, now.month);
   }
 
-  Future<void> loadMovementsForMonth(int year, int month) async {
-    try {
-      final userId = _auth.currentUser?.uid;
-      if (userId == null) return;
+  void setupMovementsStream(int year, int month) {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) return;
 
-      final snapshot = await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('transactions')
-          .doc('$year')
-          .collection('$month')
-          .orderBy('timestamp', descending: true)
-          .get();
+    _movementsSubscription?.cancel();
 
+    _movementsSubscription = _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('transactions')
+        .doc('$year')
+        .collection('$month')
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .listen((snapshot) {
       currentMonthMovements.value = snapshot.docs
           .where((doc) => doc.id != 'info')
           .map((doc) => {
@@ -41,14 +44,17 @@ class MovementController extends GetxController {
                 ...doc.data(),
               })
           .toList();
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'No se pudieron cargar los movimientos: $e',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-    }
+
+      // Actualizar balance cuando cambian los movimientos
+      _financeController.getTotalBalance();
+      _financeController.updateBalance();
+    });
+  }
+
+  @override
+  void onClose() {
+    _movementsSubscription?.cancel();
+    super.onClose();
   }
 
   String getTimeAgo(dynamic timestamp) {

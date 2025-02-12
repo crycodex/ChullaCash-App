@@ -30,15 +30,8 @@ class _HomeContentState extends State<HomeContent>
   void initState() {
     super.initState();
     financeController.getTotalBalance();
-
-    // Cargar movimientos iniciales
-    movementController.currentMonthMovements();
-
-    // Escuchar cambios en los movimientos
-    ever(movementController.currentMonthMovements, (_) {
-      financeController.getTotalBalance();
-      financeController.updateBalance();
-    });
+    final now = DateTime.now();
+    movementController.setupMovementsStream(now.year, now.month);
   }
 
   @override
@@ -51,6 +44,7 @@ class _HomeContentState extends State<HomeContent>
     super.build(context);
     return Obx(() {
       final bool isDarkMode = userController.isDarkMode.value;
+      final movements = movementController.currentMonthMovements;
 
       return SafeArea(
         child: Padding(
@@ -229,7 +223,6 @@ class _HomeContentState extends State<HomeContent>
               const SizedBox(height: 16),
               Expanded(
                 child: Obx(() {
-                  final movements = movementController.currentMonthMovements;
                   if (movements.isEmpty) {
                     return Center(
                       child: Column(

@@ -114,90 +114,86 @@ class _HomeContentState extends State<HomeContent>
                           Text(
                             'Balance Total',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
                               color: isDarkMode
-                                  ? const Color(0xFFE0E0E0)
+                                  ? Colors.white70
                                   : AppColors.textSecondary,
-                              letterSpacing: 0.5,
                             ),
                           ),
-                          Obx(() {
-                            final balance =
-                                financeController.allTimeBalance.value;
-                            final isPositive = balance >= 0;
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: (isPositive
-                                        ? AppColors.primaryGreen
-                                        : Colors.red)
-                                    .withOpacity(isDarkMode ? 0.2 : 0.1),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    isPositive
-                                        ? Icons.trending_up
-                                        : Icons.trending_down,
-                                    color: isPositive
-                                        ? AppColors.primaryGreen
-                                        : Colors.red,
-                                    size: 16,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    isPositive ? 'Positivo' : 'Negativo',
-                                    style: TextStyle(
-                                      color: isPositive
-                                          ? AppColors.primaryGreen
-                                          : Colors.red,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: isDarkMode
+                                      ? Colors.white.withOpacity(0.1)
+                                      : AppColors.primaryGreen.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.account_balance_wallet,
+                                      size: 16,
+                                      color: isDarkMode
+                                          ? Colors.white70
+                                          : AppColors.primaryGreen,
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Mi Billetera',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: isDarkMode
+                                            ? Colors.white70
+                                            : AppColors.primaryGreen,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            );
-                          }),
+                              const SizedBox(width: 8),
+                              GestureDetector(
+                                onTap: () =>
+                                    Get.to(() => const HistoryContent()),
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: isDarkMode
+                                        ? Colors.white.withOpacity(0.1)
+                                        : AppColors.primaryGreen
+                                            .withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(
+                                    Icons.history,
+                                    size: 16,
+                                    color: isDarkMode
+                                        ? Colors.white70
+                                        : AppColors.primaryGreen,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 12),
-                      //balance total
-                      Obx(() {
-                        final balance = financeController.allTimeBalance.value;
-                        final isPositive = balance >= 0;
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '\$${balance.abs().toStringAsFixed(2)}',
+                      const SizedBox(height: 16),
+                      GestureDetector(
+                        onTap: () => Get.to(() => const HistoryContent()),
+                        child: Obx(() => Text(
+                              '\$${financeController.allTimeBalance.value.toStringAsFixed(2)}',
                               style: TextStyle(
-                                fontSize: 42,
+                                fontSize: 40,
                                 fontWeight: FontWeight.bold,
-                                color: isPositive
-                                    ? AppColors.primaryGreen
-                                    : Colors.red,
-                              ),
-                            ),
-                            Text(
-                              isPositive
-                                  ? 'Tu balance está en buen estado'
-                                  : 'Tu balance está en números rojos',
-                              style: TextStyle(
-                                fontSize: 14,
                                 color: isDarkMode
-                                    ? const Color(0xFFE0E0E0)
+                                    ? Colors.white70
                                     : AppColors.textSecondary,
                               ),
-                            ),
-                          ],
-                        );
-                      }),
+                            )),
+                      ),
                     ],
                   ),
                 ),

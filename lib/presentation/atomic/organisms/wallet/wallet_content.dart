@@ -5,6 +5,7 @@ import '../../../controllers/movement_controller.dart';
 import '../../../controllers/finance_controller.dart';
 import '../../../controllers/user_controller.dart';
 import '../../molecules/charts/finance_charts.dart';
+import '../history/history_content.dart';
 
 class WalletContent extends StatefulWidget {
   const WalletContent({super.key});
@@ -83,87 +84,121 @@ class _WalletContentState extends State<WalletContent>
                 AnimatedBuilder(
                   animation: _colorAnimationController,
                   builder: (context, child) {
-                    return Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: isDarkMode
-                            ? AppColors.darkSurface.withOpacity(0.8)
-                            : _colorAnimation.value,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: isDarkMode
-                                ? Colors.black.withOpacity(0.5)
-                                : Colors.grey.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                        border: Border.all(
+                    return GestureDetector(
+                      onTap: () => Get.to(() => const HistoryContent()),
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
                           color: isDarkMode
-                              ? Colors.white.withOpacity(0.1)
-                              : Colors.transparent,
-                          width: 1,
+                              ? AppColors.darkSurface.withOpacity(0.8)
+                              : _colorAnimation.value,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: isDarkMode
+                                  ? Colors.black.withOpacity(0.5)
+                                  : Colors.grey.withOpacity(0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                          border: Border.all(
+                            color: isDarkMode
+                                ? Colors.white.withOpacity(0.1)
+                                : Colors.transparent,
+                            width: 1,
+                          ),
                         ),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Balance Total',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                  color: isDarkMode
-                                      ? Colors.white70
-                                      : AppColors.textSecondary,
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Balance Total',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500,
+                                    color: isDarkMode
+                                        ? Colors.white70
+                                        : AppColors.textSecondary,
+                                  ),
                                 ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: isDarkMode
-                                      ? Colors.white.withOpacity(0.1)
-                                      : AppColors.primaryGreen.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Row(
+                                Row(
                                   children: [
-                                    Icon(
-                                      Icons.account_balance_wallet,
-                                      size: 16,
-                                      color: isDarkMode
-                                          ? Colors.white70
-                                          : AppColors.primaryGreen,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      'Mi Billetera',
-                                      style: TextStyle(
-                                        fontSize: 14,
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
                                         color: isDarkMode
-                                            ? Colors.white70
-                                            : AppColors.primaryGreen,
+                                            ? Colors.white.withOpacity(0.1)
+                                            : AppColors.primaryGreen
+                                                .withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.account_balance_wallet,
+                                            size: 16,
+                                            color: isDarkMode
+                                                ? Colors.white70
+                                                : AppColors.primaryGreen,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'Mi Billetera',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: isDarkMode
+                                                  ? Colors.white70
+                                                  : AppColors.primaryGreen,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    GestureDetector(
+                                      onTap: () =>
+                                          Get.to(() => const HistoryContent()),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: isDarkMode
+                                              ? Colors.white.withOpacity(0.1)
+                                              : AppColors.primaryGreen
+                                                  .withOpacity(0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: Icon(
+                                          Icons.history,
+                                          size: 16,
+                                          color: isDarkMode
+                                              ? Colors.white70
+                                              : AppColors.primaryGreen,
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          Obx(() => Text(
-                                '\$${_financeController.allTimeBalance.value.toStringAsFixed(2)}',
-                                style: TextStyle(
-                                  fontSize: 40,
-                                  fontWeight: FontWeight.bold,
-                                  color: _textColorAnimation.value,
-                                ),
-                              )),
-                        ],
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            GestureDetector(
+                              onTap: () => Get.to(() => const HistoryContent()),
+                              child: Obx(() => Text(
+                                    '\$${_financeController.allTimeBalance.value.toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      fontSize: 40,
+                                      fontWeight: FontWeight.bold,
+                                      color: _textColorAnimation.value,
+                                    ),
+                                  )),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },

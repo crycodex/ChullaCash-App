@@ -6,7 +6,6 @@ import 'package:confetti/confetti.dart';
 import './finance_controller.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
-import 'dart:math' as math;
 
 class GoalsController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

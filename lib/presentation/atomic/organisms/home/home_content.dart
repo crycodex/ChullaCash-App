@@ -30,6 +30,20 @@ class _HomeContentState extends State<HomeContent>
   void initState() {
     super.initState();
     financeController.getTotalBalance();
+
+    // Cargar movimientos iniciales
+    movementController.currentMonthMovements();
+
+    // Escuchar cambios en los movimientos
+    ever(movementController.currentMonthMovements, (_) {
+      financeController.getTotalBalance();
+      financeController.updateBalance();
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override

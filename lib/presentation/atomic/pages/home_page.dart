@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import '../molecules/navigation/bottom_nav_bar.dart';
 import '../organisms/home/home_content.dart';
 import '../organisms/wallet/wallet_content.dart';
-import '../organisms/history/history_content.dart';
+import '../organisms/goals/goals_content.dart';
 import '../organisms/profile/profile_content.dart';
 import '../organisms/register/register_content.dart';
 import '../../controllers/finance_controller.dart';
@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
     const HomeContent(),
     const WalletContent(),
     const RegisterContent(),
-    const HistoryContent(),
+    const GoalsContent(),
     const ProfileContent(),
   ];
 

@@ -37,7 +37,14 @@ dependencies:
   #local auth
   local_auth: ^2.1.7
   url_launcher: ^6.2.4
-  
+  #lottie
+  lottie: ^3.3.1
+  #percent indicator
+  percent_indicator: ^4.2.4
+  #confetti
+  confetti: ^0.8.0
+  #audioplayers
+  audioplayers: ^6.1.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -69,3 +76,6 @@ flutter:
     #img login
     - lib/assets/icons/others/apple.png
     - lib/assets/icons/others/googleIcon.png
+    #sounds
+    - assets/sounds/
+    - assets/sounds/success.mp3

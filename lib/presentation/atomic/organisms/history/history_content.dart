@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../theme/app_colors.dart';
 import '../../../controllers/movement_controller.dart';
+import '../../../controllers/user_controller.dart';
 import 'package:intl/intl.dart';
 
 class HistoryContent extends StatefulWidget {
@@ -13,6 +14,7 @@ class HistoryContent extends StatefulWidget {
 
 class _HistoryContentState extends State<HistoryContent> {
   final MovementController _movementController = Get.put(MovementController());
+  final UserController _userController = Get.find<UserController>();
 
   String _selectedFilter = 'Todos';
   final List<String> _filters = ['Todos', 'Ingresos', 'Gastos'];
@@ -27,6 +29,19 @@ class _HistoryContentState extends State<HistoryContent> {
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
       locale: const Locale('es', 'ES'),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppColors.primaryGreen,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: AppColors.textPrimary,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null && picked != _selectedDate) {
       setState(() {
@@ -38,300 +53,386 @@ class _HistoryContentState extends State<HistoryContent> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: AppColors.textPrimary,
+          ),
+          onPressed: () => Get.back(),
+        ),
+        title: Text(
+          'Historial',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+        ),
+      ),
+      body: Obx(() {
+        final bool isDarkMode = _userController.isDarkMode.value;
+        return SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Historial',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
                     // Selector de mes y año
                     InkWell(
                       onTap: _showDatePicker,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
-                          vertical: 8,
+                          vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryGreen.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
+                          color: isDarkMode
+                              ? AppColors.darkSurface
+                              : AppColors.primaryGreen.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: AppColors.primaryGreen,
+                            color: AppColors.primaryGreen.withOpacity(0.3),
                             width: 1,
                           ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            Icon(
+                              Icons.calendar_today,
+                              size: 20,
+                              color: AppColors.primaryGreen,
+                            ),
+                            const SizedBox(width: 8),
                             Text(
                               _monthFormat.format(_selectedDate),
                               style: TextStyle(
                                 color: AppColors.primaryGreen,
                                 fontWeight: FontWeight.bold,
+                                fontSize: 16,
                               ),
-                            ),
-                            const SizedBox(width: 4),
-                            Icon(
-                              Icons.calendar_today,
-                              size: 16,
-                              color: AppColors.primaryGreen,
                             ),
                           ],
                         ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Resumen del mes
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color:
+                            isDarkMode ? AppColors.darkSurface : Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Ingresos',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: isDarkMode
+                                      ? Colors.white70
+                                      : AppColors.textSecondary,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '+\$${_calculateIncome().toStringAsFixed(2)}',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primaryGreen,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            width: 1,
+                            height: 40,
+                            color: AppColors.lightGray,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                'Gastos',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: isDarkMode
+                                      ? Colors.white70
+                                      : AppColors.textSecondary,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '-\$${_calculateExpenses().toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                // Resumen del mes seleccionado
-                Obx(() => Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Ingresos',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                            Text(
-                              '+\$${_calculateIncome().toStringAsFixed(2)}',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primaryGreen,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              'Gastos',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                            Text(
-                              '-\$${_calculateExpenses().toStringAsFixed(2)}',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.red,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    )),
-              ],
-            ),
-          ),
+              ),
 
-          // Filtros
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: _filters
-                  .map((filter) => _buildFilterChip(
-                        filter,
-                        _selectedFilter == filter,
-                        () {
-                          setState(() {
-                            _selectedFilter = filter;
-                          });
-                        },
-                      ))
-                  .toList(),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Lista de transacciones
-          Expanded(
-            child: Obx(() {
-              final movements = _movementController.currentMonthMovements;
-
-              if (movements.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.history,
-                        size: 64,
-                        color: AppColors.textSecondary.withOpacity(0.5),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No hay transacciones en ${_monthFormat.format(_selectedDate)}',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              final filteredMovements = movements.where((movement) {
-                if (_selectedFilter == 'Todos') return true;
-                if (_selectedFilter == 'Ingresos') {
-                  return movement['type'] == 'income';
-                }
-                return movement['type'] == 'expense';
-              }).toList();
-
-              return ListView.builder(
+              // Filtros
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: filteredMovements.length,
-                itemBuilder: (context, index) {
-                  final movement = filteredMovements[index];
-                  final isIncome = movement['type'] == 'income';
+                child: Row(
+                  children: _filters
+                      .map((filter) => _buildFilterChip(
+                            filter,
+                            _selectedFilter == filter,
+                            () {
+                              setState(() {
+                                _selectedFilter = filter;
+                              });
+                            },
+                            isDarkMode,
+                          ))
+                      .toList(),
+                ),
+              ),
 
-                  return Dismissible(
-                    key: Key(movement['id']),
-                    direction: DismissDirection.endToStart,
-                    background: Container(
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: 20.0),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(12),
+              const SizedBox(height: 16),
+
+              // Lista de transacciones
+              Expanded(
+                child: Obx(() {
+                  final movements = _movementController.currentMonthMovements;
+
+                  if (movements.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.history,
+                            size: 64,
+                            color: isDarkMode
+                                ? Colors.white.withOpacity(0.2)
+                                : AppColors.textSecondary.withOpacity(0.5),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No hay transacciones en ${_monthFormat.format(_selectedDate)}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: isDarkMode
+                                  ? Colors.white70
+                                  : AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
                       ),
-                      child: const Icon(
-                        Icons.delete,
-                        color: Colors.white,
-                      ),
-                    ),
-                    confirmDismiss: (direction) async {
-                      return await showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Confirmar eliminación'),
-                            content: const Text(
-                                '¿Estás seguro de que quieres eliminar esta transacción?'),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.of(context).pop(false),
-                                child: const Text('Cancelar'),
-                              ),
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.of(context).pop(true),
-                                child: const Text(
-                                  'Eliminar',
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    onDismissed: (direction) {
-                      _movementController.deleteMovement(movement['id']);
-                    },
-                    child: Card(
-                      elevation: 0,
-                      margin: const EdgeInsets.only(bottom: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(
-                          color: AppColors.lightGray.withOpacity(0.5),
-                          width: 1,
-                        ),
-                      ),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(16),
-                        leading: Container(
-                          width: 48,
-                          height: 48,
+                    );
+                  }
+
+                  final filteredMovements = movements.where((movement) {
+                    if (_selectedFilter == 'Todos') return true;
+                    if (_selectedFilter == 'Ingresos') {
+                      return movement['type'] == 'income';
+                    }
+                    return movement['type'] == 'expense';
+                  }).toList();
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: filteredMovements.length,
+                    itemBuilder: (context, index) {
+                      final movement = filteredMovements[index];
+                      final isIncome = movement['type'] == 'income';
+
+                      return Dismissible(
+                        key: Key(movement['id']),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 20.0),
                           decoration: BoxDecoration(
-                            color: isIncome
-                                ? AppColors.primaryGreen.withOpacity(0.1)
-                                : Colors.red.withOpacity(0.1),
+                            color: Colors.red.withOpacity(0.8),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Icon(
-                            isIncome
-                                ? Icons.arrow_downward
-                                : Icons.arrow_upward,
-                            color:
-                                isIncome ? AppColors.primaryGreen : Colors.red,
+                          child: const Icon(
+                            Icons.delete_outline,
+                            color: Colors.white,
+                            size: 28,
                           ),
                         ),
-                        title: Text(
-                          movement['description'],
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
+                        confirmDismiss: (direction) async {
+                          return await showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                backgroundColor: isDarkMode
+                                    ? AppColors.darkSurface
+                                    : Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                title: Text(
+                                  'Confirmar eliminación',
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? Colors.white
+                                        : AppColors.textPrimary,
+                                  ),
+                                ),
+                                content: Text(
+                                  '¿Estás seguro de que quieres eliminar esta transacción?',
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? Colors.white70
+                                        : AppColors.textSecondary,
+                                  ),
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(false),
+                                    child: Text(
+                                      'Cancelar',
+                                      style: TextStyle(
+                                        color: isDarkMode
+                                            ? Colors.white70
+                                            : AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(true),
+                                    child: const Text(
+                                      'Eliminar',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        onDismissed: (direction) {
+                          _movementController.deleteMovement(movement['id']);
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          decoration: BoxDecoration(
+                            color: isDarkMode
+                                ? AppColors.darkSurface
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isDarkMode
+                                  ? Colors.white.withOpacity(0.1)
+                                  : AppColors.lightGray,
+                              width: 1,
+                            ),
                           ),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 4),
-                            Text(
-                              isIncome ? 'Ingreso' : 'Gasto',
-                              style: TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 14,
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.all(16),
+                            leading: Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: (isIncome
+                                        ? AppColors.primaryGreen
+                                        : Colors.red)
+                                    .withOpacity(isDarkMode ? 0.2 : 0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                isIncome
+                                    ? Icons.arrow_downward
+                                    : Icons.arrow_upward,
+                                color: isIncome
+                                    ? AppColors.primaryGreen
+                                    : Colors.red,
                               ),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              _movementController
-                                  .getTimeAgo(movement['timestamp']),
+                            title: Text(
+                              movement['description'],
                               style: TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                color: isDarkMode
+                                    ? Colors.white
+                                    : AppColors.textPrimary,
                               ),
                             ),
-                          ],
-                        ),
-                        trailing: Text(
-                          '${isIncome ? '+' : '-'}\$${movement['amount'].toStringAsFixed(2)}',
-                          style: TextStyle(
-                            color:
-                                isIncome ? AppColors.primaryGreen : Colors.red,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 4),
+                                Text(
+                                  isIncome ? 'Ingreso' : 'Gasto',
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? Colors.white70
+                                        : AppColors.textSecondary,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _movementController
+                                      .getTimeAgo(movement['timestamp']),
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? Colors.white70
+                                        : AppColors.textSecondary,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            trailing: Text(
+                              '${isIncome ? '+' : '-'}\$${movement['amount'].toStringAsFixed(2)}',
+                              style: TextStyle(
+                                color: isIncome
+                                    ? AppColors.primaryGreen
+                                    : Colors.red,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   );
-                },
-              );
-            }),
+                }),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      }),
     );
   }
 
@@ -347,7 +448,8 @@ class _HistoryContentState extends State<HistoryContent> {
         .fold(0.0, (sum, movement) => sum + (movement['amount'] as double));
   }
 
-  Widget _buildFilterChip(String label, bool isSelected, VoidCallback onTap) {
+  Widget _buildFilterChip(
+      String label, bool isSelected, VoidCallback onTap, bool isDarkMode) {
     return Container(
       margin: const EdgeInsets.only(right: 8),
       child: FilterChip(
@@ -355,6 +457,7 @@ class _HistoryContentState extends State<HistoryContent> {
         label: Text(label),
         onSelected: (_) => onTap(),
         selectedColor: AppColors.primaryGreen.withOpacity(0.2),
+        backgroundColor: isDarkMode ? AppColors.darkSurface : Colors.white,
         checkmarkColor: AppColors.primaryGreen,
         labelStyle: TextStyle(
           color: isSelected ? AppColors.primaryGreen : AppColors.textSecondary,

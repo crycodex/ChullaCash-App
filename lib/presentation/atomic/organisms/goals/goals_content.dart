@@ -635,12 +635,6 @@ class _GoalsContentState extends State<GoalsContent>
             final bool isDarkMode = userController.isDarkMode.value;
             final goals = goalsController.goals;
 
-            if (goalsController.isLoading.value) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-
             if (goals.isEmpty) {
               return _buildEmptyState(isDarkMode);
             }
@@ -680,7 +674,6 @@ class _GoalsContentState extends State<GoalsContent>
                   ),
                   confirmDismiss: (direction) async {
                     if (direction == DismissDirection.endToStart) {
-                      // Eliminar
                       return await showDialog(
                         context: context,
                         builder: (BuildContext context) {
@@ -728,7 +721,6 @@ class _GoalsContentState extends State<GoalsContent>
                         },
                       );
                     } else {
-                      // Editar
                       _showEditGoalDialog(goals[index]);
                       return false;
                     }
@@ -743,69 +735,6 @@ class _GoalsContentState extends State<GoalsContent>
               },
             );
           }),
-        ),
-        // Confeti central (lluvia)
-        Align(
-          alignment: Alignment.topCenter,
-          child: ConfettiWidget(
-            confettiController: goalsController.confettiControllerCenter,
-            blastDirection: math.pi / 2,
-            maxBlastForce: 5,
-            minBlastForce: 2,
-            emissionFrequency: 0.05,
-            numberOfParticles: 50,
-            gravity: 0.1,
-            shouldLoop: false,
-            colors: const [
-              Colors.green,
-              Colors.blue,
-              Colors.pink,
-              Colors.orange,
-              Colors.purple,
-            ],
-          ),
-        ),
-        // Confeti izquierdo (diagonal)
-        Align(
-          alignment: Alignment.topLeft,
-          child: ConfettiWidget(
-            confettiController: goalsController.confettiControllerLeft,
-            blastDirection: -math.pi / 4,
-            maxBlastForce: 7,
-            minBlastForce: 3,
-            emissionFrequency: 0.03,
-            numberOfParticles: 30,
-            gravity: 0.2,
-            shouldLoop: false,
-            colors: const [
-              Colors.yellow,
-              Colors.lightBlue,
-              Colors.red,
-              Colors.orange,
-              Colors.purple,
-            ],
-          ),
-        ),
-        // Confeti derecho (diagonal)
-        Align(
-          alignment: Alignment.topRight,
-          child: ConfettiWidget(
-            confettiController: goalsController.confettiControllerRight,
-            blastDirection: -3 * math.pi / 4,
-            maxBlastForce: 7,
-            minBlastForce: 3,
-            emissionFrequency: 0.03,
-            numberOfParticles: 30,
-            gravity: 0.2,
-            shouldLoop: false,
-            colors: const [
-              Colors.green,
-              Colors.pink,
-              Colors.yellow,
-              Colors.cyan,
-              Colors.red,
-            ],
-          ),
         ),
       ],
     );

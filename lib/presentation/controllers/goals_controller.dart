@@ -13,10 +13,8 @@ class GoalsController extends GetxController {
   final FinanceController _financeController = Get.find<FinanceController>();
   AudioPlayer? _audioPlayer;
 
-  // Controladores para el confeti
+  // Controlador para el confeti
   late ConfettiController confettiControllerCenter;
-  late ConfettiController confettiControllerLeft;
-  late ConfettiController confettiControllerRight;
 
   final RxList<Map<String, dynamic>> goals = <Map<String, dynamic>>[].obs;
   final RxBool isLoading = false.obs;
@@ -37,10 +35,6 @@ class GoalsController extends GetxController {
 
   void _initConfettiControllers() {
     confettiControllerCenter =
-        ConfettiController(duration: const Duration(seconds: 5));
-    confettiControllerLeft =
-        ConfettiController(duration: const Duration(seconds: 5));
-    confettiControllerRight =
         ConfettiController(duration: const Duration(seconds: 5));
   }
 
@@ -96,8 +90,13 @@ class GoalsController extends GetxController {
       duration: const Duration(seconds: 5),
     );
 
-    await Future.delayed(const Duration(seconds: 5));
+    // Primero eliminamos el objetivo
     await deleteGoal(goal['id']);
+
+    // Esperamos un momento para que se vea la celebración
+    await Future.delayed(const Duration(seconds: 3));
+
+    // Detenemos la celebración
     stopCelebration();
   }
 
@@ -123,19 +122,11 @@ class GoalsController extends GetxController {
   void startCelebration() {
     isCelebrating.value = true;
     confettiControllerCenter.play();
-    Future.delayed(const Duration(milliseconds: 500), () {
-      confettiControllerLeft.play();
-    });
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      confettiControllerRight.play();
-    });
   }
 
   void stopCelebration() {
     isCelebrating.value = false;
     confettiControllerCenter.stop();
-    confettiControllerLeft.stop();
-    confettiControllerRight.stop();
   }
 
   Future<void> _playCelebrationSound() async {
@@ -306,8 +297,6 @@ class GoalsController extends GetxController {
   void onClose() {
     _audioPlayer?.dispose();
     confettiControllerCenter.dispose();
-    confettiControllerLeft.dispose();
-    confettiControllerRight.dispose();
     super.onClose();
   }
 }

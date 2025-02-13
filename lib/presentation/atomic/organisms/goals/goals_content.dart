@@ -7,8 +7,6 @@ import '../../../controllers/goals_controller.dart';
 import 'package:lottie/lottie.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
-import 'package:confetti/confetti.dart';
-import 'dart:math' as math;
 
 class GoalsContent extends StatefulWidget {
   const GoalsContent({super.key});

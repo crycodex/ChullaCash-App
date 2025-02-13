@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:confetti/confetti.dart';
-import 'dart:math';
 import '../molecules/navigation/bottom_nav_bar.dart';
 import '../organisms/home/home_content.dart';
 import '../organisms/wallet/wallet_content.dart';

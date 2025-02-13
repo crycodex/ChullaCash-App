@@ -11,6 +11,7 @@ class MovementController extends GetxController {
 
   final RxList<Map<String, dynamic>> currentMonthMovements =
       <Map<String, dynamic>>[].obs;
+  final RxBool isLoading = false.obs;
 
   final FinanceController _financeController = Get.put(FinanceController());
   StreamSubscription? _movementsSubscription;
@@ -28,6 +29,7 @@ class MovementController extends GetxController {
 
     _movementsSubscription?.cancel();
 
+    isLoading.value = true;
     _movementsSubscription = _firestore
         .collection('users')
         .doc(userId)
@@ -36,18 +38,27 @@ class MovementController extends GetxController {
         .collection('$month')
         .orderBy('timestamp', descending: true)
         .snapshots()
-        .listen((snapshot) {
-      currentMonthMovements.value = snapshot.docs
-          .where((doc) => doc.id != 'info')
-          .map((doc) => {
-                'id': doc.id,
-                ...doc.data(),
-              })
-          .toList();
+        .listen((snapshot) async {
+      try {
+        currentMonthMovements.value = snapshot.docs
+            .where((doc) => doc.id != 'info')
+            .map((doc) => {
+                  'id': doc.id,
+                  ...doc.data(),
+                })
+            .toList();
 
-      // Actualizar balance cuando cambian los movimientos
-      _financeController.getTotalBalance();
-      _financeController.updateBalance();
+        // Actualizar balance de forma secuencial
+        await _financeController.getTotalBalance();
+        await _financeController.updateBalance();
+      } catch (e) {
+        print('Error en stream de movimientos: $e');
+      } finally {
+        isLoading.value = false;
+      }
+    }, onError: (error) {
+      print('Error en stream de movimientos: $error');
+      isLoading.value = false;
     });
   }
 
@@ -84,7 +95,10 @@ class MovementController extends GetxController {
   }
 
   Future<void> deleteMovement(String id) async {
+    if (isLoading.value) return;
+
     try {
+      isLoading.value = true;
       final userId = _auth.currentUser?.uid;
       if (userId == null) return;
 
@@ -104,8 +118,8 @@ class MovementController extends GetxController {
       // Actualizar la lista local
       currentMonthMovements.removeWhere((movement) => movement['id'] == id);
 
-      // Actualizar el balance total
-      _financeController.getTotalBalance();
+      // Actualizar el balance total de forma secuencial
+      await _financeController.getTotalBalance();
 
       Get.snackbar(
         'Éxito',
@@ -120,6 +134,8 @@ class MovementController extends GetxController {
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
+    } finally {
+      isLoading.value = false;
     }
   }
 }

@@ -12,6 +12,7 @@ class FinanceController extends GetxController {
   final RxDouble allTimeBalance = 0.0.obs;
   final RxList<Map<String, double>> yearSummary = <Map<String, double>>[].obs;
   final RxList<Map<String, double>> monthSummary = <Map<String, double>>[].obs;
+  final RxBool isLoading = false.obs;
 
   @override
   void onInit() {
@@ -223,7 +224,10 @@ class FinanceController extends GetxController {
 
   //obtener balance total
   Future<void> getTotalBalance() async {
+    if (isLoading.value) return; // Evitar múltiples llamadas simultáneas
+
     try {
+      isLoading.value = true;
       final userId = _auth.currentUser?.uid;
       if (userId == null) return;
 
@@ -272,6 +276,8 @@ class FinanceController extends GetxController {
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
+    } finally {
+      isLoading.value = false;
     }
   }
 

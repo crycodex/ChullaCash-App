@@ -51,71 +51,76 @@ class GoalsController extends GetxController {
   Future<void> _checkGoalsProgress() async {
     if (goals.isEmpty) return;
 
-    for (var i = 0; i < goals.length; i++) {
-      var goal = goals[i];
-      if (goal['isCompleted']) continue;
-
-      final targetAmount = goal['targetAmount'] as double;
-      final progress = currentBalance / targetAmount;
-      final isCompleted = progress >= 1.0;
-
-      // Actualizar el progreso localmente primero para reflejar cambios inmediatos en la UI
-      goals[i] = {
-        ...goal,
-        'currentAmount': currentBalance > 0 ? currentBalance : 0.0,
-        'progress': progress > 0 ? progress : 0.0,
-        'isCompleted': isCompleted,
-      };
-
-      if (isCompleted && !goal['isCompleted']) {
-        await _celebrateGoalAchievement(goal);
-      } else {
-        await _updateGoalProgress(goal['id'], progress);
-      }
-    }
-    // Forzar actualización de la UI
-    goals.refresh();
-  }
-
-  // Método para celebrar el logro de un objetivo
-  Future<void> _celebrateGoalAchievement(Map<String, dynamic> goal) async {
-    startCelebration();
-    _playCelebrationSound();
-
-    Get.snackbar(
-      '¡Felicitaciones! 🎉',
-      'Has alcanzado tu objetivo: ${goal['title']}',
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-      duration: const Duration(seconds: 5),
-    );
-
-    // Primero eliminamos el objetivo
-    await deleteGoal(goal['id']);
-
-    // Esperamos un momento para que se vea la celebración
-    await Future.delayed(const Duration(seconds: 3));
-
-    // Detenemos la celebración
-    stopCelebration();
-  }
-
-  // Método para actualizar el progreso de un objetivo
-  Future<void> _updateGoalProgress(String goalId, double progress) async {
     try {
-      await _firestore
-          .collection('users')
-          .doc(_auth.currentUser?.uid)
-          .collection('goals')
-          .doc(goalId)
-          .update({
-        'currentAmount': currentBalance > 0 ? currentBalance : 0.0,
-        'progress': progress > 0 ? progress : 0.0,
-        'isCompleted': progress >= 1.0,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      // Crear una copia inmutable de los objetivos actuales
+      final currentGoals = List<Map<String, dynamic>>.from(goals);
+      final updatedGoals = <Map<String, dynamic>>[];
+      final goalsToUpdate = <String, Map<String, dynamic>>{};
+
+      for (final goal in currentGoals) {
+        if (goal['isCompleted'] == true) {
+          updatedGoals.add(Map<String, dynamic>.from(goal));
+          continue;
+        }
+
+        final targetAmount = goal['targetAmount'] as double;
+        final progress = currentBalance / targetAmount;
+        final isCompleted = progress >= 1.0;
+
+        final updatedGoal = Map<String, dynamic>.from(goal)
+          ..addAll({
+            'currentAmount': currentBalance > 0 ? currentBalance : 0.0,
+            'progress': progress > 0 ? progress : 0.0,
+            'isCompleted': isCompleted,
+          });
+
+        if (isCompleted && !goal['isCompleted']) {
+          // Manejar la celebración
+          startCelebration();
+          _playCelebrationSound();
+          Get.snackbar(
+            '¡Felicitaciones! 🎉',
+            'Has alcanzado tu objetivo: ${goal['title']}',
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+            duration: const Duration(seconds: 5),
+          );
+
+          // Eliminar el objetivo completado
+          await _firestore
+              .collection('users')
+              .doc(_auth.currentUser?.uid)
+              .collection('goals')
+              .doc(goal['id'])
+              .delete();
+
+          await Future.delayed(const Duration(seconds: 3));
+          stopCelebration();
+        } else {
+          updatedGoals.add(updatedGoal);
+          goalsToUpdate[goal['id']] = updatedGoal;
+        }
+      }
+
+      // Actualizar objetivos en Firestore
+      for (final entry in goalsToUpdate.entries) {
+        await _firestore
+            .collection('users')
+            .doc(_auth.currentUser?.uid)
+            .collection('goals')
+            .doc(entry.key)
+            .update({
+          'currentAmount': entry.value['currentAmount'],
+          'progress': entry.value['progress'],
+          'isCompleted': entry.value['isCompleted'],
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      }
+
+      // Actualizar la lista local solo al final
+      goals.value = updatedGoals;
     } catch (e) {
-      print('Error al actualizar progreso: $e');
+      print('Error en _checkGoalsProgress: $e');
     }
   }
 

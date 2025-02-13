@@ -21,7 +21,7 @@ class _GoalsContentState extends State<GoalsContent>
     with SingleTickerProviderStateMixin {
   final FinanceController financeController = Get.find<FinanceController>();
   final UserController userController = Get.find<UserController>();
-  final GoalsController goalsController = Get.put(GoalsController());
+  final GoalsController goalsController = Get.find<GoalsController>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -35,22 +35,6 @@ class _GoalsContentState extends State<GoalsContent>
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
-
-    ever(goalsController.isCelebrating, (isCelebrating) {
-      if (isCelebrating) {
-        _startCelebration();
-      } else {
-        _stopCelebration();
-      }
-    });
-  }
-
-  void _startCelebration() {
-    goalsController.startCelebration();
-  }
-
-  void _stopCelebration() {
-    goalsController.stopCelebration();
   }
 
   @override
@@ -156,189 +140,196 @@ class _GoalsContentState extends State<GoalsContent>
   Widget _buildGoalCard(Map<String, dynamic> goal, bool isDarkMode) {
     final double progress = goal['progress'] as double;
     final bool isCompleted = progress >= 1.0;
+    final currentAmount = goal['currentAmount'] as double;
+    final targetAmount = goal['targetAmount'] as double;
+    final title = goal['title'] as String;
+    final description = goal['description'] as String?;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.darkSurface : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
+    return RepaintBoundary(
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDarkMode ? AppColors.darkSurface : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+              color: Color.fromRGBO(0, 0, 0, 0.05),
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: isDarkMode
+                                    ? Colors.white
+                                    : AppColors.textPrimary,
+                              ),
+                            ),
+                            if (description?.isNotEmpty ?? false)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Text(
+                                  description!,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: isDarkMode
+                                        ? Colors.white70
+                                        : AppColors.textSecondary,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      CircularPercentIndicator(
+                        radius: 25.0,
+                        lineWidth: 4.0,
+                        percent: progress.clamp(0.0, 1.0),
+                        center: Text(
+                          '${(progress * 100).toInt()}%',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryGreen,
+                          ),
+                        ),
+                        progressColor: AppColors.primaryGreen,
+                        backgroundColor:
+                            AppColors.primaryGreen.withOpacity(0.2),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  LinearPercentIndicator(
+                    animation: true,
+                    lineHeight: 8.0,
+                    animationDuration: 1000,
+                    percent: progress.clamp(0.0, 1.0),
+                    barRadius: const Radius.circular(4),
+                    progressColor:
+                        isCompleted ? Colors.green : AppColors.primaryGreen,
+                    backgroundColor: AppColors.primaryGreen.withOpacity(0.2),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            goal['title'],
+                            'Balance actual / Meta',
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 14,
+                              color: isDarkMode
+                                  ? Colors.white70
+                                  : AppColors.textSecondary,
+                            ),
+                          ),
+                          Text(
+                            '\$${currentAmount.toStringAsFixed(2)} / \$${targetAmount.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: isDarkMode
                                   ? Colors.white
                                   : AppColors.textPrimary,
                             ),
                           ),
-                          if (goal['description']?.isNotEmpty ?? false)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: Text(
-                                goal['description'],
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: isDarkMode
-                                      ? Colors.white70
-                                      : AppColors.textSecondary,
-                                ),
-                              ),
-                            ),
                         ],
                       ),
-                    ),
-                    CircularPercentIndicator(
-                      radius: 25.0,
-                      lineWidth: 4.0,
-                      percent: progress.clamp(0.0, 1.0),
-                      center: Text(
-                        '${(progress * 100).toInt()}%',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryGreen,
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: isCompleted
+                              ? Colors.green.withOpacity(0.1)
+                              : AppColors.primaryGreen.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
                         ),
-                      ),
-                      progressColor: AppColors.primaryGreen,
-                      backgroundColor: AppColors.primaryGreen.withOpacity(0.2),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                LinearPercentIndicator(
-                  animation: true,
-                  lineHeight: 8.0,
-                  animationDuration: 1000,
-                  percent: progress.clamp(0.0, 1.0),
-                  barRadius: const Radius.circular(4),
-                  progressColor:
-                      isCompleted ? Colors.green : AppColors.primaryGreen,
-                  backgroundColor: AppColors.primaryGreen.withOpacity(0.2),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Balance actual / Meta',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: isDarkMode
-                                ? Colors.white70
-                                : AppColors.textSecondary,
-                          ),
-                        ),
-                        Text(
-                          '\$${goal['currentAmount'].toStringAsFixed(2)} / \$${goal['targetAmount'].toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: isDarkMode
-                                ? Colors.white
-                                : AppColors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: isCompleted
-                            ? Colors.green.withOpacity(0.1)
-                            : AppColors.primaryGreen.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            isCompleted
-                                ? Icons.check_circle
-                                : Icons.access_time,
-                            size: 16,
-                            color: isCompleted
-                                ? Colors.green
-                                : AppColors.primaryGreen,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            isCompleted ? '¡Completado!' : 'En progreso',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                        child: Row(
+                          children: [
+                            Icon(
+                              isCompleted
+                                  ? Icons.check_circle
+                                  : Icons.access_time,
+                              size: 16,
                               color: isCompleted
                                   ? Colors.green
                                   : AppColors.primaryGreen,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Text(
+                              isCompleted ? '¡Completado!' : 'En progreso',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: isCompleted
+                                    ? Colors.green
+                                    : AppColors.primaryGreen,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          if (!isCompleted)
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: isDarkMode
-                    ? Colors.black.withOpacity(0.2)
-                    : AppColors.primaryGreen.withOpacity(0.05),
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(16),
-                  bottomRight: Radius.circular(16),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.info_outline,
-                    size: 20,
-                    color: AppColors.primaryGreen,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Te faltan \$${(goal['targetAmount'] - goal['currentAmount']).toStringAsFixed(2)} para alcanzar tu objetivo',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.primaryGreen,
-                      ),
-                    ),
+                    ],
                   ),
                 ],
               ),
             ),
-        ],
+            if (!isCompleted)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: isDarkMode
+                      ? Colors.black.withOpacity(0.2)
+                      : AppColors.primaryGreen.withOpacity(0.05),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(16),
+                    bottomRight: Radius.circular(16),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      size: 20,
+                      color: AppColors.primaryGreen,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Te faltan \$${(targetAmount - currentAmount).toStringAsFixed(2)} para alcanzar tu objetivo',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.primaryGreen,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -642,9 +633,12 @@ class _GoalsContentState extends State<GoalsContent>
             return ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: goals.length,
+              addAutomaticKeepAlives: false,
+              addRepaintBoundaries: true,
               itemBuilder: (context, index) {
+                final goal = goals[index];
                 return Dismissible(
-                  key: Key(goals[index]['id']),
+                  key: ValueKey(goal['id']),
                   direction: DismissDirection.horizontal,
                   background: Container(
                     alignment: Alignment.centerLeft,
@@ -721,16 +715,16 @@ class _GoalsContentState extends State<GoalsContent>
                         },
                       );
                     } else {
-                      _showEditGoalDialog(goals[index]);
+                      _showEditGoalDialog(goal);
                       return false;
                     }
                   },
                   onDismissed: (direction) {
                     if (direction == DismissDirection.endToStart) {
-                      goalsController.deleteGoal(goals[index]['id']);
+                      goalsController.deleteGoal(goal['id']);
                     }
                   },
-                  child: _buildGoalCard(goals[index], isDarkMode),
+                  child: _buildGoalCard(goal, isDarkMode),
                 );
               },
             );

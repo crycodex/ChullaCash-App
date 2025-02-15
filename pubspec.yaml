@@ -30,7 +30,7 @@ dependencies:
   #google sign in
   google_sign_in: ^6.1.6
   #apple sign in
-  sign_in_with_apple: ^5.0.0
+  sign_in_with_apple: ^6.1.4
   fl_chart: ^0.65.0
   #image picker
   image_picker: ^1.1.2

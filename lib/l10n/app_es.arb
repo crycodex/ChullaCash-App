@@ -18,5 +18,9 @@
     "welcomeRegister": "¡Regístrate Gratis!",
     "@welcomeRegister": {
         "description": "Texto del botón de registro"
+    },
+    "appTitle": "ChullaCash",
+    "@appTitle": {
+        "description": "Nombre de la aplicación"
     }
 }

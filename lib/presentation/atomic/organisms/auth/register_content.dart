@@ -88,261 +88,276 @@ class _RegisterContentState extends State<RegisterContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: SingleChildScrollView(
+        physics: const ClampingScrollPhysics(),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            24.0,
+            24.0,
+            24.0,
+            MediaQuery.of(context).viewInsets.bottom + 24.0,
+          ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Crear cuenta',
+                      style: Theme.of(context).textTheme.displayMedium,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: widget.onClose,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
                 Text(
-                  'Crear cuenta',
-                  style: Theme.of(context).textTheme.displayMedium,
+                  'Regístrate para comenzar',
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: widget.onClose,
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Regístrate para comenzar',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-            // Campo de nombre
-            TextField(
-              controller: _nameController,
-              style: TextStyle(color: AppColors.textPrimary),
-              maxLength: AuthController.maxNameLength,
-              decoration: InputDecoration(
-                labelText: 'Nombre completo',
-                labelStyle: TextStyle(color: AppColors.textSecondary),
-                errorText: _nameError,
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppColors.lightGray),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppColors.primaryBlue),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.red),
-                ),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.red),
-                ),
-                filled: true,
-                fillColor: AppColors.surfaceLight,
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Campo de correo
-            TextField(
-              controller: _emailController,
-              style: TextStyle(color: AppColors.textPrimary),
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
-                labelText: 'Correo electrónico',
-                labelStyle: TextStyle(color: AppColors.textSecondary),
-                errorText: _emailError,
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppColors.lightGray),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppColors.primaryBlue),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.red),
-                ),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.red),
-                ),
-                filled: true,
-                fillColor: AppColors.surfaceLight,
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Campo de contraseña
-            TextField(
-              controller: _passwordController,
-              obscureText: _obscureText,
-              style: TextStyle(color: AppColors.textPrimary),
-              decoration: InputDecoration(
-                labelText: 'Contraseña',
-                labelStyle: TextStyle(color: AppColors.textSecondary),
-                errorText: _passwordError,
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppColors.lightGray),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppColors.primaryBlue),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.red),
-                ),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.red),
-                ),
-                filled: true,
-                fillColor: AppColors.surfaceLight,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscureText ? Icons.visibility_off : Icons.visibility,
-                    color: AppColors.textSecondary,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscureText = !_obscureText;
-                    });
-                  },
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Campo de confirmar contraseña
-            TextField(
-              controller: _confirmPasswordController,
-              obscureText: _obscureConfirmText,
-              style: TextStyle(color: AppColors.textPrimary),
-              decoration: InputDecoration(
-                labelText: 'Confirmar contraseña',
-                labelStyle: TextStyle(color: AppColors.textSecondary),
-                errorText: _confirmPasswordError,
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppColors.lightGray),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppColors.primaryBlue),
-                ),
-                errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.red),
-                ),
-                focusedErrorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.red),
-                ),
-                filled: true,
-                fillColor: AppColors.surfaceLight,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscureConfirmText
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                    color: AppColors.textSecondary,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscureConfirmText = !_obscureConfirmText;
-                    });
-                  },
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Botón de Registro
-            Obx(() => ElevatedButton(
-                  onPressed: _authController.isLoading.value
-                      ? null
-                      : () {
-                          if (_validateInputs()) {
-                            _authController.register(
-                              email: _emailController.text.trim(),
-                              password: _passwordController.text,
-                              onSuccess: () {
-                                Get.offAllNamed('/welcome');
-                              },
-                              onError: (error) {
-                                // Manejar errores específicos
-                                if (error.contains('email')) {
-                                  setState(() => _emailError = error);
-                                } else if (error.contains('contraseña')) {
-                                  setState(() => _passwordError = error);
-                                } else {
-                                  Get.snackbar(
-                                    'Error',
-                                    error,
-                                    backgroundColor: AppColors.error,
-                                    colorText: AppColors.textLight,
-                                  );
-                                }
-                              },
-                            );
-                          }
-                        },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryGreen,
-                    foregroundColor: AppColors.textLight,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
+                // Campo de nombre
+                TextField(
+                  controller: _nameController,
+                  style: TextStyle(color: AppColors.textPrimary),
+                  maxLength: AuthController.maxNameLength,
+                  decoration: InputDecoration(
+                    labelText: 'Nombre completo',
+                    labelStyle: TextStyle(color: AppColors.textSecondary),
+                    errorText: _nameError,
+                    enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.lightGray),
                     ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    _authController.isLoading.value
-                        ? 'Registrando...'
-                        : 'Registrarse',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide:
+                          const BorderSide(color: AppColors.primaryBlue),
                     ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.red),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.red),
+                    ),
+                    filled: true,
+                    fillColor: AppColors.surfaceLight,
                   ),
-                )),
-
-            const SizedBox(height: 24),
-
-            // Enlace de inicio de sesión
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "¿Ya tienes una cuenta? ",
-                  style: TextStyle(color: AppColors.textSecondary),
                 ),
-                TextButton(
-                  onPressed: () {
-                    _authController.toggleLogin();
-                  },
-                  child: Text(
-                    'Inicia sesión',
-                    style: TextStyle(
-                      color: AppColors.primaryGreen,
-                      fontWeight: FontWeight.w600,
+
+                const SizedBox(height: 16),
+
+                // Campo de correo
+                TextField(
+                  controller: _emailController,
+                  style: TextStyle(color: AppColors.textPrimary),
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    labelText: 'Correo electrónico',
+                    labelStyle: TextStyle(color: AppColors.textSecondary),
+                    errorText: _emailError,
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.lightGray),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide:
+                          const BorderSide(color: AppColors.primaryBlue),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.red),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.red),
+                    ),
+                    filled: true,
+                    fillColor: AppColors.surfaceLight,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Campo de contraseña
+                TextField(
+                  controller: _passwordController,
+                  obscureText: _obscureText,
+                  style: TextStyle(color: AppColors.textPrimary),
+                  decoration: InputDecoration(
+                    labelText: 'Contraseña',
+                    labelStyle: TextStyle(color: AppColors.textSecondary),
+                    errorText: _passwordError,
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.lightGray),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide:
+                          const BorderSide(color: AppColors.primaryBlue),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.red),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.red),
+                    ),
+                    filled: true,
+                    fillColor: AppColors.surfaceLight,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureText ? Icons.visibility_off : Icons.visibility,
+                        color: AppColors.textSecondary,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureText = !_obscureText;
+                        });
+                      },
                     ),
                   ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Campo de confirmar contraseña
+                TextField(
+                  controller: _confirmPasswordController,
+                  obscureText: _obscureConfirmText,
+                  style: TextStyle(color: AppColors.textPrimary),
+                  decoration: InputDecoration(
+                    labelText: 'Confirmar contraseña',
+                    labelStyle: TextStyle(color: AppColors.textSecondary),
+                    errorText: _confirmPasswordError,
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: AppColors.lightGray),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide:
+                          const BorderSide(color: AppColors.primaryBlue),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.red),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.red),
+                    ),
+                    filled: true,
+                    fillColor: AppColors.surfaceLight,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureConfirmText
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: AppColors.textSecondary,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureConfirmText = !_obscureConfirmText;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Botón de Registro
+                Obx(() => ElevatedButton(
+                      onPressed: _authController.isLoading.value
+                          ? null
+                          : () {
+                              if (_validateInputs()) {
+                                _authController.register(
+                                  email: _emailController.text.trim(),
+                                  password: _passwordController.text,
+                                  onSuccess: () {
+                                    Get.offAllNamed('/welcome');
+                                  },
+                                  onError: (error) {
+                                    // Manejar errores específicos
+                                    if (error.contains('email')) {
+                                      setState(() => _emailError = error);
+                                    } else if (error.contains('contraseña')) {
+                                      setState(() => _passwordError = error);
+                                    } else {
+                                      Get.snackbar(
+                                        'Error',
+                                        error,
+                                        backgroundColor: AppColors.error,
+                                        colorText: AppColors.textLight,
+                                      );
+                                    }
+                                  },
+                                );
+                              }
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryGreen,
+                        foregroundColor: AppColors.textLight,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        _authController.isLoading.value
+                            ? 'Registrando...'
+                            : 'Registrarse',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    )),
+
+                const SizedBox(height: 24),
+
+                // Enlace de inicio de sesión
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "¿Ya tienes una cuenta? ",
+                      style: TextStyle(color: AppColors.textSecondary),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        _authController.toggleLogin();
+                      },
+                      child: Text(
+                        'Inicia sesión',
+                        style: TextStyle(
+                          color: AppColors.primaryGreen,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );

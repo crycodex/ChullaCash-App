@@ -9,6 +9,9 @@ import '../../../data/models/user_model.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 //apple sign in
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+//theme
+import '../../../presentation/theme/app_colors.dart';
+import '../../../presentation/theme/app_theme.dart';
 
 enum AuthStatus { checking, authenticated, unauthenticated, error }
 
@@ -18,6 +21,15 @@ class AuthController extends GetxController {
   final RxBool showRegister = false.obs;
   final RxBool showForgotPassword = false.obs;
   final RxBool isDarkMode = false.obs;
+  final RxString userName = 'Usuario'.obs;
+  final RxString userEmail = 'usuario@example.com'.obs;
+  final Rxn<String> profileImage = Rxn<String>();
+
+  // Seguridad
+  final RxBool isAppLockEnabled = false.obs;
+  final RxBool isBiometricEnabled = false.obs;
+  final RxString lockTimeout = 'immediately'.obs;
+  final RxString pin = ''.obs;
 
   @override
   void onInit() {
@@ -30,10 +42,28 @@ class AuthController extends GetxController {
       final currentUser = _auth.currentUser;
       if (currentUser != null) {
         uid.value = currentUser.uid;
+        await _loadUserData();
         await _loadTheme();
+        await _loadSecuritySettings();
       }
     } catch (e) {
       debugPrint('Error al inicializar auth: $e');
+    }
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      if (uid.value.isEmpty) return;
+
+      final userDoc = await _firestore.collection('users').doc(uid.value).get();
+      if (userDoc.exists) {
+        final userData = userDoc.data()!;
+        userName.value = userData['name'] ?? 'Usuario';
+        userEmail.value = userData['email'] ?? 'usuario@example.com';
+        profileImage.value = userData['photoUrl'];
+      }
+    } catch (e) {
+      debugPrint('Error al cargar datos del usuario: $e');
     }
   }
 
@@ -45,26 +75,46 @@ class AuthController extends GetxController {
       if (userDoc.exists) {
         final darkMode = userDoc.data()?['isDarkMode'];
         isDarkMode.value = darkMode == true || darkMode == "true";
-        Get.changeThemeMode(
-            isDarkMode.value ? ThemeMode.dark : ThemeMode.light);
+        _applyTheme();
       }
     } catch (e) {
       debugPrint('Error al cargar el tema: $e');
     }
   }
 
+  void _applyTheme() {
+    Get.changeThemeMode(isDarkMode.value ? ThemeMode.dark : ThemeMode.light);
+    Get.changeTheme(
+        isDarkMode.value ? AppTheme.darkTheme : AppTheme.lightTheme);
+  }
+
   void toggleTheme() async {
     try {
       isDarkMode.value = !isDarkMode.value;
-      Get.changeThemeMode(isDarkMode.value ? ThemeMode.dark : ThemeMode.light);
+      _applyTheme();
 
       if (uid.value.isNotEmpty) {
         await _firestore.collection('users').doc(uid.value).update({
           'isDarkMode': isDarkMode.value,
         });
       }
+
+      Get.snackbar(
+        'Tema cambiado',
+        isDarkMode.value ? 'Modo oscuro activado' : 'Modo claro activado',
+        backgroundColor:
+            isDarkMode.value ? const Color(0xFF1E1E1E) : Colors.white,
+        colorText: isDarkMode.value ? Colors.white : AppColors.textPrimary,
+        duration: const Duration(seconds: 2),
+      );
     } catch (e) {
       debugPrint('Error al cambiar el tema: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo cambiar el tema',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     }
   }
 
@@ -385,29 +435,48 @@ class AuthController extends GetxController {
 
   //* Login con Google
   Future<void> loginWithGoogle() async {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
-    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-    if (googleUser != null) {
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser != null) {
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
 
-      final UserCredential userCredential =
-          await _auth.signInWithCredential(credential);
-      final User? user = userCredential.user;
-      if (user == null) {
-        throw Exception('Error al iniciar sesión con Google');
-      }
+        final UserCredential userCredential =
+            await _auth.signInWithCredential(credential);
+        final User? user = userCredential.user;
+        if (user == null) {
+          throw Exception('Error al iniciar sesión con Google');
+        }
 
-      final userDoc = await _firestore.collection('users').doc(user.uid).get();
-      if (!userDoc.exists) {
-        await _createUserDocument(user);
-        //ir a la pantalla de home
+        final userDoc =
+            await _firestore.collection('users').doc(user.uid).get();
+        if (!userDoc.exists) {
+          await _createUserDocument(user);
+        }
+
+        // Actualizar datos observables
+        uid.value = user.uid;
+        email.value = user.email ?? '';
+        name.value = user.displayName ?? '';
+        profilePicture.value = user.photoURL ?? '';
+
+        debugPrint('Login con Google exitoso, redirigiendo a home');
         Get.offAllNamed('/home');
       }
+    } catch (e) {
+      debugPrint('Error en login con Google: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo completar el inicio de sesión con Google',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 
@@ -502,6 +571,222 @@ class AuthController extends GetxController {
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  Future<void> updateProfileImage(String imagePath) async {
+    try {
+      // Aquí implementarías la lógica para subir la imagen a Firebase Storage
+      // y actualizar la URL en Firestore
+      // Por ahora solo actualizamos el estado local
+      profileImage.value = imagePath;
+      Get.snackbar(
+        'Éxito',
+        'Imagen de perfil actualizada',
+        backgroundColor: AppColors.primaryGreen,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'No se pudo actualizar la imagen de perfil',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<void> updateUserName(String newName) async {
+    try {
+      if (uid.value.isEmpty) return;
+
+      await _firestore.collection('users').doc(uid.value).update({
+        'name': newName,
+      });
+
+      userName.value = newName;
+      Get.snackbar(
+        'Éxito',
+        'Nombre actualizado correctamente',
+        backgroundColor: AppColors.primaryGreen,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      debugPrint('Error al actualizar nombre: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo actualizar el nombre',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<void> deleteAccount() async {
+    try {
+      // Aquí implementarías la lógica para eliminar la cuenta en Firebase
+      // Por ahora solo cerramos sesión
+      await logout();
+      Get.snackbar(
+        'Éxito',
+        'Cuenta eliminada correctamente',
+        backgroundColor: AppColors.primaryGreen,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'No se pudo eliminar la cuenta',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<void> _loadSecuritySettings() async {
+    try {
+      if (uid.value.isEmpty) return;
+
+      final userDoc = await _firestore.collection('users').doc(uid.value).get();
+      if (userDoc.exists) {
+        final data = userDoc.data()!;
+        isAppLockEnabled.value = data['isAppLockEnabled'] ?? false;
+        isBiometricEnabled.value = data['isBiometricEnabled'] ?? false;
+        pin.value = data['pin'] ?? '';
+        lockTimeout.value = data['lockTimeout'] ?? 'immediately';
+
+        // Si hay PIN configurado, redirigir a la pantalla de verificación
+        if (isAppLockEnabled.value && pin.value.isNotEmpty) {
+          Get.offAllNamed('/app-lock');
+        }
+      }
+    } catch (e) {
+      debugPrint('Error al cargar configuración de seguridad: $e');
+    }
+  }
+
+  Future<void> toggleAppLock(bool value) async {
+    try {
+      isAppLockEnabled.value = value;
+      if (value && pin.value.isEmpty) {
+        // Si se activa el bloqueo y no hay PIN, mostrar diálogo para configurarlo
+        Get.dialog(
+          AlertDialog(
+            title: const Text('Configurar PIN'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  keyboardType: TextInputType.number,
+                  maxLength: 4,
+                  obscureText: true,
+                  onChanged: (value) => pin.value = value,
+                  decoration: const InputDecoration(
+                    labelText: 'PIN (4 dígitos)',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  isAppLockEnabled.value = false;
+                  Get.back();
+                },
+                child: const Text('Cancelar'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  if (pin.value.length == 4) {
+                    await _saveSecuritySettings();
+                    Get.back();
+                  }
+                },
+                child: const Text('Guardar'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        await _saveSecuritySettings();
+      }
+    } catch (e) {
+      debugPrint('Error al cambiar estado de bloqueo: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo cambiar el estado del bloqueo',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<void> _saveSecuritySettings() async {
+    if (uid.value.isEmpty) return;
+
+    await _firestore.collection('users').doc(uid.value).update({
+      'isAppLockEnabled': isAppLockEnabled.value,
+      'isBiometricEnabled': isBiometricEnabled.value,
+      'pin': pin.value,
+      'lockTimeout': lockTimeout.value,
+    });
+  }
+
+  Future<void> toggleBiometric(bool value) async {
+    try {
+      isBiometricEnabled.value = value;
+      await _saveSecuritySettings();
+      Get.snackbar(
+        'Éxito',
+        value ? 'Biometría activada' : 'Biometría desactivada',
+        backgroundColor: AppColors.primaryGreen,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      debugPrint('Error al cambiar estado de biometría: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo cambiar el estado de la biometría',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<void> updatePin(String newPin) async {
+    try {
+      pin.value = newPin;
+      // Aquí implementarías la lógica para guardar en Firebase/local storage
+      Get.snackbar(
+        'Éxito',
+        'PIN actualizado correctamente',
+        backgroundColor: AppColors.primaryGreen,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      debugPrint('Error al actualizar PIN: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo actualizar el PIN',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<void> setLockTimeout(String timeout) async {
+    try {
+      lockTimeout.value = timeout;
+      // Aquí implementarías la lógica para guardar en Firebase/local storage
+    } catch (e) {
+      debugPrint('Error al cambiar tiempo de bloqueo: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo cambiar el tiempo de bloqueo',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
       );
     }
   }

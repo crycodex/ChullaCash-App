@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import '../../../controllers/user_controller.dart';
 import '../../../controllers/finance_controller.dart';
 import '../../../controllers/movement_controller.dart';
+import '../../../controllers/Login/auth_controller.dart';
+import '../history/history_content.dart';
 
 class HomeContent extends StatefulWidget {
   const HomeContent({super.key});
@@ -18,8 +20,8 @@ class _HomeContentState extends State<HomeContent>
     with AutomaticKeepAliveClientMixin {
   final UserController userController = Get.put(UserController());
   final FinanceController financeController = Get.put(FinanceController());
-  final MovementController movementController =
-      Get.put(MovementController());
+  final MovementController movementController = Get.put(MovementController());
+  final AuthController authController = Get.put(AuthController());
 
   @override
   bool get wantKeepAlive => true;
@@ -28,6 +30,13 @@ class _HomeContentState extends State<HomeContent>
   void initState() {
     super.initState();
     financeController.getTotalBalance();
+    final now = DateTime.now();
+    movementController.setupMovementsStream(now.year, now.month);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -35,6 +44,7 @@ class _HomeContentState extends State<HomeContent>
     super.build(context);
     return Obx(() {
       final bool isDarkMode = userController.isDarkMode.value;
+      final movements = movementController.currentMonthMovements;
 
       return SafeArea(
         child: Padding(
@@ -60,14 +70,14 @@ class _HomeContentState extends State<HomeContent>
                       ),
                       const SizedBox(height: 4),
                       Obx(() => Text(
-                            userController.name.value,
+                            authController.userName.value,
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 0.5,
                               color: isDarkMode
-                                  ? Colors.white
-                                  : AppColors.textPrimary,
+                                  ? const Color(0xFFE0E0E0)
+                                  : AppColors.textSecondary,
                             ),
                           )),
                     ],
@@ -77,122 +87,123 @@ class _HomeContentState extends State<HomeContent>
               const SizedBox(height: 24),
 
               // Sección de Balance
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: isDarkMode
-                      ? AppColors.darkSurface.withOpacity(0.8)
-                      : Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: isDarkMode
-                          ? Colors.black.withOpacity(0.5)
-                          : Colors.grey.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                  border: Border.all(
+              GestureDetector(
+                onTap: () {
+                  Get.to(() => const HistoryContent());
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
                     color: isDarkMode
-                        ? Colors.white.withOpacity(0.1)
-                        : Colors.transparent,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Balance Total',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: isDarkMode
-                                ? const Color(0xFFE0E0E0)
-                                : AppColors.textSecondary,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                        Obx(() {
-                          final balance =
-                              financeController.allTimeBalance.value;
-                          final isPositive = balance >= 0;
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: (isPositive
-                                      ? AppColors.primaryGreen
-                                      : Colors.red)
-                                  .withOpacity(isDarkMode ? 0.2 : 0.1),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  isPositive
-                                      ? Icons.trending_up
-                                      : Icons.trending_down,
-                                  color: isPositive
-                                      ? AppColors.primaryGreen
-                                      : Colors.red,
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  isPositive ? 'Positivo' : 'Negativo',
-                                  style: TextStyle(
-                                    color: isPositive
-                                        ? AppColors.primaryGreen
-                                        : Colors.red,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
-                      ],
+                        ? AppColors.darkSurface.withOpacity(0.8)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDarkMode
+                            ? Colors.black.withOpacity(0.5)
+                            : Colors.grey.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                    border: Border.all(
+                      color: isDarkMode
+                          ? Colors.white.withOpacity(0.1)
+                          : Colors.transparent,
                     ),
-                    const SizedBox(height: 12),
-                    //balance total
-                    Obx(() {
-                      final balance = financeController.allTimeBalance.value;
-                      final isPositive = balance >= 0;
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '\$${balance.abs().toStringAsFixed(2)}',
+                            'Balance Total',
                             style: TextStyle(
-                              fontSize: 42,
-                              fontWeight: FontWeight.bold,
-                              color: isPositive
-                                  ? AppColors.primaryGreen
-                                  : Colors.red,
-                            ),
-                          ),
-                          Text(
-                            isPositive
-                                ? 'Tu balance está en buen estado'
-                                : 'Tu balance está en números rojos',
-                            style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
                               color: isDarkMode
-                                  ? const Color(0xFFE0E0E0)
+                                  ? Colors.white70
                                   : AppColors.textSecondary,
                             ),
                           ),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: isDarkMode
+                                      ? Colors.white.withOpacity(0.1)
+                                      : AppColors.primaryGreen.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.account_balance_wallet,
+                                      size: 16,
+                                      color: isDarkMode
+                                          ? Colors.white70
+                                          : AppColors.primaryGreen,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Mi Billetera',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: isDarkMode
+                                            ? Colors.white70
+                                            : AppColors.primaryGreen,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              GestureDetector(
+                                onTap: () =>
+                                    Get.to(() => const HistoryContent()),
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: isDarkMode
+                                        ? Colors.white.withOpacity(0.1)
+                                        : AppColors.primaryGreen
+                                            .withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(
+                                    Icons.history,
+                                    size: 16,
+                                    color: isDarkMode
+                                        ? Colors.white70
+                                        : AppColors.primaryGreen,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
-                      );
-                    }),
-                  ],
+                      ),
+                      const SizedBox(height: 16),
+                      GestureDetector(
+                        onTap: () => Get.to(() => const HistoryContent()),
+                        child: Obx(() => Text(
+                              '\$${financeController.allTimeBalance.value.toStringAsFixed(2)}',
+                              style: TextStyle(
+                                fontSize: 40,
+                                fontWeight: FontWeight.bold,
+                                color: isDarkMode
+                                    ? Colors.white70
+                                    : AppColors.textSecondary,
+                              ),
+                            )),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -212,7 +223,6 @@ class _HomeContentState extends State<HomeContent>
               const SizedBox(height: 16),
               Expanded(
                 child: Obx(() {
-                  final movements = movementController.currentMonthMovements;
                   if (movements.isEmpty) {
                     return Center(
                       child: Column(

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,45 +11,61 @@ class MovementController extends GetxController {
 
   final RxList<Map<String, dynamic>> currentMonthMovements =
       <Map<String, dynamic>>[].obs;
+  final RxBool isLoading = false.obs;
 
   final FinanceController _financeController = Get.put(FinanceController());
+  StreamSubscription? _movementsSubscription;
 
   @override
   void onInit() {
     super.onInit();
     final now = DateTime.now();
-    loadMovementsForMonth(now.year, now.month);
+    setupMovementsStream(now.year, now.month);
   }
 
-  Future<void> loadMovementsForMonth(int year, int month) async {
-    try {
-      final userId = _auth.currentUser?.uid;
-      if (userId == null) return;
+  void setupMovementsStream(int year, int month) {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) return;
 
-      final snapshot = await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('transactions')
-          .doc('$year')
-          .collection('$month')
-          .orderBy('timestamp', descending: true)
-          .get();
+    _movementsSubscription?.cancel();
 
-      currentMonthMovements.value = snapshot.docs
-          .where((doc) => doc.id != 'info')
-          .map((doc) => {
-                'id': doc.id,
-                ...doc.data(),
-              })
-          .toList();
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'No se pudieron cargar los movimientos: $e',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-    }
+    isLoading.value = true;
+    _movementsSubscription = _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('transactions')
+        .doc('$year')
+        .collection('$month')
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .listen((snapshot) async {
+      try {
+        currentMonthMovements.value = snapshot.docs
+            .where((doc) => doc.id != 'info')
+            .map((doc) => {
+                  'id': doc.id,
+                  ...doc.data(),
+                })
+            .toList();
+
+        // Actualizar balance de forma secuencial
+        await _financeController.getTotalBalance();
+        await _financeController.updateBalance();
+      } catch (e) {
+        print('Error en stream de movimientos: $e');
+      } finally {
+        isLoading.value = false;
+      }
+    }, onError: (error) {
+      print('Error en stream de movimientos: $error');
+      isLoading.value = false;
+    });
+  }
+
+  @override
+  void onClose() {
+    _movementsSubscription?.cancel();
+    super.onClose();
   }
 
   String getTimeAgo(dynamic timestamp) {
@@ -78,7 +95,10 @@ class MovementController extends GetxController {
   }
 
   Future<void> deleteMovement(String id) async {
+    if (isLoading.value) return;
+
     try {
+      isLoading.value = true;
       final userId = _auth.currentUser?.uid;
       if (userId == null) return;
 
@@ -98,8 +118,8 @@ class MovementController extends GetxController {
       // Actualizar la lista local
       currentMonthMovements.removeWhere((movement) => movement['id'] == id);
 
-      // Actualizar el balance total
-      _financeController.getTotalBalance();
+      // Actualizar el balance total de forma secuencial
+      await _financeController.getTotalBalance();
 
       Get.snackbar(
         'Éxito',
@@ -114,6 +134,8 @@ class MovementController extends GetxController {
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
+    } finally {
+      isLoading.value = false;
     }
   }
 }

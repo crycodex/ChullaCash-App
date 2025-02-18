@@ -160,7 +160,11 @@ class ProfileContent extends StatelessWidget {
             _SettingsItem(
               icon: Icons.policy_outlined,
               title: 'Términos y condiciones',
-              onTap: () {},
+              onTap: () {
+                //url
+                launchUrl(Uri.parse(
+                    'https://sites.google.com/view/chullacash/inicio'));
+              },
             ),
 
             const SizedBox(height: 32),

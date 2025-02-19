@@ -50,6 +50,12 @@ dependencies:
   confetti: ^0.8.0
   #audioplayers
   audioplayers: ^6.1.2
+  #flutter gen
+  flutter_gen: ^5.9.0
+  #admob
+  google_mobile_ads: ^5.3.1
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

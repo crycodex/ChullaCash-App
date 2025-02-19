@@ -7,7 +7,6 @@ import 'presentation/routes/routes.dart';
 import 'presentation/theme/app_theme.dart';
 //idioma
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 //change notifier
 import 'change_notifier.dart';
 //provider
@@ -17,6 +16,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 //controllers
 import 'presentation/controllers/user_controller.dart';
 import 'presentation/controllers/Login/auth_controller.dart';
+//admob google
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+//services
+import 'services/ad_service.dart';
+
+final adService = AdService();
 
 Future<void> main() async {
   try {
@@ -27,6 +32,9 @@ Future<void> main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+
+    // Inicializar AdMob
+    await MobileAds.instance.initialize();
 
     // Inicializar el controlador de usuario
     Get.put(UserController(), permanent: true);
@@ -72,13 +80,45 @@ Future<void> main() async {
   }
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   final String initialRoute;
 
   const MainApp({
     super.key,
     required this.initialRoute,
   });
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  @override
+  void initState() {
+    super.initState();
+    _initAds();
+  }
+
+  void _initAds() async {
+    try {
+      debugPrint('🚀 Iniciando configuración de anuncios...');
+      // Cargar el anuncio
+      adService.loadInterstitialAd();
+
+      // Mostrar el anuncio después de un breve retraso
+      await Future.delayed(const Duration(seconds: 3));
+      debugPrint('⏰ Tiempo de espera completado, mostrando anuncio...');
+      adService.showInterstitialAd();
+    } catch (e) {
+      debugPrint('❌ Error al inicializar anuncios: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    adService.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,10 +133,9 @@ class MainApp extends StatelessWidget {
               : ThemeMode.light,
           locale: localeProvider.locale,
           fallbackLocale: const Locale('es'),
-          initialRoute: initialRoute,
+          initialRoute: widget.initialRoute,
           getPages: Routes.routes,
           localizationsDelegates: const [
-            AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,

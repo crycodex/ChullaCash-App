@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import 'dart:math' as math;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 //idioma
 import 'package:provider/provider.dart';
 import '../../../change_notifier.dart';
+import '../../../services/ad_service.dart';
 
 //controllers
 import 'package:get/get.dart';
@@ -97,8 +97,42 @@ class _AnimatedWaveState extends State<AnimatedWave>
   }
 }
 
-class WelcomePage extends StatelessWidget {
+class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
+
+  @override
+  State<WelcomePage> createState() => _WelcomePageState();
+}
+
+class _WelcomePageState extends State<WelcomePage> {
+  final AdService _adService = AdService();
+
+  @override
+  void initState() {
+    super.initState();
+    _initAds();
+  }
+
+  void _initAds() async {
+    try {
+      debugPrint('👋 Iniciando configuración de anuncios en WelcomePage...');
+      await Future.delayed(const Duration(seconds: 1));
+      _adService.loadInterstitialAd();
+
+      // Mostrar el anuncio después de un breve retraso
+      await Future.delayed(const Duration(seconds: 2));
+      debugPrint('⏰ Mostrando anuncio en WelcomePage...');
+      _adService.showInterstitialAd();
+    } catch (e) {
+      debugPrint('❌ Error al inicializar anuncios en WelcomePage: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _adService.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -204,7 +238,7 @@ class WelcomePage extends StatelessWidget {
                       children: [
                         SizedBox(height: size.height * 0.35),
                         Text(
-                          AppLocalizations.of(context)!.welcomeTitle,
+                          'Lleva el control de tu dinero sin esfuerzo',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 32,
@@ -215,7 +249,7 @@ class WelcomePage extends StatelessWidget {
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          AppLocalizations.of(context)!.welcomeDescription,
+                          'Gestiona tus finanzas fácilmente con nuestra interfaz intuitiva y amigable. Establece metas financieras, controla tu presupuesto y haz un seguimiento de tus gastos en un solo lugar.',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 18,
@@ -247,7 +281,7 @@ class WelcomePage extends StatelessWidget {
                               elevation: 0,
                             ),
                             child: Text(
-                              AppLocalizations.of(context)!.welcomeButton,
+                              'Iniciar sesión',
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -260,7 +294,7 @@ class WelcomePage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              AppLocalizations.of(context)!.welcomeNoAccount,
+                              'No tienes una cuenta?',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
@@ -272,7 +306,7 @@ class WelcomePage extends StatelessWidget {
                                 foregroundColor: Colors.white,
                               ),
                               child: Text(
-                                AppLocalizations.of(context)!.welcomeRegister,
+                                'Registrarse',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,

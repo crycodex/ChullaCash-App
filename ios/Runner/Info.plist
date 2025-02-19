@@ -29,6 +29,11 @@
 		<string>Para proteger tus datos, necesitamos autenticar tu identidad.</string>
 		<!-- end of local auth -->
 
+		<!-- admob -->
+		<key>GADApplicationIdentifier</key>
+		<string>ca-app-pub-6468767225905546~1283581526</string>
+		<!-- end of admob -->
+
 		<key>CADisableMinimumFrameDurationOnPhone</key>
 		<true/>
 		<key>CFBundleDevelopmentRegion</key>

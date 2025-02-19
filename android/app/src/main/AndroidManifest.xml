@@ -1,6 +1,7 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.chullacash.app">
     <application
-        android:label="chulla_cash"
+        android:label="ChullaCash"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

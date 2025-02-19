@@ -1,5 +1,6 @@
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:io';
 import '../ad_helper.dart';
 
 class AdService {
@@ -7,6 +8,20 @@ class AdService {
   bool _isInterstitialAdReady = false;
   bool _isLoading = false;
   bool _hasShownAd = false;
+
+  AdService() {
+    _initGoogleMobileAds();
+  }
+
+  Future<void> _initGoogleMobileAds() async {
+    // Solo configurar dispositivo de prueba en el emulador
+    if (!Platform.isAndroid && !Platform.isIOS) {
+      RequestConfiguration configuration = RequestConfiguration(
+        testDeviceIds: ['13def7a256a57ca7900a203ed8d14b7d'],
+      );
+      MobileAds.instance.updateRequestConfiguration(configuration);
+    }
+  }
 
   Future<void> loadInterstitialAd() async {
     if (_isLoading || _hasShownAd) return;

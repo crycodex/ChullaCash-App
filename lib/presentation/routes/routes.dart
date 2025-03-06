@@ -14,6 +14,8 @@ import '../atomic/organisms/profile/security_content.dart';
 import '../atomic/organisms/auth/app_lock_screen.dart';
 //credits page
 import '../atomic/organisms/credits/credits_content.dart';
+//connectivity checker
+import '../atomic/molecules/connectivity_checker.dart';
 
 class Routes {
   //welcome page
@@ -26,12 +28,34 @@ class Routes {
   static const String credits = '/credits';
 
   static final List<GetPage> routes = [
-    GetPage(name: Routes.welcome, page: () => WelcomePage()),
-    GetPage(name: Routes.home, page: () => HomePage()),
-    GetPage(name: Routes.history, page: () => HistoryContent()),
-    GetPage(name: Routes.personalInfo, page: () => PersonalInfoContent()),
-    GetPage(name: Routes.security, page: () => SecurityContent()),
-    GetPage(name: Routes.appLock, page: () => AppLockScreen()),
-    GetPage(name: Routes.credits, page: () => CreditsContent()),
+    GetPage(
+      name: Routes.welcome,
+      page: () => ConnectivityChecker(child: WelcomePage()),
+    ),
+    GetPage(
+      name: Routes.home,
+      page: () => ConnectivityChecker(child: HomePage()),
+    ),
+    GetPage(
+      name: Routes.history,
+      page: () => ConnectivityChecker(child: HistoryContent()),
+    ),
+    GetPage(
+      name: Routes.personalInfo,
+      page: () => ConnectivityChecker(child: PersonalInfoContent()),
+    ),
+    GetPage(
+      name: Routes.security,
+      page: () => ConnectivityChecker(child: SecurityContent()),
+    ),
+    GetPage(
+      name: Routes.appLock,
+      page: () =>
+          AppLockScreen(), // No añadimos el checker aquí para permitir el acceso sin conexión
+    ),
+    GetPage(
+      name: Routes.credits,
+      page: () => ConnectivityChecker(child: CreditsContent()),
+    ),
   ];
 }

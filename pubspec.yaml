@@ -45,6 +45,9 @@ dependencies:
   confetti: ^0.8.0
   #audioplayers
   audioplayers: ^6.1.2
+  #connectivity
+  connectivity_plus: ^5.0.2
+  internet_connection_checker: ^1.0.0+1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -75,5 +78,7 @@ flutter:
     #img login
     - lib/assets/icons/others/apple.png
     - lib/assets/icons/others/googleIcon.png
+    #animations
+    - lib/assets/animations/
     #sounds
     - assets/sounds/success.mp3

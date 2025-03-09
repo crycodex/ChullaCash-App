@@ -1,0 +1,2 @@
+/Users/cristhianrecalde/dev/mobile/ChullaCash-App/android/app/.cxx/RelWithDebInfo/3r18735j/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/cristhianrecalde/dev/mobile/ChullaCash-App/android/app/.cxx/RelWithDebInfo/3r18735j/arm64-v8a/CMakeFiles/rebuild_cache.dir

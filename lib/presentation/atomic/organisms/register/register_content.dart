@@ -332,101 +332,110 @@ class _RegisterContentState extends State<RegisterContent>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-    return SafeArea(
-      child: Column(
-        children: [
-          // Amount Display
-          Container(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '\$$_amount',
-                      style: TextStyle(
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                        color: _isIncome ? AppColors.primaryGreen : Colors.red,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                // Toggle Button
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+    return Card(
+      margin: const EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Amount Display
+            Container(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildToggleButton(true),
-                      _buildToggleButton(false),
+                      Text(
+                        '\$$_amount',
+                        style: TextStyle(
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                          color:
+                              _isIncome ? AppColors.primaryGreen : Colors.red,
+                        ),
+                      ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 16),
-                // Category Selector
-                _buildCategorySelector(),
-              ],
-            ),
-          ),
-          const Spacer(),
-          // Numeric Keypad
-          Container(
-            margin: const EdgeInsets.only(bottom: 80),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    _buildKeypadButton('1'),
-                    _buildKeypadButton('2'),
-                    _buildKeypadButton('3'),
-                  ],
-                ),
-                Row(
-                  children: [
-                    _buildKeypadButton('4'),
-                    _buildKeypadButton('5'),
-                    _buildKeypadButton('6'),
-                  ],
-                ),
-                Row(
-                  children: [
-                    _buildKeypadButton('7'),
-                    _buildKeypadButton('8'),
-                    _buildKeypadButton('9'),
-                  ],
-                ),
-                Row(
-                  children: [
-                    _buildKeypadButton('.'),
-                    _buildKeypadButton('0'),
-                    _buildKeypadButton('⌫', onTap: _deleteLastDigit),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: CustomButton(
-                    text: _isIncome ? 'Registrar Ingreso' : 'Registrar Egreso',
-                    onPressed: _handleSubmit,
-                    backgroundColor:
-                        _isIncome ? AppColors.primaryGreen : Colors.red,
+                  const SizedBox(height: 16),
+                  // Toggle Button
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildToggleButton(true),
+                        _buildToggleButton(false),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  // Category Selector
+                  _buildCategorySelector(),
+                ],
+              ),
             ),
-          ),
-        ],
+            const Spacer(),
+            // Numeric Keypad
+            Container(
+              margin: const EdgeInsets.only(bottom: 80),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      _buildKeypadButton('1'),
+                      _buildKeypadButton('2'),
+                      _buildKeypadButton('3'),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      _buildKeypadButton('4'),
+                      _buildKeypadButton('5'),
+                      _buildKeypadButton('6'),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      _buildKeypadButton('7'),
+                      _buildKeypadButton('8'),
+                      _buildKeypadButton('9'),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      _buildKeypadButton('.'),
+                      _buildKeypadButton('0'),
+                      _buildKeypadButton('⌫', onTap: _deleteLastDigit),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: CustomButton(
+                      text:
+                          _isIncome ? 'Registrar Ingreso' : 'Registrar Egreso',
+                      onPressed: _handleSubmit,
+                      backgroundColor:
+                          _isIncome ? AppColors.primaryGreen : Colors.red,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

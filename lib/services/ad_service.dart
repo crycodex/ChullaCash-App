@@ -8,23 +8,45 @@ class AdService {
   bool _isInterstitialAdReady = false;
   bool _isLoading = false;
   bool _hasShownAd = false;
+  bool _isInitialized = false;
 
   AdService() {
     _initGoogleMobileAds();
   }
 
   Future<void> _initGoogleMobileAds() async {
-    // Solo configurar dispositivo de prueba en el emulador
-    if (!Platform.isAndroid && !Platform.isIOS) {
-      RequestConfiguration configuration = RequestConfiguration(
-        testDeviceIds: ['13def7a256a57ca7900a203ed8d14b7d'],
-      );
-      MobileAds.instance.updateRequestConfiguration(configuration);
+    try {
+      debugPrint('🚀 Inicializando Google Mobile Ads...');
+
+      // Configurar dispositivos de prueba
+      List<String> testDeviceIds = ['13def7a256a57ca7900a203ed8d14b7d'];
+
+      if (kDebugMode) {
+        RequestConfiguration configuration = RequestConfiguration(
+          testDeviceIds: testDeviceIds,
+        );
+        await MobileAds.instance.updateRequestConfiguration(configuration);
+        debugPrint('✅ Configuración de dispositivos de prueba completada');
+      }
+
+      // Inicializar MobileAds
+      await MobileAds.instance.initialize();
+      debugPrint('✅ Google Mobile Ads inicializado correctamente');
+
+      _isInitialized = true;
+    } catch (e) {
+      debugPrint('❌ Error al inicializar Google Mobile Ads: $e');
+      _isInitialized = false;
     }
   }
 
   Future<void> loadInterstitialAd() async {
-    if (_isLoading || _hasShownAd) return;
+    if (_isLoading || _hasShownAd || !_isInitialized) {
+      debugPrint(
+          '⚠️ No se puede cargar el anuncio: ${!_isInitialized ? "AdMob no inicializado" : "Ya está cargando o ya se mostró"}');
+      return;
+    }
+
     _isLoading = true;
 
     debugPrint('🎯 Iniciando carga del anuncio intersticial...');
@@ -57,9 +79,6 @@ class AdService {
                 ad.dispose();
               },
             );
-
-            // Mostrar el anuncio inmediatamente después de cargarlo
-            showInterstitialAd();
           },
           onAdFailedToLoad: (LoadAdError error) {
             debugPrint('❌ Error al cargar el anuncio: ${error.message}');
@@ -76,6 +95,12 @@ class AdService {
   }
 
   void showInterstitialAd() {
+    if (!_isInitialized) {
+      debugPrint(
+          '⚠️ AdMob no está inicializado, no se puede mostrar el anuncio');
+      return;
+    }
+
     if (_hasShownAd) {
       debugPrint('⚠️ El anuncio ya fue mostrado anteriormente');
       return;

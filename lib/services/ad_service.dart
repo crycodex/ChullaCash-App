@@ -11,7 +11,7 @@ class AdService {
   bool _hasShownAd = false;
   bool _isInitialized = false;
   int _numInterstitialLoadAttempts = 0;
-  int _maxInterstitialLoadAttempts = 3;
+  final int _maxInterstitialLoadAttempts = 1;
 
   // Completer para manejar la inicialización asíncrona
   final Completer<bool> _initCompleter = Completer<bool>();

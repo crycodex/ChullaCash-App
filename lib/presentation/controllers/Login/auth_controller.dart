@@ -436,47 +436,108 @@ class AuthController extends GetxController {
   //* Login con Google
   Future<void> loginWithGoogle() async {
     try {
+      isLoading.value = true;
+      debugPrint('Iniciando login con Google...');
+
+      // Primero intentamos cerrar sesión para evitar problemas de caché
       final GoogleSignIn googleSignIn = GoogleSignIn();
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-      if (googleUser != null) {
-        final GoogleSignInAuthentication googleAuth =
-            await googleUser.authentication;
-        final AuthCredential credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
-
-        final UserCredential userCredential =
-            await _auth.signInWithCredential(credential);
-        final User? user = userCredential.user;
-        if (user == null) {
-          throw Exception('Error al iniciar sesión con Google');
-        }
-
-        final userDoc =
-            await _firestore.collection('users').doc(user.uid).get();
-        if (!userDoc.exists) {
-          await _createUserDocument(user);
-        }
-
-        // Actualizar datos observables
-        uid.value = user.uid;
-        email.value = user.email ?? '';
-        name.value = user.displayName ?? '';
-        profilePicture.value = user.photoURL ?? '';
-
-        debugPrint('Login con Google exitoso, redirigiendo a home');
-        Get.offAllNamed('/home');
+      try {
+        await googleSignIn.signOut();
+        debugPrint('Sesión previa de Google cerrada correctamente');
+      } catch (e) {
+        debugPrint('No había sesión previa de Google o error al cerrarla: $e');
       }
+
+      // Intentamos iniciar sesión con Google
+      debugPrint('Solicitando cuenta de Google...');
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        debugPrint('Usuario canceló el inicio de sesión con Google');
+        throw Exception('Inicio de sesión cancelado');
+      }
+
+      debugPrint('Cuenta de Google seleccionada: ${googleUser.email}');
+      debugPrint('Obteniendo tokens de autenticación...');
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      if (googleAuth.accessToken == null || googleAuth.idToken == null) {
+        debugPrint('Error: No se pudieron obtener los tokens de autenticación');
+        throw Exception('No se pudieron obtener los tokens de autenticación');
+      }
+
+      debugPrint('Tokens obtenidos correctamente');
+      debugPrint('Creando credencial para Firebase...');
+
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      debugPrint('Iniciando sesión en Firebase con credencial de Google...');
+      final UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
+      final User? user = userCredential.user;
+
+      if (user == null) {
+        debugPrint('Error: Firebase no devolvió un usuario válido');
+        throw Exception('Error al iniciar sesión con Google en Firebase');
+      }
+
+      debugPrint('Usuario autenticado en Firebase: ${user.uid}');
+      debugPrint('Verificando si el usuario existe en Firestore...');
+
+      final userDoc = await _firestore.collection('users').doc(user.uid).get();
+      if (!userDoc.exists) {
+        debugPrint('Usuario nuevo, creando documento en Firestore...');
+        await _createUserDocument(user);
+        debugPrint('Documento de usuario creado correctamente');
+      } else {
+        debugPrint('Usuario existente encontrado en Firestore');
+      }
+
+      // Actualizar datos observables
+      uid.value = user.uid;
+      email.value = user.email ?? '';
+      name.value = user.displayName ?? '';
+      profilePicture.value = user.photoURL ?? '';
+
+      // Actualizar datos del usuario en Firestore si es necesario
+      await _firestore.collection('users').doc(user.uid).update({
+        'lastLogin': Timestamp.now(),
+        'name': user.displayName ?? name.value,
+        'email': user.email?.toLowerCase() ?? email.value,
+        'photoUrl': user.photoURL ?? profilePicture.value,
+      });
+
+      debugPrint('Login con Google exitoso, redirigiendo a home');
+      Get.offAllNamed('/home');
     } catch (e) {
-      debugPrint('Error en login con Google: $e');
+      debugPrint('Error detallado en login con Google: $e');
+      String errorMessage =
+          'No se pudo completar el inicio de sesión con Google';
+
+      if (e.toString().contains('network')) {
+        errorMessage = 'Error de conexión. Verifica tu conexión a internet.';
+      } else if (e.toString().contains('canceled')) {
+        errorMessage = 'Inicio de sesión cancelado.';
+      } else if (e.toString().contains('credential')) {
+        errorMessage =
+            'Error de autenticación. Verifica tu configuración de Firebase.';
+      }
+
       Get.snackbar(
         'Error',
-        'No se pudo completar el inicio de sesión con Google',
+        errorMessage,
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 5),
       );
+    } finally {
+      isLoading.value = false;
     }
   }
 

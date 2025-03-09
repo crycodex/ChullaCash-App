@@ -9,6 +9,7 @@ import '../organisms/profile/profile_content.dart';
 import '../organisms/register/register_content.dart';
 import '../../controllers/finance_controller.dart';
 import '../../controllers/goals_controller.dart';
+import '../../../services/ad_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,6 +23,7 @@ class _HomePageState extends State<HomePage> {
   final PageController _pageController = PageController(keepPage: true);
   late final FinanceController financeController;
   late final GoalsController goalsController;
+  final AdService _adService = AdService();
 
   final List<Widget> _pages = [
     const HomeContent(),
@@ -38,6 +40,7 @@ class _HomePageState extends State<HomePage> {
     goalsController = Get.put(GoalsController());
     Get.put(_pageController, permanent: true);
     _initializeControllers();
+    _initAds();
   }
 
   void _initializeControllers() async {
@@ -46,9 +49,20 @@ class _HomePageState extends State<HomePage> {
     await financeController.updateBalance();
   }
 
+  void _initAds() async {
+    try {
+      debugPrint('🏠 Iniciando configuración de anuncios en HomePage...');
+      // Solo cargar el anuncio, se mostrará automáticamente cuando esté listo
+      await _adService.loadInterstitialAd();
+    } catch (e) {
+      debugPrint('❌ Error al inicializar anuncios en HomePage: $e');
+    }
+  }
+
   @override
   void dispose() {
     _pageController.dispose();
+    _adService.dispose();
     super.dispose();
   }
 

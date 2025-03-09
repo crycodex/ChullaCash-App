@@ -6,6 +6,10 @@
 -dontwarn com.google.android.gms.**
 -dontwarn com.google.firebase.**
 
+# Reglas para Play Integrity API
+-keep class com.google.android.play.** { *; }
+-dontwarn com.google.android.play.**
+
 # Reglas para Kotlin
 -keep class kotlin.** { *; }
 -keep class kotlin.Metadata { *; }

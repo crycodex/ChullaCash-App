@@ -160,7 +160,16 @@ class ProfileContent extends StatelessWidget {
             _SettingsItem(
               icon: Icons.policy_outlined,
               title: 'Términos y condiciones',
-              onTap: () {},
+              onTap: () {
+                //enlace a la pagina de terminos y condiciones
+                launchUrl(Uri.parse(
+                    'https://sites.google.com/view/chullacash/inicios'));
+              },
+            ),
+            _SettingsItem(
+              icon: Icons.info_outline,
+              title: 'Créditos',
+              onTap: () => Get.toNamed("/credits"),
             ),
 
             const SizedBox(height: 32),

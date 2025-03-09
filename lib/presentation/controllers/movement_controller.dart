@@ -19,78 +19,129 @@ class MovementController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    final now = DateTime.now();
-    setupMovementsStream(now.year, now.month);
+    try {
+      final now = DateTime.now();
+      setupMovementsStream(now.year, now.month);
+    } catch (e) {
+      print('Error en onInit: $e');
+    }
   }
 
-  void setupMovementsStream(int year, int month) {
-    final userId = _auth.currentUser?.uid;
-    if (userId == null) return;
-
-    _movementsSubscription?.cancel();
-
-    isLoading.value = true;
-    _movementsSubscription = _firestore
-        .collection('users')
-        .doc(userId)
-        .collection('transactions')
-        .doc('$year')
-        .collection('$month')
-        .orderBy('timestamp', descending: true)
-        .snapshots()
-        .listen((snapshot) async {
-      try {
-        currentMonthMovements.value = snapshot.docs
-            .where((doc) => doc.id != 'info')
-            .map((doc) => {
-                  'id': doc.id,
-                  ...doc.data(),
-                })
-            .toList();
-
-        // Actualizar balance de forma secuencial
-        await _financeController.getTotalBalance();
-        await _financeController.updateBalance();
-      } catch (e) {
-        print('Error en stream de movimientos: $e');
-      } finally {
-        isLoading.value = false;
+  void setupMovementsStream(int year, int month) async {
+    try {
+      final userId = _auth.currentUser?.uid;
+      if (userId == null) {
+        print('Usuario no autenticado');
+        return;
       }
-    }, onError: (error) {
-      print('Error en stream de movimientos: $error');
+
+      _movementsSubscription?.cancel();
+      isLoading.value = true;
+
+      final collectionRef = _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('transactions')
+          .doc('$year')
+          .collection('$month');
+
+      // Verificar si la colección existe
+      final collectionSnapshot = await collectionRef.get();
+      if (collectionSnapshot.docs.isEmpty) {
+        // Crear documento inicial si no existe
+        await collectionRef.doc('info').set({
+          'created_at': FieldValue.serverTimestamp(),
+        });
+      }
+
+      _movementsSubscription = collectionRef
+          .orderBy('timestamp', descending: true)
+          .snapshots()
+          .listen(
+        (snapshot) async {
+          try {
+            currentMonthMovements.value = snapshot.docs
+                .where((doc) => doc.id != 'info')
+                .map((doc) => {
+                      'id': doc.id,
+                      ...doc.data(),
+                    })
+                .toList();
+
+            await _financeController.getTotalBalance();
+            await _financeController.updateBalance();
+          } catch (e) {
+            print('Error procesando datos: $e');
+            Get.snackbar(
+              'Error',
+              'Error al procesar los movimientos',
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+            );
+          }
+        },
+        onError: (error) {
+          print('Error en stream: $error');
+          Get.snackbar(
+            'Error',
+            'Error al obtener los movimientos',
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+        },
+        cancelOnError: false,
+      );
+    } catch (e) {
+      print('Error configurando stream: $e');
+      Get.snackbar(
+        'Error',
+        'Error al configurar la sincronización',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
       isLoading.value = false;
-    });
+    }
   }
 
   @override
   void onClose() {
-    _movementsSubscription?.cancel();
+    try {
+      _movementsSubscription?.cancel();
+    } catch (e) {
+      print('Error en onClose: $e');
+    }
     super.onClose();
   }
 
   String getTimeAgo(dynamic timestamp) {
     if (timestamp == null) return '';
 
-    DateTime date;
-    if (timestamp is Timestamp) {
-      date = timestamp.toDate();
-    } else if (timestamp is DateTime) {
-      date = timestamp;
-    } else {
+    try {
+      DateTime date;
+      if (timestamp is Timestamp) {
+        date = timestamp.toDate();
+      } else if (timestamp is DateTime) {
+        date = timestamp;
+      } else {
+        return '';
+      }
+
+      final now = DateTime.now();
+      final difference = now.difference(date);
+
+      if (difference.inDays > 0) {
+        return '${difference.inDays} ${difference.inDays == 1 ? 'día' : 'días'} atrás';
+      } else if (difference.inHours > 0) {
+        return '${difference.inHours} ${difference.inHours == 1 ? 'hora' : 'horas'} atrás';
+      } else if (difference.inMinutes > 0) {
+        return '${difference.inMinutes} ${difference.inMinutes == 1 ? 'minuto' : 'minutos'} atrás';
+      } else {
+        return 'Hace un momento';
+      }
+    } catch (e) {
+      print('Error en getTimeAgo: $e');
       return '';
-    }
-
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inDays > 0) {
-      return '${difference.inDays} ${difference.inDays == 1 ? 'día' : 'días'} atrás';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours} ${difference.inHours == 1 ? 'hora' : 'horas'} atrás';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes} ${difference.inMinutes == 1 ? 'minuto' : 'minutos'} atrás';
-    } else {
-      return 'Hace un momento';
     }
   }
 
@@ -100,25 +151,32 @@ class MovementController extends GetxController {
     try {
       isLoading.value = true;
       final userId = _auth.currentUser?.uid;
-      if (userId == null) return;
+      if (userId == null) {
+        throw Exception('Usuario no autenticado');
+      }
 
       final now = DateTime.now();
       final year = now.year;
       final month = now.month;
 
-      await _firestore
+      // Obtener el documento antes de eliminarlo para verificar que existe
+      final docRef = _firestore
           .collection('users')
           .doc(userId)
           .collection('transactions')
           .doc('$year')
           .collection('$month')
-          .doc(id)
-          .delete();
+          .doc(id);
+
+      final docSnapshot = await docRef.get();
+      if (!docSnapshot.exists) {
+        throw Exception('El movimiento no existe');
+      }
+
+      await docRef.delete();
 
       // Actualizar la lista local
       currentMonthMovements.removeWhere((movement) => movement['id'] == id);
-
-      // Actualizar el balance total de forma secuencial
       await _financeController.getTotalBalance();
 
       Get.snackbar(
@@ -128,9 +186,10 @@ class MovementController extends GetxController {
         colorText: Colors.white,
       );
     } catch (e) {
+      print('Error en deleteMovement: $e');
       Get.snackbar(
         'Error',
-        'No se pudo eliminar el movimiento: $e',
+        'No se pudo eliminar el movimiento',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );

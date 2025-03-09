@@ -89,11 +89,11 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
+            VALUE "CompanyName", "com.chullacash.app" "\0"
             VALUE "FileDescription", "chulla_cash" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "chulla_cash" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2025 com.chullacash.app. All rights reserved." "\0"
             VALUE "OriginalFilename", "chulla_cash.exe" "\0"
             VALUE "ProductName", "chulla_cash" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"

@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../presentation/controllers/connectivity_controller.dart';
-import '../../../presentation/theme/app_colors.dart';
 
 class ConnectivityChecker extends StatelessWidget {
   final Widget child;
 
   const ConnectivityChecker({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

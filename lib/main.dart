@@ -19,8 +19,6 @@ import 'presentation/controllers/Login/auth_controller.dart';
 import 'presentation/controllers/connectivity_controller.dart';
 //pages
 import 'presentation/atomic/pages/no_connection_page.dart';
-//admob google
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 //services
 import 'services/ad_service.dart';
 

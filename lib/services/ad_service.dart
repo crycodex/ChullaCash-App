@@ -1,6 +1,5 @@
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/foundation.dart';
-import 'dart:io';
 import '../ad_helper.dart';
 import 'dart:async';
 

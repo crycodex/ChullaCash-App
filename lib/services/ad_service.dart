@@ -2,6 +2,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:io';
 import '../ad_helper.dart';
+import 'dart:async';
 
 class AdService {
   InterstitialAd? _interstitialAd;
@@ -9,6 +10,14 @@ class AdService {
   bool _isLoading = false;
   bool _hasShownAd = false;
   bool _isInitialized = false;
+  int _numInterstitialLoadAttempts = 0;
+  int _maxInterstitialLoadAttempts = 3;
+
+  // Completer para manejar la inicialización asíncrona
+  final Completer<bool> _initCompleter = Completer<bool>();
+
+  // Getter para obtener el Future de inicialización
+  Future<bool> get initialized => _initCompleter.future;
 
   AdService() {
     _initGoogleMobileAds();
@@ -34,19 +43,49 @@ class AdService {
       debugPrint('✅ Google Mobile Ads inicializado correctamente');
 
       _isInitialized = true;
+
+      // Completar el Future de inicialización
+      if (!_initCompleter.isCompleted) {
+        _initCompleter.complete(true);
+      }
     } catch (e) {
       debugPrint('❌ Error al inicializar Google Mobile Ads: $e');
       _isInitialized = false;
+
+      // Completar el Future con error
+      if (!_initCompleter.isCompleted) {
+        _initCompleter.complete(false);
+      }
     }
   }
 
   Future<void> loadInterstitialAd() async {
-    if (_isLoading || _hasShownAd || !_isInitialized) {
-      debugPrint(
-          '⚠️ No se puede cargar el anuncio: ${!_isInitialized ? "AdMob no inicializado" : "Ya está cargando o ya se mostró"}');
+    // Esperar a que AdMob esté inicializado
+    if (!_isInitialized) {
+      debugPrint('⏳ Esperando a que AdMob se inicialice...');
+      final isInitialized = await initialized.timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          debugPrint(
+              '⚠️ Tiempo de espera agotado para la inicialización de AdMob');
+          return false;
+        },
+      );
+
+      if (!isInitialized) {
+        debugPrint(
+            '⚠️ No se puede cargar el anuncio: AdMob no se inicializó correctamente');
+        return;
+      }
+    }
+
+    if (_isLoading) {
+      debugPrint('⚠️ Ya se está cargando un anuncio');
       return;
     }
 
+    // Reiniciar el estado para permitir cargar un nuevo anuncio
+    _hasShownAd = false;
     _isLoading = true;
 
     debugPrint('🎯 Iniciando carga del anuncio intersticial...');
@@ -61,6 +100,7 @@ class AdService {
             _interstitialAd = ad;
             _isInterstitialAdReady = true;
             _isLoading = false;
+            _numInterstitialLoadAttempts = 0;
 
             ad.fullScreenContentCallback = FullScreenContentCallback(
               onAdShowedFullScreenContent: (ad) {
@@ -71,12 +111,18 @@ class AdService {
                 debugPrint('👋 Anuncio cerrado por el usuario');
                 _isInterstitialAdReady = false;
                 ad.dispose();
+
+                // Precargar el siguiente anuncio
+                loadInterstitialAd();
               },
               onAdFailedToShowFullScreenContent: (ad, error) {
                 debugPrint('❌ Error al mostrar el anuncio: ${error.message}');
                 _isInterstitialAdReady = false;
                 _isLoading = false;
                 ad.dispose();
+
+                // Intentar cargar otro anuncio
+                loadInterstitialAd();
               },
             );
           },
@@ -85,6 +131,15 @@ class AdService {
             _isInterstitialAdReady = false;
             _isLoading = false;
             _interstitialAd = null;
+
+            _numInterstitialLoadAttempts += 1;
+            if (_numInterstitialLoadAttempts < _maxInterstitialLoadAttempts) {
+              debugPrint(
+                  '🔄 Reintentando cargar anuncio (intento $_numInterstitialLoadAttempts de $_maxInterstitialLoadAttempts)');
+              Future.delayed(const Duration(seconds: 1), () {
+                loadInterstitialAd();
+              });
+            }
           },
         ),
       );
@@ -94,11 +149,25 @@ class AdService {
     }
   }
 
-  void showInterstitialAd() {
+  Future<void> showInterstitialAd() async {
+    // Esperar a que AdMob esté inicializado
     if (!_isInitialized) {
       debugPrint(
-          '⚠️ AdMob no está inicializado, no se puede mostrar el anuncio');
-      return;
+          '⏳ Esperando a que AdMob se inicialice antes de mostrar el anuncio...');
+      final isInitialized = await initialized.timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          debugPrint(
+              '⚠️ Tiempo de espera agotado para la inicialización de AdMob');
+          return false;
+        },
+      );
+
+      if (!isInitialized) {
+        debugPrint(
+            '⚠️ No se puede mostrar el anuncio: AdMob no se inicializó correctamente');
+        return;
+      }
     }
 
     if (_hasShownAd) {
@@ -112,7 +181,19 @@ class AdService {
     } else {
       debugPrint('⚠️ El anuncio no está listo para mostrarse');
       if (!_isLoading) {
-        loadInterstitialAd();
+        // Intentar cargar el anuncio primero
+        await loadInterstitialAd();
+
+        // Esperar un momento para que se cargue
+        await Future.delayed(const Duration(seconds: 2));
+
+        // Intentar mostrar de nuevo si está listo
+        if (_isInterstitialAdReady && _interstitialAd != null) {
+          debugPrint('🎬 Mostrando anuncio intersticial (segundo intento)...');
+          _interstitialAd!.show();
+        } else {
+          debugPrint('⚠️ No se pudo cargar el anuncio después de intentarlo');
+        }
       }
     }
   }

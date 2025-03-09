@@ -37,9 +37,7 @@ Future<void> main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-
-    // Inicializar AdMob
-    await MobileAds.instance.initialize();
+    debugPrint('✅ Firebase inicializado correctamente');
 
     // Inicializar el controlador de usuario
     Get.put(UserController(), permanent: true);
@@ -102,36 +100,61 @@ class MainApp extends StatefulWidget {
   State<MainApp> createState() => _MainAppState();
 }
 
-class _MainAppState extends State<MainApp> {
+class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
+  bool _isFirstLaunch = true;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initAds();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    adService.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Mostrar anuncio cuando la app vuelve al primer plano desde segundo plano
+    if (state == AppLifecycleState.resumed && !_isFirstLaunch) {
+      // Usar Future.microtask para no bloquear la UI
+      Future.microtask(() async {
+        // Esperar un momento para que la app esté completamente en primer plano
+        await Future.delayed(const Duration(seconds: 1));
+        await _showInterstitialAd();
+      });
+    }
   }
 
   void _initAds() async {
     try {
       debugPrint('🚀 Iniciando configuración de anuncios...');
 
-      // Esperar un poco para asegurarse de que la app esté completamente inicializada
-      await Future.delayed(const Duration(seconds: 2));
-
-      // Cargar el anuncio
-      await adService.loadInterstitialAd();
-
-      // Mostrar el anuncio después de un breve retraso
+      // Esperar a que la app esté completamente inicializada
       await Future.delayed(const Duration(seconds: 3));
-      debugPrint('⏰ Tiempo de espera completado, mostrando anuncio...');
-      adService.showInterstitialAd();
+
+      // Mostrar anuncio al iniciar la app
+      await _showInterstitialAd();
+
+      // Marcar que ya no es el primer lanzamiento
+      _isFirstLaunch = false;
     } catch (e) {
       debugPrint('❌ Error al inicializar anuncios: $e');
     }
   }
 
-  @override
-  void dispose() {
-    adService.dispose();
-    super.dispose();
+  Future<void> _showInterstitialAd() async {
+    try {
+      // Mostrar el anuncio
+      debugPrint('⏰ Intentando mostrar anuncio intersticial...');
+      await adService.showInterstitialAd();
+    } catch (e) {
+      debugPrint('❌ Error al mostrar anuncio: $e');
+    }
   }
 
   @override

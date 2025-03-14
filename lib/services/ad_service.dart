@@ -2,6 +2,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:flutter/foundation.dart';
 import '../ad_helper.dart';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AdService {
   InterstitialAd? _interstitialAd;
@@ -11,6 +12,8 @@ class AdService {
   bool _isInitialized = false;
   int _numInterstitialLoadAttempts = 0;
   final int _maxInterstitialLoadAttempts = 1;
+  late SharedPreferences _prefs;
+  bool _prefsInitialized = false;
 
   // Completer para manejar la inicialización asíncrona
   final Completer<bool> _initCompleter = Completer<bool>();
@@ -20,6 +23,46 @@ class AdService {
 
   AdService() {
     _initGoogleMobileAds();
+    _initPrefs();
+  }
+
+  Future<void> _initPrefs() async {
+    try {
+      _prefs = await SharedPreferences.getInstance();
+      _prefsInitialized = true;
+      debugPrint('✅ SharedPreferences inicializado correctamente');
+    } catch (e) {
+      debugPrint('❌ Error al inicializar SharedPreferences: $e');
+    }
+  }
+
+  Future<bool> _shouldShowAd() async {
+    if (!_prefsInitialized) {
+      await _initPrefs();
+    }
+
+    final lastDismissed = _prefs.getInt('lastAdDismissed') ?? 0;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final timeDifference = now - lastDismissed;
+
+    // No mostrar el anuncio si se cerró hace menos de 1 hora (3600000 milisegundos)
+    if (timeDifference < 3600000) {
+      debugPrint(
+          '⏳ No se muestra el anuncio: tiempo desde último cierre ${timeDifference / 1000} segundos');
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<void> _markAdDismissed() async {
+    if (!_prefsInitialized) {
+      await _initPrefs();
+    }
+
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _prefs.setInt('lastAdDismissed', now);
+    debugPrint('✅ Anuncio marcado como cerrado a las ${DateTime.now()}');
   }
 
   Future<void> _initGoogleMobileAds() async {
@@ -106,9 +149,10 @@ class AdService {
                 debugPrint('📱 Anuncio mostrado en pantalla completa');
                 _hasShownAd = true;
               },
-              onAdDismissedFullScreenContent: (ad) {
+              onAdDismissedFullScreenContent: (ad) async {
                 debugPrint('👋 Anuncio cerrado por el usuario');
                 _isInterstitialAdReady = false;
+                await _markAdDismissed();
                 ad.dispose();
 
                 // Precargar el siguiente anuncio
@@ -167,6 +211,12 @@ class AdService {
             '⚠️ No se puede mostrar el anuncio: AdMob no se inicializó correctamente');
         return;
       }
+    }
+
+    // Verificar si debemos mostrar el anuncio basado en el tiempo desde el último cierre
+    if (!await _shouldShowAd()) {
+      debugPrint('⏳ No se muestra el anuncio: tiempo de espera no cumplido');
+      return;
     }
 
     if (_hasShownAd) {

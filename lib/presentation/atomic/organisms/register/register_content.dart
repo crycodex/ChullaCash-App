@@ -332,6 +332,7 @@ class _RegisterContentState extends State<RegisterContent>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Card(
       margin: const EdgeInsets.all(16),
       shape: RoundedRectangleBorder(

@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import 'dart:math' as math;
-
-//idioma
-import 'package:provider/provider.dart';
-import '../../../change_notifier.dart';
 import '../../../services/ad_service.dart';
 
 //controllers
@@ -174,58 +170,6 @@ class _WelcomePageState extends State<WelcomePage> {
                     child: Image.asset(
                       'lib/assets/icons/icon_removebg.png',
                       fit: BoxFit.contain,
-                    ),
-                  ),
-                ),
-
-                // Botón de idioma
-                Positioned(
-                  top: 40,
-                  right: 20,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: PopupMenuButton<Locale>(
-                      icon: Icon(Icons.language,
-                          color: AppColors.primaryBlue, size: 32),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      onSelected: (Locale locale) {
-                        final provider =
-                            Provider.of<LocaleProvider>(context, listen: false);
-                        provider.setLocale(locale);
-                      },
-                      itemBuilder: (BuildContext context) => [
-                        PopupMenuItem(
-                          value: const Locale('es'),
-                          child: Row(
-                            children: const [
-                              Text('🇪🇸  Español',
-                                  style: TextStyle(fontSize: 16)),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: const Locale('en'),
-                          child: Row(
-                            children: const [
-                              Text('🇺🇸  English',
-                                  style: TextStyle(fontSize: 16)),
-                            ],
-                          ),
-                        ),
-                      ],
                     ),
                   ),
                 ),

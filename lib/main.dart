@@ -5,12 +5,6 @@ import 'package:get/get.dart';
 import 'presentation/routes/routes.dart';
 //theme
 import 'presentation/theme/app_theme.dart';
-//idioma
-import 'package:flutter_localizations/flutter_localizations.dart';
-//change notifier
-import 'change_notifier.dart';
-//provider
-import 'package:provider/provider.dart';
 //firebase
 import 'package:firebase_auth/firebase_auth.dart';
 //controllers
@@ -64,11 +58,8 @@ Future<void> main() async {
     }
 
     runApp(
-      ChangeNotifierProvider(
-        create: (context) => LocaleProvider(),
-        child: MainApp(
-          initialRoute: initialRoute,
-        ),
+      MainApp(
+        initialRoute: initialRoute,
       ),
     );
   } catch (e) {
@@ -165,65 +156,41 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
       connectivityController.checkConnectivity();
     });
 
-    return Consumer<LocaleProvider>(
-      builder: (context, localeProvider, child) {
-        return Obx(() {
-          // Solo mostrar la pantalla de sin conexión si estamos seguros de que no hay conexión
-          // y ya se ha completado la verificación inicial
-          if (!connectivityController.isConnected.value &&
-              !connectivityController.isInitialCheck.value) {
-            debugPrint('Mostrando pantalla de sin conexión');
-            return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              theme: AppTheme.lightTheme,
-              darkTheme: AppTheme.darkTheme,
-              themeMode: Get.put(UserController()).isDarkMode.value
-                  ? ThemeMode.dark
-                  : ThemeMode.light,
-              home: NoConnectionPage(
-                onRetry: () {
-                  debugPrint('Intentando reconectar...');
-                  connectivityController.checkConnectivity();
-                },
-              ),
-              localizationsDelegates: const [
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
-              supportedLocales: const [
-                Locale('es'),
-                Locale('en'),
-              ],
-            );
-          }
+    return Obx(() {
+      // Solo mostrar la pantalla de sin conexión si estamos seguros de que no hay conexión
+      // y ya se ha completado la verificación inicial
+      if (!connectivityController.isConnected.value &&
+          !connectivityController.isInitialCheck.value) {
+        debugPrint('Mostrando pantalla de sin conexión');
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: Get.put(UserController()).isDarkMode.value
+              ? ThemeMode.dark
+              : ThemeMode.light,
+          home: NoConnectionPage(
+            onRetry: () {
+              debugPrint('Intentando reconectar...');
+              connectivityController.checkConnectivity();
+            },
+          ),
+        );
+      }
 
-          // Si hay conexión o estamos verificando, mostrar la aplicación normal
-          debugPrint(
-              'Mostrando aplicación normal. Estado de conexión: ${connectivityController.isConnected.value}');
-          return GetMaterialApp(
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: Get.put(UserController()).isDarkMode.value
-                ? ThemeMode.dark
-                : ThemeMode.light,
-            locale: localeProvider.locale,
-            fallbackLocale: const Locale('es'),
-            initialRoute: widget.initialRoute,
-            getPages: Routes.routes,
-            localizationsDelegates: const [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [
-              Locale('es'),
-              Locale('en'),
-            ],
-          );
-        });
-      },
-    );
+      // Si hay conexión o estamos verificando, mostrar la aplicación normal
+      debugPrint(
+          'Mostrando aplicación normal. Estado de conexión: ${connectivityController.isConnected.value}');
+      return GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: Get.put(UserController()).isDarkMode.value
+            ? ThemeMode.dark
+            : ThemeMode.light,
+        initialRoute: widget.initialRoute,
+        getPages: Routes.routes,
+      );
+    });
   }
 }

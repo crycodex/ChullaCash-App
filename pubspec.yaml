@@ -12,18 +12,13 @@ dependencies:
   #splash screen
   flutter_native_splash: ^2.4.0
   #firebasecore
-  firebase_core: ^2.25.4
+  firebase_core: ^3.13.1
   #firebase auth
-  firebase_auth: ^4.16.0
+  firebase_auth: ^5.5.4
   #firebase storage
-  firebase_storage: ^11.6.5
+  firebase_storage: ^12.4.6
   #firebase firestore
-  cloud_firestore: ^4.15.4
-  #firebase web
-  firebase_core_web: ^2.11.4
-  firebase_auth_web: ^5.9.4
-  firebase_storage_web: ^3.6.22
-  cloud_firestore_web: ^3.10.4
+  cloud_firestore: ^5.6.8
   #getX
   get: ^4.6.5
   #idioma

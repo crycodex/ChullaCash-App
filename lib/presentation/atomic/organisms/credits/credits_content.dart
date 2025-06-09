@@ -71,9 +71,16 @@ class CreditsContent extends StatelessWidget {
               subtitle: 'Por sus valiosos comentarios',
               description: 'Feedback y sugerencias para mejorar la app',
             ),
+            //revisores de la app
+            const _SectionTitle(title: 'Q/A Testers de la App'),
+            _InfoCard(
+              icon: Icons.person_outline,
+              title: 'Samantha Antonella Maisincho Mera',
+              subtitle: 'Q/A Tester',
+              description: 'Revisión y pruebas de la aplicación',
+            ),
 
             const SizedBox(height: 32),
-
             // Línea divisoria
             Container(
               height: 1,
@@ -95,7 +102,7 @@ class CreditsContent extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Versión 0.1.1',
+                    'Versión 2.2.1',
                     style: TextStyle(
                       color: Theme.of(context).textTheme.bodySmall?.color,
                     ),

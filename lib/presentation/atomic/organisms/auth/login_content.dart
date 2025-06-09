@@ -61,161 +61,232 @@ class _LoginContentState extends State<LoginContent> {
 
   @override
   Widget build(BuildContext context) {
+    // Obtener información de la pantalla y fuente
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final textScaleFactor = mediaQuery.textScaleFactor;
+
+    // Espaciados dinámicos basados en el tamaño de pantalla y fuente
+    final dynamicSpacing =
+        screenHeight < 700 || textScaleFactor > 1.2 ? 12.0 : 16.0;
+    final headerSpacing =
+        screenHeight < 700 || textScaleFactor > 1.2 ? 16.0 : 24.0;
+    final sectionSpacing =
+        screenHeight < 700 || textScaleFactor > 1.2 ? 16.0 : 24.0;
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Header más compacto
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Iniciar sesión',
-                style: Theme.of(context).textTheme.displayMedium,
+              Expanded(
+                child: Text(
+                  'Iniciar sesión',
+                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                        fontSize: Theme.of(context)
+                                    .textTheme
+                                    .displayMedium
+                                    ?.fontSize !=
+                                null
+                            ? Theme.of(context)
+                                    .textTheme
+                                    .displayMedium!
+                                    .fontSize! *
+                                (textScaleFactor > 1.3 ? 0.9 : 1.0)
+                            : null,
+                      ),
+                ),
               ),
               IconButton(
                 icon: const Icon(Icons.close),
                 onPressed: widget.onClose,
+                padding: const EdgeInsets.all(8),
+                constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: dynamicSpacing * 0.5),
           Text(
             'En tu cuenta',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: headerSpacing),
 
-          //login form
-          LoginForm(
-            emailController: _emailController,
-            passwordController: _passwordController,
-            emailFocusNode: _emailFocusNode,
-            passwordFocusNode: _passwordFocusNode,
-            formKey: _formKey,
-            onSubmit: _handleLogin,
-          ),
-
-          const SizedBox(height: 8),
-
-          // Olvidé mi contraseña
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () {
-                _authController.toggleForgotPassword();
-              },
-              child: Text(
-                '¿Olvidaste tu contraseña?',
-                style: TextStyle(
-                  color: AppColors.primaryGreen,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // O inicia sesión con
-          Row(
-            children: [
-              Expanded(child: Divider(color: AppColors.lightGray)),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  'O inicia sesión con',
-                  style: TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 12,
+          // Formulario expandido con mejor scroll
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  //login form
+                  LoginForm(
+                    emailController: _emailController,
+                    passwordController: _passwordController,
+                    emailFocusNode: _emailFocusNode,
+                    passwordFocusNode: _passwordFocusNode,
+                    formKey: _formKey,
+                    onSubmit: _handleLogin,
                   ),
-                ),
-              ),
-              Expanded(child: Divider(color: AppColors.lightGray)),
-            ],
-          ),
 
-          const SizedBox(height: 24),
+                  SizedBox(height: dynamicSpacing * 0.5),
 
-          // Botones de redes sociales
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    _authController.loginWithGoogle();
-                  },
-                  icon: Image.asset(
-                    'lib/assets/icons/others/googleIcon.png',
-                    height: 24,
-                  ),
-                  label: Text(
-                    'Google',
-                    style: TextStyle(color: AppColors.textPrimary),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    side: BorderSide(color: AppColors.lightGray),
-                    backgroundColor: AppColors.surfaceLight,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
-              if (GetPlatform.isIOS) ...[
-                const SizedBox(width: 16),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      _authController.loginWithApple();
-                    },
-                    icon: Image.asset(
-                      'lib/assets/icons/others/apple.png',
-                      height: 24,
-                    ),
-                    label: Text(
-                      'Apple',
-                      style: TextStyle(color: AppColors.textPrimary),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      side: BorderSide(color: AppColors.lightGray),
-                      backgroundColor: AppColors.surfaceLight,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  // Olvidé mi contraseña
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        _authController.toggleForgotPassword();
+                      },
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: Text(
+                        '¿Olvidaste tu contraseña?',
+                        style: TextStyle(
+                          color: AppColors.primaryGreen,
+                          fontWeight: FontWeight.w600,
+                          fontSize: textScaleFactor > 1.3 ? 13 : 14,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ],
-          ),
 
-          const SizedBox(height: 24),
+                  SizedBox(height: sectionSpacing),
 
-          // Enlace de registro
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "¿No tienes una cuenta? ",
-                style: TextStyle(color: AppColors.textSecondary),
-              ),
-              TextButton(
-                onPressed: () {
-                  _authController.toggleRegister();
-                },
-                child: Text(
-                  'Regístrate',
-                  style: TextStyle(
-                    color: AppColors.primaryGreen,
-                    fontWeight: FontWeight.w600,
+                  // O inicia sesión con
+                  Row(
+                    children: [
+                      Expanded(child: Divider(color: AppColors.lightGray)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          'O inicia sesión con',
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: textScaleFactor > 1.3 ? 11 : 12,
+                          ),
+                        ),
+                      ),
+                      Expanded(child: Divider(color: AppColors.lightGray)),
+                    ],
                   ),
-                ),
+
+                  SizedBox(height: sectionSpacing),
+
+                  // Botones de redes sociales con mejor responsividad
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            _authController.loginWithGoogle();
+                          },
+                          icon: Image.asset(
+                            'lib/assets/icons/others/googleIcon.png',
+                            height: textScaleFactor > 1.3 ? 20 : 24,
+                          ),
+                          label: Text(
+                            'Google',
+                            style: TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: textScaleFactor > 1.3 ? 13 : 14,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                              vertical: textScaleFactor > 1.2 ? 10 : 12,
+                            ),
+                            side: BorderSide(color: AppColors.lightGray),
+                            backgroundColor: AppColors.surfaceLight,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (GetPlatform.isIOS) ...[
+                        SizedBox(width: dynamicSpacing),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              _authController.loginWithApple();
+                            },
+                            icon: Image.asset(
+                              'lib/assets/icons/others/apple.png',
+                              height: textScaleFactor > 1.3 ? 20 : 24,
+                            ),
+                            label: Text(
+                              'Apple',
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
+                                fontSize: textScaleFactor > 1.3 ? 13 : 14,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(
+                                vertical: textScaleFactor > 1.2 ? 10 : 12,
+                              ),
+                              side: BorderSide(color: AppColors.lightGray),
+                              backgroundColor: AppColors.surfaceLight,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+
+                  SizedBox(height: sectionSpacing),
+
+                  // Enlace de registro
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          "¿No tienes una cuenta? ",
+                          style: TextStyle(color: AppColors.textSecondary),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          _authController.toggleRegister();
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          'Regístrate',
+                          style: TextStyle(
+                            color: AppColors.primaryGreen,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // Espacio adicional para el scroll
+                  SizedBox(
+                      height: MediaQuery.of(context).viewInsets.bottom > 0
+                          ? 20
+                          : 8),
+                ],
               ),
-            ],
+            ),
           ),
         ],
       ),

@@ -1,0 +1,1 @@
+/Users/cristhianrecalde/dev/mobile/ChullaCash-App/build/app/intermediates/cxx/Debug/4x706d67/obj/arm64-v8a

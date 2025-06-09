@@ -88,43 +88,74 @@ class _RegisterContentState extends State<RegisterContent> {
 
   @override
   Widget build(BuildContext context) {
+    // Obtener información de la pantalla y fuente
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height;
+    final textScaleFactor = mediaQuery.textScaleFactor;
+
+    // Espaciados dinámicos basados en el tamaño de pantalla y fuente
+    final dynamicSpacing =
+        screenHeight < 700 || textScaleFactor > 1.2 ? 12.0 : 16.0;
+    final headerSpacing =
+        screenHeight < 700 || textScaleFactor > 1.2 ? 16.0 : 24.0;
+    final buttonSpacing =
+        screenHeight < 700 || textScaleFactor > 1.2 ? 16.0 : 24.0;
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Header más compacto
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Crear cuenta',
-                style: Theme.of(context).textTheme.displayMedium,
+              Expanded(
+                child: Text(
+                  'Crear cuenta',
+                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                        fontSize: Theme.of(context)
+                                    .textTheme
+                                    .displayMedium
+                                    ?.fontSize !=
+                                null
+                            ? Theme.of(context)
+                                    .textTheme
+                                    .displayMedium!
+                                    .fontSize! *
+                                (textScaleFactor > 1.3 ? 0.9 : 1.0)
+                            : null,
+                      ),
+                ),
               ),
               IconButton(
                 icon: const Icon(Icons.close),
                 onPressed: widget.onClose,
+                padding: const EdgeInsets.all(8),
+                constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: dynamicSpacing * 0.5),
           Text(
             'Regístrate para comenzar',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: headerSpacing),
 
-          // Contenido del formulario en un SingleChildScrollView para dispositivos pequeños
-          Flexible(
+          // Formulario expandido con mejor scroll
+          Expanded(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               child: Form(
                 key: _formKey,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Campo de nombre
+                    // Campo de nombre con padding más compacto
                     TextField(
                       controller: _nameController,
                       style: TextStyle(color: AppColors.textPrimary),
@@ -133,6 +164,10 @@ class _RegisterContentState extends State<RegisterContent> {
                         labelText: 'Nombre completo',
                         labelStyle: TextStyle(color: AppColors.textSecondary),
                         errorText: _nameError,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: textScaleFactor > 1.2 ? 12 : 16,
+                        ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide:
@@ -156,7 +191,7 @@ class _RegisterContentState extends State<RegisterContent> {
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    SizedBox(height: dynamicSpacing),
 
                     // Campo de correo
                     TextField(
@@ -167,6 +202,10 @@ class _RegisterContentState extends State<RegisterContent> {
                         labelText: 'Correo electrónico',
                         labelStyle: TextStyle(color: AppColors.textSecondary),
                         errorText: _emailError,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: textScaleFactor > 1.2 ? 12 : 16,
+                        ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide:
@@ -190,7 +229,7 @@ class _RegisterContentState extends State<RegisterContent> {
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    SizedBox(height: dynamicSpacing),
 
                     // Campo de contraseña
                     TextField(
@@ -201,6 +240,10 @@ class _RegisterContentState extends State<RegisterContent> {
                         labelText: 'Contraseña',
                         labelStyle: TextStyle(color: AppColors.textSecondary),
                         errorText: _passwordError,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: textScaleFactor > 1.2 ? 12 : 16,
+                        ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide:
@@ -237,7 +280,7 @@ class _RegisterContentState extends State<RegisterContent> {
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    SizedBox(height: dynamicSpacing),
 
                     // Campo de confirmar contraseña
                     TextField(
@@ -248,6 +291,10 @@ class _RegisterContentState extends State<RegisterContent> {
                         labelText: 'Confirmar contraseña',
                         labelStyle: TextStyle(color: AppColors.textSecondary),
                         errorText: _confirmPasswordError,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: textScaleFactor > 1.2 ? 12 : 16,
+                        ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide:
@@ -284,7 +331,7 @@ class _RegisterContentState extends State<RegisterContent> {
                       ),
                     ),
 
-                    const SizedBox(height: 24),
+                    SizedBox(height: buttonSpacing),
 
                     // Botón de Registro
                     Obx(() => ElevatedButton(
@@ -321,7 +368,9 @@ class _RegisterContentState extends State<RegisterContent> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryGreen,
                             foregroundColor: AppColors.textLight,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            padding: EdgeInsets.symmetric(
+                              vertical: textScaleFactor > 1.2 ? 12 : 16,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -331,27 +380,34 @@ class _RegisterContentState extends State<RegisterContent> {
                             _authController.isLoading.value
                                 ? 'Registrando...'
                                 : 'Registrarse',
-                            style: const TextStyle(
-                              fontSize: 16,
+                            style: TextStyle(
+                              fontSize: textScaleFactor > 1.3 ? 14 : 16,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         )),
 
-                    const SizedBox(height: 24),
+                    SizedBox(height: dynamicSpacing),
 
                     // Enlace de inicio de sesión
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          "¿Ya tienes una cuenta? ",
-                          style: TextStyle(color: AppColors.textSecondary),
+                        Flexible(
+                          child: Text(
+                            "¿Ya tienes una cuenta? ",
+                            style: TextStyle(color: AppColors.textSecondary),
+                          ),
                         ),
                         TextButton(
                           onPressed: () {
                             _authController.toggleLogin();
                           },
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
                           child: Text(
                             'Inicia sesión',
                             style: TextStyle(
@@ -362,6 +418,12 @@ class _RegisterContentState extends State<RegisterContent> {
                         ),
                       ],
                     ),
+
+                    // Espacio adicional para el scroll
+                    SizedBox(
+                        height: MediaQuery.of(context).viewInsets.bottom > 0
+                            ? 20
+                            : 8),
                   ],
                 ),
               ),

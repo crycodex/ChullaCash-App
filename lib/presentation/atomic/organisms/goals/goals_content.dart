@@ -26,6 +26,10 @@ class _GoalsContentState extends State<GoalsContent>
   late AnimationController _animationController;
   final RxBool _showTutorial = true.obs;
 
+  // Variables para prevenir doble ejecución
+  bool _isCreating = false;
+  bool _isUpdating = false;
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +47,9 @@ class _GoalsContentState extends State<GoalsContent>
     _descriptionController.dispose();
     super.dispose();
   }
+
+  // Método helper para verificar si el widget está montado
+  bool get isMounted => mounted;
 
   Widget _buildEmptyState(bool isDarkMode) {
     return Column(
@@ -389,7 +396,11 @@ class _GoalsContentState extends State<GoalsContent>
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              if (isMounted) {
+                Navigator.pop(context);
+              }
+            },
             child: Text(
               'Cancelar',
               style: TextStyle(
@@ -398,63 +409,99 @@ class _GoalsContentState extends State<GoalsContent>
             ),
           ),
           ElevatedButton(
-            onPressed: () async {
-              if (_titleController.text.isEmpty ||
-                  _amountController.text.isEmpty) {
-                Get.snackbar(
-                  'Error',
-                  'Por favor completa todos los campos requeridos',
-                  backgroundColor: Colors.red,
-                  colorText: Colors.white,
-                  snackPosition: SnackPosition.BOTTOM,
-                );
-                return;
-              }
+            onPressed: _isCreating
+                ? null
+                : () async {
+                    if (_isCreating) return; // Doble protección
 
-              final amount = double.tryParse(_amountController.text);
-              if (amount == null || amount <= 0) {
-                Get.snackbar(
-                  'Error',
-                  'Por favor ingresa un monto válido',
-                  backgroundColor: Colors.red,
-                  colorText: Colors.white,
-                  snackPosition: SnackPosition.BOTTOM,
-                );
-                return;
-              }
+                    if (_titleController.text.isEmpty ||
+                        _amountController.text.isEmpty) {
+                      Get.snackbar(
+                        'Error',
+                        'Por favor completa todos los campos requeridos',
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                      return;
+                    }
 
-              await goalsController.addGoal(
-                title: _titleController.text,
-                targetAmount: amount,
-                description: _descriptionController.text,
-              );
+                    final amount = double.tryParse(_amountController.text);
+                    if (amount == null || amount <= 0) {
+                      Get.snackbar(
+                        'Error',
+                        'Por favor ingresa un monto válido',
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                      return;
+                    }
 
-              _titleController.clear();
-              _amountController.clear();
-              _descriptionController.clear();
-              _showTutorial.value = false;
-              Navigator.pop(context);
+                    setState(() {
+                      _isCreating = true;
+                    });
 
-              Get.snackbar(
-                '¡Éxito!',
-                'Objetivo creado correctamente',
-                backgroundColor: AppColors.primaryGreen,
-                colorText: Colors.white,
-                snackPosition: SnackPosition.BOTTOM,
-              );
-            },
+                    try {
+                      await goalsController.addGoal(
+                        title: _titleController.text,
+                        targetAmount: amount,
+                        description: _descriptionController.text,
+                      );
+
+                      _titleController.clear();
+                      _amountController.clear();
+                      _descriptionController.clear();
+                      _showTutorial.value = false;
+
+                      if (isMounted) {
+                        Navigator.pop(context);
+                      }
+
+                      Get.snackbar(
+                        '¡Éxito!',
+                        'Objetivo creado correctamente',
+                        backgroundColor: AppColors.primaryGreen,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                    } catch (e) {
+                      Get.snackbar(
+                        'Error',
+                        'No se pudo crear el objetivo',
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                    } finally {
+                      if (isMounted) {
+                        setState(() {
+                          _isCreating = false;
+                        });
+                      }
+                    }
+                  },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryGreen,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text(
-              'Crear Objetivo',
-              style: TextStyle(
-                color: Colors.white,
-              ),
-            ),
+            child: _isCreating
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : const Text(
+                    'Crear Objetivo',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
           ),
         ],
       ),
@@ -519,7 +566,11 @@ class _GoalsContentState extends State<GoalsContent>
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              if (isMounted) {
+                Navigator.pop(context);
+              }
+            },
             child: Text(
               'Cancelar',
               style: TextStyle(
@@ -528,58 +579,94 @@ class _GoalsContentState extends State<GoalsContent>
             ),
           ),
           ElevatedButton(
-            onPressed: () async {
-              if (_titleController.text.isEmpty ||
-                  _amountController.text.isEmpty) {
-                Get.snackbar(
-                  'Error',
-                  'Por favor completa todos los campos requeridos',
-                  backgroundColor: Colors.red,
-                  colorText: Colors.white,
-                  snackPosition: SnackPosition.BOTTOM,
-                );
-                return;
-              }
+            onPressed: _isUpdating
+                ? null
+                : () async {
+                    if (_isUpdating) return; // Doble protección
 
-              final amount = double.tryParse(_amountController.text);
-              if (amount == null || amount <= 0) {
-                Get.snackbar(
-                  'Error',
-                  'Por favor ingresa un monto válido',
-                  backgroundColor: Colors.red,
-                  colorText: Colors.white,
-                  snackPosition: SnackPosition.BOTTOM,
-                );
-                return;
-              }
+                    if (_titleController.text.isEmpty ||
+                        _amountController.text.isEmpty) {
+                      Get.snackbar(
+                        'Error',
+                        'Por favor completa todos los campos requeridos',
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                      return;
+                    }
 
-              await goalsController.updateGoal(
-                goalId: goal['id'],
-                title: _titleController.text,
-                targetAmount: amount,
-                description: _descriptionController.text,
-              );
+                    final amount = double.tryParse(_amountController.text);
+                    if (amount == null || amount <= 0) {
+                      Get.snackbar(
+                        'Error',
+                        'Por favor ingresa un monto válido',
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                      return;
+                    }
 
-              _titleController.clear();
-              _amountController.clear();
-              _descriptionController.clear();
-              Navigator.pop(context);
+                    setState(() {
+                      _isUpdating = true;
+                    });
 
-              Get.snackbar(
-                '¡Éxito!',
-                'Objetivo actualizado correctamente',
-                backgroundColor: AppColors.primaryGreen,
-                colorText: Colors.white,
-                snackPosition: SnackPosition.BOTTOM,
-              );
-            },
+                    try {
+                      await goalsController.updateGoal(
+                        goalId: goal['id'],
+                        title: _titleController.text,
+                        targetAmount: amount,
+                        description: _descriptionController.text,
+                      );
+
+                      _titleController.clear();
+                      _amountController.clear();
+                      _descriptionController.clear();
+
+                      if (isMounted) {
+                        Navigator.pop(context);
+                      }
+
+                      Get.snackbar(
+                        '¡Éxito!',
+                        'Objetivo actualizado correctamente',
+                        backgroundColor: AppColors.primaryGreen,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                    } catch (e) {
+                      Get.snackbar(
+                        'Error',
+                        'No se pudo actualizar el objetivo',
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                    } finally {
+                      if (isMounted) {
+                        setState(() {
+                          _isUpdating = false;
+                        });
+                      }
+                    }
+                  },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryGreen,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Actualizar'),
+            child: _isUpdating
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : const Text('Actualizar'),
           ),
         ],
       ),
@@ -666,9 +753,10 @@ class _GoalsContentState extends State<GoalsContent>
                   ),
                   confirmDismiss: (direction) async {
                     if (direction == DismissDirection.endToStart) {
+                      if (!isMounted) return false;
                       return await showDialog(
                         context: context,
-                        builder: (BuildContext context) {
+                        builder: (BuildContext dialogContext) {
                           return AlertDialog(
                             backgroundColor: isDarkMode
                                 ? AppColors.darkSurface
@@ -691,7 +779,8 @@ class _GoalsContentState extends State<GoalsContent>
                             ),
                             actions: [
                               TextButton(
-                                onPressed: () => Navigator.pop(context, false),
+                                onPressed: () =>
+                                    Navigator.pop(dialogContext, false),
                                 child: Text(
                                   'Cancelar',
                                   style: TextStyle(
@@ -702,7 +791,8 @@ class _GoalsContentState extends State<GoalsContent>
                                 ),
                               ),
                               ElevatedButton(
-                                onPressed: () => Navigator.pop(context, true),
+                                onPressed: () =>
+                                    Navigator.pop(dialogContext, true),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.red,
                                 ),
@@ -713,7 +803,9 @@ class _GoalsContentState extends State<GoalsContent>
                         },
                       );
                     } else {
-                      _showEditGoalDialog(goal);
+                      if (isMounted) {
+                        _showEditGoalDialog(goal);
+                      }
                       return false;
                     }
                   },

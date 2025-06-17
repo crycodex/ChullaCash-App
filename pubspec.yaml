@@ -22,7 +22,7 @@ dependencies:
   #getX
   get: ^4.6.5
   #idioma
-  intl: 0.19.0
+  intl: 0.20.2
   #flutter localizations
   flutter_localizations:
     sdk: flutter

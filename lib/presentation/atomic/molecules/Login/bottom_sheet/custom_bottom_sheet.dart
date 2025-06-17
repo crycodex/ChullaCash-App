@@ -22,48 +22,48 @@ class CustomBottomSheet extends StatelessWidget {
           child: child,
         );
       },
-      child: GestureDetector(
-        onTap: onClose,
-        child: Container(
-          color: Colors.black38,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              GestureDetector(
-                onTap: () {}, // Evita que el tap se propague al fondo
-                onVerticalDragUpdate: (details) {
-                  if (details.delta.dy > 0 && details.primaryDelta! > 0.5) {
-                    onClose();
-                  }
-                },
-                child: Container(
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
+      child: Material(
+        color: Colors.transparent,
+        child: GestureDetector(
+          onTap: onClose,
+          child: Container(
+            color: Colors.black38,
+            width: double.infinity,
+            height: double.infinity,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  onTap: () {}, // Evita que el tap se propague al fondo
+                  onVerticalDragUpdate: (details) {
+                    if (details.delta.dy > 0 && details.primaryDelta! > 0.5) {
+                      onClose();
+                    }
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.7,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 10,
-                        spreadRadius: 5,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Indicador de arrastre
-                      GestureDetector(
-                        onVerticalDragUpdate: (details) {
-                          if (details.delta.dy > 0 &&
-                              details.primaryDelta! > 0.5) {
-                            onClose();
-                          }
-                        },
-                        child: Container(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 10,
+                          spreadRadius: 5,
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Indicador de arrastre
+                        Container(
                           margin: const EdgeInsets.symmetric(vertical: 12),
                           width: 40,
                           height: 4,
@@ -72,13 +72,15 @@ class CustomBottomSheet extends StatelessWidget {
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
-                      ),
-                      child,
-                    ],
+                        Flexible(
+                          child: child,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

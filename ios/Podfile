@@ -31,13 +31,6 @@ target 'Runner' do
   use_frameworks! # Habilita el uso de frameworks.
   use_modular_headers! # Habilita encabezados modulares.
 
-  # Agrega tus pods aquí.
-  pod 'Google-Mobile-Ads-SDK' # Pod para el SDK de Google Mobile Ads.
-  pod 'Firebase/Core'
-  pod 'Firebase/Auth'
-  pod 'Firebase/Firestore'
-  pod 'Firebase/Storage'
-
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__)) # Instala todos los pods de Flutter.
   
   target 'RunnerTests' do

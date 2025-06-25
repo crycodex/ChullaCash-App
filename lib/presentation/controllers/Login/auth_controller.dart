@@ -544,15 +544,19 @@ class AuthController extends GetxController {
   //* Login con Apple
   Future<void> loginWithApple() async {
     try {
-      debugPrint('Iniciando login con Apple...');
+      isLoading.value = true;
+      debugPrint('🍎 Iniciando login con Apple...');
 
-      // Verificar si el servicio está disponible
+      // Verificar disponibilidad del servicio
       final isAvailable = await SignInWithApple.isAvailable();
+      debugPrint('🍎 Apple Sign In disponible: $isAvailable');
+
       if (!isAvailable) {
         throw Exception(
             'El inicio de sesión con Apple no está disponible en este dispositivo');
       }
 
+      debugPrint('🍎 Solicitando credenciales de Apple...');
       final credential = await SignInWithApple.getAppleIDCredential(
         scopes: [
           AppleIDAuthorizationScopes.email,
@@ -560,43 +564,70 @@ class AuthController extends GetxController {
         ],
       );
 
-      debugPrint('Credencial de Apple obtenida');
+      debugPrint('🍎 Credenciales de Apple obtenidas:');
+      debugPrint('  - userIdentifier: ${credential.userIdentifier}');
+      debugPrint('  - email: ${credential.email}');
+      debugPrint('  - givenName: ${credential.givenName}');
+      debugPrint('  - familyName: ${credential.familyName}');
+      debugPrint(
+          '  - authorizationCode length: ${credential.authorizationCode?.length}');
+      debugPrint(
+          '  - identityToken length: ${credential.identityToken?.length}');
 
-      // Crear credencial de Firebase
+      if (credential.identityToken == null) {
+        debugPrint('❌ Error: identityToken es null');
+        throw Exception('No se pudo obtener el token de identidad de Apple');
+      }
+
+      debugPrint('🍎 Creando credencial de Firebase...');
       final oAuthProvider = OAuthProvider('apple.com');
       final authCredential = oAuthProvider.credential(
         idToken: credential.identityToken,
         accessToken: credential.authorizationCode,
       );
 
-      // Iniciar sesión en Firebase
+      debugPrint('🍎 Iniciando sesión en Firebase...');
       final userCredential = await _auth.signInWithCredential(authCredential);
       final user = userCredential.user;
 
       if (user == null) {
-        throw Exception('Error al iniciar sesión con Apple');
+        debugPrint('❌ Error: Firebase no devolvió un usuario válido');
+        throw Exception('Error al iniciar sesión con Apple en Firebase');
       }
 
-      debugPrint('Usuario autenticado con Firebase');
+      debugPrint('🍎 Usuario autenticado en Firebase: ${user.uid}');
+      debugPrint('🍎 Verificando documento en Firestore...');
 
       // Verificar si el usuario existe en Firestore
       final userDoc = await _firestore.collection('users').doc(user.uid).get();
       if (!userDoc.exists) {
-        // Crear documento del usuario si no existe
+        debugPrint('🍎 Usuario nuevo, creando documento en Firestore...');
         await _createUserDocument(user);
-        debugPrint('Documento de usuario creado en Firestore');
+        debugPrint('🍎 Documento de usuario creado correctamente');
+      } else {
+        debugPrint('🍎 Usuario existente encontrado en Firestore');
       }
 
       // Actualizar datos observables
       uid.value = user.uid;
       email.value = user.email ?? '';
-      name.value = user.displayName ?? '';
+      name.value = user.displayName ?? credential.givenName ?? '';
       profilePicture.value = user.photoURL ?? '';
 
-      debugPrint('Login con Apple exitoso');
+      // Actualizar datos del usuario en Firestore
+      await _firestore.collection('users').doc(user.uid).update({
+        'lastLogin': Timestamp.now(),
+        'name': user.displayName ?? credential.givenName ?? name.value,
+        'email': user.email?.toLowerCase() ?? email.value,
+        'photoUrl': user.photoURL ?? profilePicture.value,
+      });
+
+      debugPrint('🍎 Login con Apple exitoso, redirigiendo a home...');
       Get.offAllNamed('/home');
     } on SignInWithAppleAuthorizationException catch (e) {
       String errorMessage;
+      debugPrint('❌ Error de autorización de Apple: ${e.code} - ${e.message}');
+
       switch (e.code) {
         case AuthorizationErrorCode.canceled:
           errorMessage = 'Inicio de sesión cancelado por el usuario';
@@ -614,25 +645,59 @@ class AuthController extends GetxController {
           errorMessage = 'Error desconocido al iniciar sesión con Apple';
           break;
         default:
-          errorMessage = 'Error al iniciar sesión con Apple';
+          errorMessage = 'Error al iniciar sesión con Apple: ${e.message}';
       }
-      debugPrint('Error en login con Apple: $errorMessage');
+
       Get.snackbar(
         'Error',
         errorMessage,
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 5),
       );
-    } catch (e) {
-      debugPrint('Error inesperado en login con Apple: $e');
+    } on FirebaseAuthException catch (e) {
+      debugPrint('❌ Error de Firebase Auth: ${e.code} - ${e.message}');
+      String errorMessage;
+
+      switch (e.code) {
+        case 'invalid-credential':
+          errorMessage = 'Credenciales de Apple inválidas';
+          break;
+        case 'account-exists-with-different-credential':
+          errorMessage =
+              'Ya existe una cuenta con este email usando otro método de autenticación';
+          break;
+        case 'operation-not-allowed':
+          errorMessage = 'Apple Sign In no está habilitado en Firebase Console';
+          break;
+        case 'user-disabled':
+          errorMessage = 'Esta cuenta ha sido deshabilitada';
+          break;
+        default:
+          errorMessage = 'Error de autenticación en Firebase: ${e.message}';
+      }
+
       Get.snackbar(
-        'Error',
-        'No se pudo completar el inicio de sesión con Apple',
+        'Error de Firebase',
+        errorMessage,
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 5),
       );
+    } catch (e) {
+      debugPrint('❌ Error inesperado en login con Apple: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo completar el inicio de sesión con Apple: ${e.toString()}',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 5),
+      );
+    } finally {
+      isLoading.value = false;
     }
   }
 

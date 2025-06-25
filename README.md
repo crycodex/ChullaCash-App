@@ -236,10 +236,9 @@ Este proyecto está bajo la Licencia MIT. Ver [LICENSE](LICENSE) para más detal
 
 ## 📞 Contacto
 
-- **Desarrollador**: [Tu Nombre]
-- **Email**: tu-email@ejemplo.com
-- **LinkedIn**: [Tu LinkedIn]
-- **Twitter**: [@tu_twitter]
+- **Desarrollador**: Cristhian Recalde
+- **Email**: isnotcristhian@gmail.com
+- **LinkedIn**: https://www.linkedin.com/in/isnotcristhianr/
 
 ## 🙏 Agradecimientos
 

@@ -1,5 +1,5 @@
 # Uncomment this line to define a global platform for your project
-platform :ios, '13.0' # Define la plataforma iOS mínima requerida.
+platform :ios, '15.0' # Actualizado de 13.0 a 14.0 para mejor compatibilidad
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true' # Deshabilita el envío de estadísticas de CocoaPods para mejorar la latencia.
@@ -33,6 +33,10 @@ target 'Runner' do
 
   # Agrega tus pods aquí.
   pod 'Google-Mobile-Ads-SDK' # Pod para el SDK de Google Mobile Ads.
+  pod 'Firebase/Core'
+  pod 'Firebase/Auth'
+  pod 'Firebase/Firestore'
+  pod 'Firebase/Storage'
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__)) # Instala todos los pods de Flutter.
   
@@ -47,23 +51,34 @@ post_install do |installer|
     flutter_additional_ios_build_settings(target)
 
     target.build_configurations.each do |config|
+      # Configuraciones básicas mejoradas
       config.build_settings['ENABLE_BITCODE'] = 'NO'
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
       config.build_settings['DEAD_CODE_STRIPPING'] = 'YES'
+      
+      # Mejorar compatibilidad con módulos Swift
+      config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+      config.build_settings['SWIFT_VERSION'] = '5.0'
+      
+      # Configuración simplificada de FRAMEWORK_SEARCH_PATHS
       config.build_settings['FRAMEWORK_SEARCH_PATHS'] ||= [
         '$(inherited)',
-        '${PODS_ROOT}/**',
-        '${PODS_XCFRAMEWORKS_BUILD_DIR}/**',
-        '${PODS_CONFIGURATION_BUILD_DIR}/**'
+        '$(PODS_ROOT)/**'
       ]
+      
+      # Limpiar flags problemáticos de manera más segura
       ['OTHER_CFLAGS', 'OTHER_CPLUSPLUSFLAGS'].each do |flag|
         flags = config.build_settings[flag]
+        next unless flags
+        
         if flags.is_a?(String)
           flags = flags.split(' ')
         end
+        
         if flags.is_a?(Array)
-          flags = flags.reject { |f| f == '-G' }
-          config.build_settings[flag] = flags.empty? ? nil : flags
+          # Remover flags problemáticos específicos
+          flags = flags.reject { |f| f == '-G' || f.include?('AudioToolbox') }
+          config.build_settings[flag] = flags.empty? ? '$(inherited)' : flags
         end
       end
     end

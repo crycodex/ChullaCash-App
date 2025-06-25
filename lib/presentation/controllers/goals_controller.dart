@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:confetti/confetti.dart';
 import './finance_controller.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +10,6 @@ class GoalsController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FinanceController _financeController = Get.find<FinanceController>();
-  AudioPlayer? _audioPlayer;
 
   // Controlador para el confeti
   late ConfettiController confettiControllerCenter;
@@ -26,7 +24,7 @@ class GoalsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _initAudioPlayer();
+    // _initAudioPlayer(); // Comentado temporalmente
     _initConfettiControllers();
     loadGoals();
     // Escuchar cambios en el balance total
@@ -38,14 +36,14 @@ class GoalsController extends GetxController {
         ConfettiController(duration: const Duration(seconds: 5));
   }
 
-  Future<void> _initAudioPlayer() async {
-    try {
-      _audioPlayer = AudioPlayer();
-      await _audioPlayer?.setSource(AssetSource('sounds/success.mp3'));
-    } catch (e) {
-      print('Error inicializando audio player: $e');
-    }
-  }
+  // Future<void> _initAudioPlayer() async {
+  //   try {
+  //     _audioPlayer = AudioPlayer();
+  //     await _audioPlayer?.setSource(AssetSource('sounds/success.mp3'));
+  //   } catch (e) {
+  //     print('Error inicializando audio player: $e');
+  //   }
+  // }
 
   // Método simplificado para verificar el progreso de los objetivos
   Future<void> _checkGoalsProgress() async {
@@ -77,7 +75,6 @@ class GoalsController extends GetxController {
         if (isCompleted && !goal['isCompleted']) {
           // Manejar la celebración
           startCelebration();
-          _playCelebrationSound();
           Get.snackbar(
             '¡Felicitaciones! 🎉',
             'Has alcanzado tu objetivo: ${goal['title']}',
@@ -132,17 +129,6 @@ class GoalsController extends GetxController {
   void stopCelebration() {
     isCelebrating.value = false;
     confettiControllerCenter.stop();
-  }
-
-  Future<void> _playCelebrationSound() async {
-    try {
-      if (_audioPlayer == null) {
-        await _initAudioPlayer();
-      }
-      await _audioPlayer?.resume();
-    } catch (e) {
-      print('Error reproduciendo sonido: $e');
-    }
   }
 
   Future<void> loadGoals() async {
@@ -300,7 +286,6 @@ class GoalsController extends GetxController {
 
   @override
   void onClose() {
-    _audioPlayer?.dispose();
     confettiControllerCenter.dispose();
     super.onClose();
   }

@@ -43,8 +43,8 @@ dependencies:
   percent_indicator: ^4.2.4
   #confetti
   confetti: ^0.8.0
-  #audioplayers
-  audioplayers: ^6.1.2
+  #audioplayers - Comentado temporalmente para publicación
+  # audioplayers: ^6.1.2
   #connectivity
   connectivity_plus: ^5.0.2
   internet_connection_checker: ^1.0.0+1

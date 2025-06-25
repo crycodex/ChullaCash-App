@@ -570,7 +570,7 @@ class AuthController extends GetxController {
       debugPrint('  - givenName: ${credential.givenName}');
       debugPrint('  - familyName: ${credential.familyName}');
       debugPrint(
-          '  - authorizationCode length: ${credential.authorizationCode?.length}');
+          '  - authorizationCode length: ${credential.authorizationCode.length}');
       debugPrint(
           '  - identityToken length: ${credential.identityToken?.length}');
 

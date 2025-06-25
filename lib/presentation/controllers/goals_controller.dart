@@ -117,7 +117,7 @@ class GoalsController extends GetxController {
       // Actualizar la lista local solo al final
       goals.value = updatedGoals;
     } catch (e) {
-      print('Error en _checkGoalsProgress: $e');
+      debugPrint('Error en _checkGoalsProgress: $e');
     }
   }
 
@@ -154,7 +154,7 @@ class GoalsController extends GetxController {
       // Verificar progreso después de cargar los objetivos
       _checkGoalsProgress();
     } catch (e) {
-      print('Error al cargar objetivos: $e');
+      debugPrint('Error al cargar objetivos: $e');
     } finally {
       isLoading.value = false;
     }
@@ -194,7 +194,7 @@ class GoalsController extends GetxController {
 
       await loadGoals();
     } catch (e) {
-      print('Error al agregar objetivo: $e');
+      debugPrint('Error al agregar objetivo: $e');
     } finally {
       isLoading.value = false;
     }
@@ -227,7 +227,7 @@ class GoalsController extends GetxController {
         );
       }
     } catch (e) {
-      print('Error al eliminar objetivo: $e');
+      debugPrint('Error al eliminar objetivo: $e');
       Get.snackbar(
         'Error',
         'No se pudo eliminar el objetivo',
@@ -272,7 +272,7 @@ class GoalsController extends GetxController {
 
       await loadGoals();
     } catch (e) {
-      print('Error al actualizar objetivo: $e');
+      debugPrint('Error al actualizar objetivo: $e');
       Get.snackbar(
         'Error',
         'No se pudo actualizar el objetivo',

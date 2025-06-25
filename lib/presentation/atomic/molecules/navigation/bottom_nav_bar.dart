@@ -27,8 +27,8 @@ class BottomNavBar extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: isDark
-                  ? Colors.black.withOpacity(0.3)
-                  : Colors.black.withOpacity(0.08),
+                  ? Colors.black.withValues(alpha: 0.3)
+                  : Colors.black.withValues(alpha: 0.08),
               blurRadius: 20,
               spreadRadius: isDark ? 0 : 1,
               offset: const Offset(0, 4),
@@ -66,7 +66,7 @@ class BottomNavBar extends StatelessWidget {
               color: isSelected
                   ? AppColors.primaryGreen
                   : isDark
-                      ? AppColors.textLight.withOpacity(0.6)
+                      ? AppColors.textLight.withValues(alpha: 0.6)
                       : AppColors.textSecondary,
               size: 32,
             ),

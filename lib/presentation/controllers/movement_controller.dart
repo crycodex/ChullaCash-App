@@ -23,7 +23,7 @@ class MovementController extends GetxController {
       final now = DateTime.now();
       setupMovementsStream(now.year, now.month);
     } catch (e) {
-      print('Error en onInit: $e');
+      debugPrint('Error en onInit: $e');
     }
   }
 
@@ -31,7 +31,7 @@ class MovementController extends GetxController {
     try {
       final userId = _auth.currentUser?.uid;
       if (userId == null) {
-        print('Usuario no autenticado');
+        debugPrint('Usuario no autenticado');
         return;
       }
 
@@ -71,7 +71,7 @@ class MovementController extends GetxController {
             await _financeController.getTotalBalance();
             await _financeController.updateBalance();
           } catch (e) {
-            print('Error procesando datos: $e');
+            debugPrint('Error procesando datos: $e');
             Get.snackbar(
               'Error',
               'Error al procesar los movimientos',
@@ -81,7 +81,7 @@ class MovementController extends GetxController {
           }
         },
         onError: (error) {
-          print('Error en stream: $error');
+          debugPrint('Error en stream: $error');
           Get.snackbar(
             'Error',
             'Error al obtener los movimientos',
@@ -92,7 +92,7 @@ class MovementController extends GetxController {
         cancelOnError: false,
       );
     } catch (e) {
-      print('Error configurando stream: $e');
+      debugPrint('Error configurando stream: $e');
       Get.snackbar(
         'Error',
         'Error al configurar la sincronización',
@@ -109,7 +109,7 @@ class MovementController extends GetxController {
     try {
       _movementsSubscription?.cancel();
     } catch (e) {
-      print('Error en onClose: $e');
+      debugPrint('Error en onClose: $e');
     }
     super.onClose();
   }
@@ -140,7 +140,7 @@ class MovementController extends GetxController {
         return 'Hace un momento';
       }
     } catch (e) {
-      print('Error en getTimeAgo: $e');
+      debugPrint('Error en getTimeAgo: $e');
       return '';
     }
   }
@@ -186,7 +186,7 @@ class MovementController extends GetxController {
         colorText: Colors.white,
       );
     } catch (e) {
-      print('Error en deleteMovement: $e');
+      debugPrint('Error en deleteMovement: $e');
       Get.snackbar(
         'Error',
         'No se pudo eliminar el movimiento',

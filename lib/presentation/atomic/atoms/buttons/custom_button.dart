@@ -28,7 +28,7 @@ class CustomButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         elevation: 2,
-        shadowColor: (backgroundColor ?? AppColors.primaryGreen).withOpacity(0.3),
+        shadowColor: (backgroundColor ?? AppColors.primaryGreen).withValues(alpha: 0.3),
       ),
       child: Text(
         text,

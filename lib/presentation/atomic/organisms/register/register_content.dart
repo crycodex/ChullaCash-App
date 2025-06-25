@@ -189,7 +189,7 @@ class _RegisterContentState extends State<RegisterContent>
             'Categoría',
             style: TextStyle(
               color: (_isIncome ? AppColors.primaryGreen : Colors.red)
-                  .withOpacity(isDarkMode ? 0.9 : 1),
+                  .withValues(alpha: isDarkMode ? 0.9 : 1),
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -201,14 +201,14 @@ class _RegisterContentState extends State<RegisterContent>
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: _isIncome
-                    ? AppColors.primaryGreen.withOpacity(isDarkMode ? 0.5 : 1)
-                    : Colors.red.withOpacity(isDarkMode ? 0.5 : 1),
+                    ? AppColors.primaryGreen.withValues(alpha: isDarkMode ? 0.5 : 1)
+                    : Colors.red.withValues(alpha: isDarkMode ? 0.5 : 1),
                 width: 1,
               ),
               boxShadow: isDarkMode
                   ? [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       )
@@ -228,8 +228,8 @@ class _RegisterContentState extends State<RegisterContent>
                     Icons.arrow_drop_down,
                     color: _isIncome
                         ? AppColors.primaryGreen
-                            .withOpacity(isDarkMode ? 0.7 : 1)
-                        : Colors.red.withOpacity(isDarkMode ? 0.7 : 1),
+                            .withValues(alpha: isDarkMode ? 0.7 : 1)
+                        : Colors.red.withValues(alpha: isDarkMode ? 0.7 : 1),
                   ),
                   dropdownColor:
                       isDarkMode ? const Color(0xFF2C2C2C) : Colors.white,
@@ -246,8 +246,8 @@ class _RegisterContentState extends State<RegisterContent>
                             _categoryIcons[category] ?? Icons.more_horiz,
                             color: _isIncome
                                 ? AppColors.primaryGreen
-                                    .withOpacity(isDarkMode ? 0.7 : 1)
-                                : Colors.red.withOpacity(isDarkMode ? 0.7 : 1),
+                                    .withValues(alpha: isDarkMode ? 0.7 : 1)
+                                : Colors.red.withValues(alpha: isDarkMode ? 0.7 : 1),
                             size: 20,
                           ),
                           const SizedBox(width: 8),
@@ -286,17 +286,17 @@ class _RegisterContentState extends State<RegisterContent>
                 hintStyle: TextStyle(
                   color: isDarkMode
                       ? Colors.white60
-                      : AppColors.textSecondary.withOpacity(0.7),
+                      : AppColors.textSecondary.withValues(alpha: 0.7),
                 ),
                 prefixIcon: Icon(
                   Icons.description_outlined,
                   color: (_isIncome ? AppColors.primaryGreen : Colors.red)
-                      .withOpacity(isDarkMode ? 0.7 : 1),
+                      .withValues(alpha: isDarkMode ? 0.7 : 1),
                 ),
                 suffixIcon: Icon(
                   Icons.edit,
                   color: (_isIncome ? AppColors.primaryGreen : Colors.red)
-                      .withOpacity(isDarkMode ? 0.4 : 0.5),
+                      .withValues(alpha: isDarkMode ? 0.4 : 0.5),
                   size: 18,
                 ),
                 filled: true,
@@ -310,7 +310,7 @@ class _RegisterContentState extends State<RegisterContent>
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(
                     color: (_isIncome ? AppColors.primaryGreen : Colors.red)
-                        .withOpacity(isDarkMode ? 0.7 : 1),
+                        .withValues(alpha: isDarkMode ? 0.7 : 1),
                     width: 2,
                   ),
                 ),
@@ -318,7 +318,7 @@ class _RegisterContentState extends State<RegisterContent>
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(
                     color: (_isIncome ? AppColors.primaryGreen : Colors.red)
-                        .withOpacity(isDarkMode ? 0.3 : 0.2),
+                        .withValues(alpha: isDarkMode ? 0.3 : 0.2),
                     width: 1,
                   ),
                 ),
@@ -479,8 +479,8 @@ class _RegisterContentState extends State<RegisterContent>
           child: InkWell(
             onTap: onTap ?? () => _updateAmount(text),
             borderRadius: BorderRadius.circular(12),
-            splashColor: AppColors.textSecondary.withOpacity(0.1),
-            highlightColor: AppColors.textSecondary.withOpacity(0.2),
+            splashColor: AppColors.textSecondary.withValues(alpha:  0.1),
+            highlightColor: AppColors.textSecondary.withValues(alpha: 0.2),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.grey[100],

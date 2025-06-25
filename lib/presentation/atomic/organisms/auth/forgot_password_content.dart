@@ -30,15 +30,15 @@ class _ForgotPasswordContentState extends State<ForgotPasswordContent> {
     // Obtener información de la pantalla y fuente
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
-    final textScaleFactor = mediaQuery.textScaleFactor;
+    final textScaleFactor = mediaQuery.textScaler;
 
     // Espaciados dinámicos basados en el tamaño de pantalla y fuente
     final dynamicSpacing =
-        screenHeight < 700 || textScaleFactor > 1.2 ? 12.0 : 16.0;
+        screenHeight < 700 || textScaleFactor.scale(1.2) > 1.2 ? 12.0 : 16.0;
     final headerSpacing =
-        screenHeight < 700 || textScaleFactor > 1.2 ? 16.0 : 24.0;
+        screenHeight < 700 || textScaleFactor.scale(1.2) > 1.2 ? 16.0 : 24.0;
     final sectionSpacing =
-        screenHeight < 700 || textScaleFactor > 1.2 ? 16.0 : 24.0;
+        screenHeight < 700 || textScaleFactor.scale(1.2) > 1.2 ? 16.0 : 24.0;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
@@ -63,7 +63,7 @@ class _ForgotPasswordContentState extends State<ForgotPasswordContent> {
                                     .textTheme
                                     .displayMedium!
                                     .fontSize! *
-                                (textScaleFactor > 1.3 ? 0.9 : 1.0)
+                                (textScaleFactor.scale(1.3) > 1.3 ? 0.9 : 1.0)
                             : null,
                       ),
                 ),
@@ -82,7 +82,7 @@ class _ForgotPasswordContentState extends State<ForgotPasswordContent> {
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize !=
                               null &&
-                          textScaleFactor > 1.3
+                          textScaleFactor.scale(1.3) > 1.3
                       ? Theme.of(context).textTheme.bodyMedium!.fontSize! * 0.95
                       : null,
                 ),

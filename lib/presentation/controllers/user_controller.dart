@@ -36,13 +36,13 @@ class UserController extends GetxController {
           .collection('users')
           .doc(_auth.currentUser!.uid)
           .update({'darkMode': darkMode})
-          .then((_) => print('Tema actualizado en Firestore'))
-          .catchError((error) => print('Error updating theme: $error'));
+          .then((_) => debugPrint('Tema actualizado en Firestore'))
+          .catchError((error) => debugPrint('Error updating theme: $error'));
     }
   }
 
   void toggleTheme() {
-    print('Cambiando tema. Actual: ${isDarkMode.value}');
+    debugPrint('Cambiando tema. Actual: ${isDarkMode.value}');
     isDarkMode.value = !isDarkMode.value;
   }
 
@@ -67,7 +67,7 @@ class UserController extends GetxController {
         }
       }
     } catch (e) {
-      print('Error al inicializar usuario: $e');
+      debugPrint('Error al inicializar usuario: $e');
     }
   }
 
@@ -90,7 +90,7 @@ class UserController extends GetxController {
       }
       return name.value;
     } catch (e) {
-      print('Error al obtener nombre de usuario: $e');
+      debugPrint('Error al obtener nombre de usuario: $e');
       return 'Usuario';
     }
   }

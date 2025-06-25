@@ -96,10 +96,10 @@ class _HistoryContentState extends State<HistoryContent> {
                         decoration: BoxDecoration(
                           color: isDarkMode
                               ? AppColors.darkSurface
-                              : AppColors.primaryGreen.withOpacity(0.1),
+                              : AppColors.primaryGreen.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: AppColors.primaryGreen.withOpacity(0.3),
+                            color: AppColors.primaryGreen.withValues(alpha: 0.3),
                             width: 1,
                           ),
                         ),
@@ -134,7 +134,7 @@ class _HistoryContentState extends State<HistoryContent> {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -237,8 +237,8 @@ class _HistoryContentState extends State<HistoryContent> {
                             Icons.history,
                             size: 64,
                             color: isDarkMode
-                                ? Colors.white.withOpacity(0.2)
-                                : AppColors.textSecondary.withOpacity(0.5),
+                                ? Colors.white.withValues(alpha: 0.2)
+                                : AppColors.textSecondary.withValues(alpha: 0.5),
                           ),
                           const SizedBox(height: 16),
                           Text(
@@ -277,7 +277,7 @@ class _HistoryContentState extends State<HistoryContent> {
                           alignment: Alignment.centerRight,
                           padding: const EdgeInsets.only(right: 20.0),
                           decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.8),
+                            color: Colors.red.withValues(alpha: 0.8),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(
@@ -351,7 +351,7 @@ class _HistoryContentState extends State<HistoryContent> {
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: isDarkMode
-                                  ? Colors.white.withOpacity(0.1)
+                                  ? Colors.white.withValues(alpha: 0.1)
                                   : AppColors.lightGray,
                               width: 1,
                             ),
@@ -365,7 +365,7 @@ class _HistoryContentState extends State<HistoryContent> {
                                 color: (isIncome
                                         ? AppColors.primaryGreen
                                         : Colors.red)
-                                    .withOpacity(isDarkMode ? 0.2 : 0.1),
+                                    .withValues(alpha: isDarkMode ? 0.2 : 0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Icon(
@@ -457,7 +457,7 @@ class _HistoryContentState extends State<HistoryContent> {
         selected: isSelected,
         label: Text(label),
         onSelected: (_) => onTap(),
-        selectedColor: AppColors.primaryGreen.withOpacity(0.2),
+        selectedColor: AppColors.primaryGreen.withValues(alpha: 0.2),
         backgroundColor: isDarkMode ? AppColors.darkSurface : Colors.white,
         checkmarkColor: AppColors.primaryGreen,
         labelStyle: TextStyle(

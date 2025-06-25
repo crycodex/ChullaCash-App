@@ -11,9 +11,8 @@ class AppTheme {
         cardColor: Colors.white,
         colorScheme: ColorScheme.light(
           primary: AppColors.primaryGreen,
-          secondary: AppColors.primaryGreen.withOpacity(0.8),
+          secondary: AppColors.primaryGreen.withValues(alpha: 0.8),
           surface: Colors.white,
-          background: Colors.grey[50]!,
           error: Colors.red,
         ),
         appBarTheme: const AppBarTheme(
@@ -32,23 +31,23 @@ class AppTheme {
           titleLarge: TextStyle(color: AppColors.textPrimary),
         ),
         switchTheme: SwitchThemeData(
-          thumbColor: MaterialStateProperty.resolveWith<Color>((states) {
-            if (states.contains(MaterialState.selected)) {
+          thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+            if (states.contains(WidgetState.selected)) {
               return AppColors.primaryGreen;
             }
             return Colors.grey;
           }),
-          trackColor: MaterialStateProperty.resolveWith<Color>((states) {
-            if (states.contains(MaterialState.selected)) {
-              return AppColors.primaryGreen.withOpacity(0.5);
+          trackColor: WidgetStateProperty.resolveWith<Color>((states) {
+            if (states.contains(WidgetState.selected)) {
+              return AppColors.primaryGreen.withValues(alpha: 0.5);
             }
-            return Colors.grey.withOpacity(0.5);
+            return Colors.grey.withValues(alpha: 0.5);
           }),
         ),
         cardTheme: CardThemeData(
           color: Colors.white,
           elevation: 2,
-          shadowColor: Colors.black.withOpacity(0.1),
+          shadowColor: Colors.black.withValues(alpha: 0.1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -79,9 +78,8 @@ class AppTheme {
         cardColor: const Color(0xFF1E1E1E),
         colorScheme: ColorScheme.dark(
           primary: AppColors.primaryGreen,
-          secondary: AppColors.primaryGreen.withOpacity(0.8),
+          secondary: AppColors.primaryGreen.withValues(alpha: 0.8),
           surface: const Color(0xFF1E1E1E),
-          background: const Color(0xFF121212),
           error: Colors.red[700]!,
         ),
         appBarTheme: const AppBarTheme(
@@ -100,23 +98,23 @@ class AppTheme {
           titleLarge: TextStyle(color: Colors.white),
         ),
         switchTheme: SwitchThemeData(
-          thumbColor: MaterialStateProperty.resolveWith<Color>((states) {
-            if (states.contains(MaterialState.selected)) {
+          thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+            if (states.contains(WidgetState.selected)) {
               return AppColors.primaryGreen;
             }
             return Colors.grey;
           }),
-          trackColor: MaterialStateProperty.resolveWith<Color>((states) {
-            if (states.contains(MaterialState.selected)) {
-              return AppColors.primaryGreen.withOpacity(0.5);
+          trackColor: WidgetStateProperty.resolveWith<Color>((states) {
+            if (states.contains(WidgetState.selected)) {
+              return AppColors.primaryGreen.withValues(alpha: 0.5);
             }
-            return Colors.grey.withOpacity(0.5);
+            return Colors.grey.withValues(alpha: 0.5);
           }),
         ),
         cardTheme: CardThemeData(
           color: const Color(0xFF1E1E1E),
           elevation: 2,
-          shadowColor: Colors.black.withOpacity(0.3),
+          shadowColor: Colors.black.withValues(alpha: 0.3),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

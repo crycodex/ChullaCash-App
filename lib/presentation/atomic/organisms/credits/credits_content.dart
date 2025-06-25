@@ -84,7 +84,7 @@ class CreditsContent extends StatelessWidget {
             // Línea divisoria
             Container(
               height: 1,
-              color: AppColors.primaryGreen.withOpacity(0.2),
+              color: AppColors.primaryGreen.withValues(alpha: 0.2),
               margin: const EdgeInsets.symmetric(vertical: 16),
             ),
 
@@ -184,7 +184,7 @@ class _InfoCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: AppColors.primaryGreen.withOpacity(0.1),
+          color: AppColors.primaryGreen.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -196,7 +196,7 @@ class _InfoCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.primaryGreen.withOpacity(0.1),
+                color: AppColors.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(

@@ -91,15 +91,15 @@ class _RegisterContentState extends State<RegisterContent> {
     // Obtener información de la pantalla y fuente
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
-    final textScaleFactor = mediaQuery.textScaleFactor;
+    final textScaleFactor = mediaQuery.textScaler;
 
     // Espaciados dinámicos basados en el tamaño de pantalla y fuente
     final dynamicSpacing =
-        screenHeight < 700 || textScaleFactor > 1.2 ? 12.0 : 16.0;
+        screenHeight < 700 || textScaleFactor.scale(1.2) > 1.2 ? 12.0 : 16.0;
     final headerSpacing =
-        screenHeight < 700 || textScaleFactor > 1.2 ? 16.0 : 24.0;
+        screenHeight < 700 || textScaleFactor.scale(1.2) > 1.2 ? 16.0 : 24.0;
     final buttonSpacing =
-        screenHeight < 700 || textScaleFactor > 1.2 ? 16.0 : 24.0;
+        screenHeight < 700 || textScaleFactor.scale(1.2) > 1.2 ? 16.0 : 24.0;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
@@ -124,7 +124,7 @@ class _RegisterContentState extends State<RegisterContent> {
                                     .textTheme
                                     .displayMedium!
                                     .fontSize! *
-                                (textScaleFactor > 1.3 ? 0.9 : 1.0)
+                                (textScaleFactor.scale(1.3) > 1.3 ? 0.9 : 1.0)
                             : null,
                       ),
                 ),
@@ -166,7 +166,7 @@ class _RegisterContentState extends State<RegisterContent> {
                         errorText: _nameError,
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: 16,
-                          vertical: textScaleFactor > 1.2 ? 12 : 16,
+                          vertical: textScaleFactor.scale(1.2) > 1.2 ? 12 : 16,
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -204,7 +204,7 @@ class _RegisterContentState extends State<RegisterContent> {
                         errorText: _emailError,
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: 16,
-                          vertical: textScaleFactor > 1.2 ? 12 : 16,
+                          vertical: textScaleFactor.scale(1.2) > 1.2 ? 12 : 16,
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -242,7 +242,7 @@ class _RegisterContentState extends State<RegisterContent> {
                         errorText: _passwordError,
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: 16,
-                          vertical: textScaleFactor > 1.2 ? 12 : 16,
+                          vertical: textScaleFactor.scale(1.2) > 1.2 ? 12 : 16,
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -293,7 +293,7 @@ class _RegisterContentState extends State<RegisterContent> {
                         errorText: _confirmPasswordError,
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: 16,
-                          vertical: textScaleFactor > 1.2 ? 12 : 16,
+                          vertical: textScaleFactor.scale(1.2) > 1.2 ? 12 : 16,
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -369,7 +369,7 @@ class _RegisterContentState extends State<RegisterContent> {
                             backgroundColor: AppColors.primaryGreen,
                             foregroundColor: AppColors.textLight,
                             padding: EdgeInsets.symmetric(
-                              vertical: textScaleFactor > 1.2 ? 12 : 16,
+                                vertical: textScaleFactor.scale(1.2) > 1.2 ? 12 : 16,
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -381,7 +381,7 @@ class _RegisterContentState extends State<RegisterContent> {
                                 ? 'Registrando...'
                                 : 'Registrarse',
                             style: TextStyle(
-                              fontSize: textScaleFactor > 1.3 ? 14 : 16,
+                              fontSize: textScaleFactor.scale(1.3) > 1.3 ? 14 : 16,
                               fontWeight: FontWeight.w600,
                             ),
                           ),

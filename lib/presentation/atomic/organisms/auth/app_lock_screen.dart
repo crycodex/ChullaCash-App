@@ -113,15 +113,15 @@ class _AppLockScreenState extends State<AppLockScreen> {
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
     final screenWidth = mediaQuery.size.width;
-    final textScaleFactor = mediaQuery.textScaleFactor;
+    final textScaleFactor = mediaQuery.textScaler;
 
     // Espaciados y tamaños dinámicos basados en el tamaño de pantalla y fuente
     final dynamicSpacing =
-        screenHeight < 700 || textScaleFactor > 1.2 ? 16.0 : 24.0;
-    final iconSize = textScaleFactor > 1.3 ? 48.0 : 64.0;
-    final titleFontSize = textScaleFactor > 1.3 ? 20.0 : 24.0;
-    final subtitleFontSize = textScaleFactor > 1.3 ? 15.0 : 18.0;
-    final errorFontSize = textScaleFactor > 1.3 ? 14.0 : 16.0;
+        screenHeight < 700 || textScaleFactor.scale(1.2) > 1.2 ? 16.0 : 24.0;
+    final iconSize = textScaleFactor.scale(1.3) > 1.3 ? 48.0 : 64.0;
+    final titleFontSize = textScaleFactor.scale(1.3) > 1.3 ? 20.0 : 24.0;
+    final subtitleFontSize = textScaleFactor.scale(1.3) > 1.3 ? 15.0 : 18.0;
+    final errorFontSize = textScaleFactor.scale(1.3) > 1.3 ? 14.0 : 16.0;
     final keypadMaxWidth = screenWidth < 400 ? screenWidth * 0.8 : 300.0;
 
     return Scaffold(
@@ -137,10 +137,10 @@ class _AppLockScreenState extends State<AppLockScreen> {
                 children: [
                   // Icono de bloqueo más compacto
                   Container(
-                    padding: EdgeInsets.all(textScaleFactor > 1.2 ? 12 : 16),
+                    padding: EdgeInsets.all(textScaleFactor.scale(1.2) > 1.2 ? 12 : 16),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.primaryGreen.withOpacity(0.1),
+                      color: AppColors.primaryGreen.withValues(alpha: 0.1),
                     ),
                     child: Icon(
                       Icons.lock_outline,
@@ -166,20 +166,20 @@ class _AppLockScreenState extends State<AppLockScreen> {
                       onPressed: _authenticateWithBiometrics,
                       icon: Icon(
                         Icons.fingerprint,
-                        size: textScaleFactor > 1.3 ? 18 : 20,
+                        size: textScaleFactor.scale(1.3) > 1.3 ? 18 : 20,
                       ),
                       label: Text(
                         'Usar biometría',
                         style: TextStyle(
-                          fontSize: textScaleFactor > 1.3 ? 14 : 16,
+                          fontSize: textScaleFactor.scale(1.3) > 1.3 ? 14 : 16,
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryGreen,
                         foregroundColor: Colors.white,
                         padding: EdgeInsets.symmetric(
-                          horizontal: textScaleFactor > 1.2 ? 20 : 24,
-                          vertical: textScaleFactor > 1.2 ? 10 : 12,
+                          horizontal: textScaleFactor.scale(1.2) > 1.2 ? 20 : 24,
+                          vertical: textScaleFactor.scale(1.2) > 1.2 ? 10 : 12,
                         ),
                       ),
                     ),
@@ -187,7 +187,7 @@ class _AppLockScreenState extends State<AppLockScreen> {
                     Text(
                       'O',
                       style: TextStyle(
-                        fontSize: textScaleFactor > 1.3 ? 14 : 16,
+                        fontSize: textScaleFactor.scale(1.3) > 1.3 ? 14 : 16,
                         color: AppColors.textSecondary,
                       ),
                     ),
@@ -220,10 +220,10 @@ class _AppLockScreenState extends State<AppLockScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(4, (index) {
-                      final dotSize = textScaleFactor > 1.3 ? 16.0 : 20.0;
+                      final dotSize = textScaleFactor.scale(1.3) > 1.3 ? 16.0 : 20.0;
                       return Container(
                         margin: EdgeInsets.symmetric(
-                          horizontal: textScaleFactor > 1.3 ? 6 : 8,
+                          horizontal: textScaleFactor.scale(1.3) > 1.3 ? 6 : 8,
                         ),
                         width: dotSize,
                         height: dotSize,
@@ -244,9 +244,9 @@ class _AppLockScreenState extends State<AppLockScreen> {
                     child: GridView.count(
                       shrinkWrap: true,
                       crossAxisCount: 3,
-                      childAspectRatio: textScaleFactor > 1.3 ? 1.8 : 1.5,
-                      mainAxisSpacing: textScaleFactor > 1.2 ? 12 : 16,
-                      crossAxisSpacing: textScaleFactor > 1.2 ? 12 : 16,
+                      childAspectRatio: textScaleFactor.scale(1.3) > 1.3 ? 1.8 : 1.5,
+                      mainAxisSpacing: textScaleFactor.scale(1.2) > 1.2 ? 12 : 16,
+                      crossAxisSpacing: textScaleFactor.scale(1.2) > 1.2 ? 12 : 16,
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
                         ...[1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) {
@@ -271,8 +271,8 @@ class _AppLockScreenState extends State<AppLockScreen> {
   }
 
   Widget _buildKeypadButton(String text, {bool isDelete = false}) {
-    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
-    final buttonFontSize = textScaleFactor > 1.3 ? 20.0 : 24.0;
+    final textScaleFactor = MediaQuery.of(context).textScaler;
+    final buttonFontSize = textScaleFactor.scale(1.3) > 1.3 ? 20.0 : 24.0;
 
     return Material(
       color: Colors.transparent,
@@ -290,7 +290,7 @@ class _AppLockScreenState extends State<AppLockScreen> {
             color: Colors.grey[100],
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: AppColors.primaryGreen.withOpacity(0.1),
+                color: AppColors.primaryGreen.withValues(alpha: 0.1),
             ),
           ),
           child: Center(

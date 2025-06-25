@@ -104,7 +104,7 @@ class FinanceController extends GetxController {
       await updateBalance();
       await getTotalBalance();
     } catch (e) {
-      print('Error al agregar ingreso: $e');
+      debugPrint('Error al agregar ingreso: $e');
       rethrow;
     }
   }
@@ -143,7 +143,7 @@ class FinanceController extends GetxController {
       await updateBalance();
       await getTotalBalance();
     } catch (e) {
-      print('Error al agregar egreso: $e');
+      debugPrint('Error al agregar egreso: $e');
       rethrow;
     }
   }
@@ -217,7 +217,7 @@ class FinanceController extends GetxController {
 
       totalBalance.value = balance;
     } catch (e) {
-      print('Error al actualizar balance: $e');
+      debugPrint('Error al actualizar balance: $e');
       Get.snackbar('Error', 'No se pudo actualizar el balance: $e');
     }
   }
@@ -269,7 +269,7 @@ class FinanceController extends GetxController {
       // Actualizar el balance total observable
       allTimeBalance.value = total;
     } catch (e) {
-      print('Error al calcular balance total: $e');
+        debugPrint('Error al calcular balance total: $e');
       Get.snackbar(
         'Error',
         'No se pudo calcular el balance total: $e',

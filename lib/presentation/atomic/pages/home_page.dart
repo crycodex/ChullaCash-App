@@ -88,13 +88,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        if (_currentIndex != 0) {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) {
           _onNavItemTapped(0);
-          return false;
         }
-        return true;
       },
       child: Scaffold(
         body: Stack(

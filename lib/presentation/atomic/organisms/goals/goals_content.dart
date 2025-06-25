@@ -118,7 +118,7 @@ class _GoalsContentState extends State<GoalsContent>
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.primaryGreen.withOpacity(0.1),
+              color: AppColors.primaryGreen.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -219,7 +219,7 @@ class _GoalsContentState extends State<GoalsContent>
                         ),
                         progressColor: AppColors.primaryGreen,
                         backgroundColor:
-                            AppColors.primaryGreen.withOpacity(0.2),
+                            AppColors.primaryGreen.withValues(alpha: 0.2),
                       ),
                     ],
                   ),
@@ -232,7 +232,7 @@ class _GoalsContentState extends State<GoalsContent>
                     barRadius: const Radius.circular(4),
                     progressColor:
                         isCompleted ? Colors.green : AppColors.primaryGreen,
-                    backgroundColor: AppColors.primaryGreen.withOpacity(0.2),
+                    backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.2),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -267,8 +267,8 @@ class _GoalsContentState extends State<GoalsContent>
                             horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: isCompleted
-                              ? Colors.green.withOpacity(0.1)
-                              : AppColors.primaryGreen.withOpacity(0.1),
+                              ? Colors.green.withValues(alpha: 0.1)
+                              : AppColors.primaryGreen.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
@@ -306,8 +306,8 @@ class _GoalsContentState extends State<GoalsContent>
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: isDarkMode
-                      ? Colors.black.withOpacity(0.2)
-                      : AppColors.primaryGreen.withOpacity(0.05),
+                      ? Colors.black.withValues(alpha: 0.2)
+                      : AppColors.primaryGreen.withValues(alpha: 0.05),
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(16),
                     bottomRight: Radius.circular(16),
@@ -455,7 +455,8 @@ class _GoalsContentState extends State<GoalsContent>
               _showTutorial.value = false;
 
                       if (isMounted) {
-              Navigator.pop(context);
+              // ignore: use_build_context_synchronously
+              Navigator.pop(context, true);
                       }
 
               Get.snackbar(
@@ -625,6 +626,7 @@ class _GoalsContentState extends State<GoalsContent>
               _descriptionController.clear();
 
                       if (isMounted) {
+              // ignore: use_build_context_synchronously
               Navigator.pop(context);
                       }
 
@@ -695,7 +697,7 @@ class _GoalsContentState extends State<GoalsContent>
                 icon: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryGreen.withOpacity(0.1),
+                    color: AppColors.primaryGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -729,7 +731,7 @@ class _GoalsContentState extends State<GoalsContent>
                     alignment: Alignment.centerLeft,
                     padding: const EdgeInsets.only(left: 20),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryGreen.withOpacity(0.8),
+                      color: AppColors.primaryGreen.withValues(alpha: 0.8),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: const Icon(
@@ -742,7 +744,7 @@ class _GoalsContentState extends State<GoalsContent>
                     alignment: Alignment.centerRight,
                     padding: const EdgeInsets.only(right: 20),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.8),
+                        color: Colors.red.withValues(alpha: 0.8),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: const Icon(

@@ -36,18 +36,18 @@ class _LoginFormState extends State<LoginForm> {
   bool _isLoading = false;
 
   void _handleSubmit() async {
-    print('Intentando submit del formulario...'); // Debug log
+    debugPrint('Intentando submit del formulario...'); // Debug log
 
     // Forzar la validación del formulario
     final isValid = widget.formKey.currentState?.validate() ?? false;
-    print('¿Formulario válido? $isValid'); // Debug log
+    debugPrint('¿Formulario válido? $isValid'); // Debug log
 
     if (!isValid) {
-      print('Formulario inválido, mostrando error...'); // Debug log
+      debugPrint('Formulario inválido, mostrando error...'); // Debug log
       Get.snackbar(
         'Error',
         'Por favor, complete todos los campos correctamente',
-        backgroundColor: Colors.red.withOpacity(0.1),
+        backgroundColor: Colors.red.withValues(alpha: 0.1),
         colorText: Colors.red,
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.all(20),
@@ -57,11 +57,11 @@ class _LoginFormState extends State<LoginForm> {
 
     if (widget.emailController.text.isEmpty ||
         widget.passwordController.text.isEmpty) {
-      print('Campos vacíos, mostrando error...'); // Debug log
+      debugPrint('Campos vacíos, mostrando error...'); // Debug log
       Get.snackbar(
         'Error',
         'Por favor, complete todos los campos',
-        backgroundColor: Colors.red.withOpacity(0.1),
+        backgroundColor: Colors.red.withValues(alpha: 0.1),
         colorText: Colors.red,
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.all(20),
@@ -70,7 +70,7 @@ class _LoginFormState extends State<LoginForm> {
     }
 
     setState(() => _isLoading = true);
-    print('Iniciando proceso de login...'); // Debug log
+    debugPrint('Iniciando proceso de login...'); // Debug log
 
     try {
       await widget.onSubmit(
@@ -78,16 +78,16 @@ class _LoginFormState extends State<LoginForm> {
         password: widget.passwordController.text,
         onSuccess: () {
           setState(() => _isLoading = false);
-          print('Login exitoso, navegando a home...'); // Debug log
+          debugPrint('Login exitoso, navegando a home...'); // Debug log
           Get.offAllNamed('/home');
         },
         onError: (error) {
           setState(() => _isLoading = false);
-          print('Error en login: $error'); // Debug log
+          debugPrint('Error en login: $error'); // Debug log
           Get.snackbar(
             'Error',
             error,
-            backgroundColor: Colors.red.withOpacity(0.1),
+            backgroundColor: Colors.red.withValues(alpha: 0.1),
             colorText: Colors.red,
             snackPosition: SnackPosition.BOTTOM,
             margin: const EdgeInsets.all(20),
@@ -96,11 +96,11 @@ class _LoginFormState extends State<LoginForm> {
       );
     } catch (e) {
       setState(() => _isLoading = false);
-      print('Error inesperado: $e'); // Debug log
+      debugPrint('Error inesperado: $e'); // Debug log
       Get.snackbar(
         'Error',
         e.toString(),
-        backgroundColor: Colors.red.withOpacity(0.1),
+          backgroundColor: Colors.red.withValues(alpha: 0.1),
         colorText: Colors.red,
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.all(20),

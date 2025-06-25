@@ -50,8 +50,8 @@ class _WalletContentState extends State<WalletContent>
           ? AppColors.darkSurface
           : Colors.white,
       end: isPositive
-          ? AppColors.primaryGreen.withOpacity(0.1)
-          : Colors.red.withOpacity(0.1),
+          ? AppColors.primaryGreen.withValues(alpha: 0.1)
+          : Colors.red.withValues(alpha: 0.1),
     ).animate(_colorAnimationController);
 
     _textColorAnimation = ColorTween(
@@ -90,21 +90,21 @@ class _WalletContentState extends State<WalletContent>
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           color: isDarkMode
-                              ? AppColors.darkSurface.withOpacity(0.8)
+                              ? AppColors.darkSurface.withValues(alpha: 0.8)
                               : _colorAnimation.value,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
                               color: isDarkMode
-                                  ? Colors.black.withOpacity(0.5)
-                                  : Colors.grey.withOpacity(0.1),
+                                  ? Colors.black.withValues(alpha: 0.5)
+                                  : Colors.grey.withValues(alpha: 0.1),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
                           ],
                           border: Border.all(
                             color: isDarkMode
-                                ? Colors.white.withOpacity(0.1)
+                                ? Colors.white.withValues(alpha: 0.1)
                                 : Colors.transparent,
                             width: 1,
                           ),
@@ -131,9 +131,9 @@ class _WalletContentState extends State<WalletContent>
                                           horizontal: 12, vertical: 6),
                                       decoration: BoxDecoration(
                                         color: isDarkMode
-                                            ? Colors.white.withOpacity(0.1)
+                                            ? Colors.white.withValues(alpha: 0.1)
                                             : AppColors.primaryGreen
-                                                .withOpacity(0.1),
+                                                .withValues(alpha: 0.1),
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                       child: Row(
@@ -166,9 +166,9 @@ class _WalletContentState extends State<WalletContent>
                                         padding: const EdgeInsets.all(8),
                                         decoration: BoxDecoration(
                                           color: isDarkMode
-                                              ? Colors.white.withOpacity(0.1)
+                                              ? Colors.white.withValues(alpha: 0.1)
                                               : AppColors.primaryGreen
-                                                  .withOpacity(0.1),
+                                                  .withValues(alpha: 0.1),
                                           borderRadius:
                                               BorderRadius.circular(12),
                                         ),
@@ -209,21 +209,21 @@ class _WalletContentState extends State<WalletContent>
                 Container(
                   decoration: BoxDecoration(
                     color: isDarkMode
-                        ? AppColors.darkSurface.withOpacity(0.8)
+                        ? AppColors.darkSurface.withValues(alpha: 0.8)
                         : Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
                         color: isDarkMode
-                            ? Colors.black.withOpacity(0.5)
-                            : Colors.grey.withOpacity(0.1),
+                            ? Colors.black.withValues(alpha: 0.5)
+                            : Colors.grey.withValues(alpha: 0.1),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
                     ],
                     border: Border.all(
                       color: isDarkMode
-                          ? Colors.white.withOpacity(0.1)
+                          ? Colors.white.withValues(alpha: 0.1)
                           : Colors.transparent,
                       width: 1,
                     ),
@@ -281,20 +281,20 @@ class _WalletContentState extends State<WalletContent>
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: isDarkMode
-            ? AppColors.darkSurface.withOpacity(0.8)
-            : color.withOpacity(0.1),
+            ? AppColors.darkSurface.withValues(alpha: 0.8)
+            : color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDarkMode
-              ? Colors.white.withOpacity(0.1)
-              : color.withOpacity(0.3),
+              ? Colors.white.withValues(alpha: 0.1)
+              : color.withValues(alpha: 0.3),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
             color: isDarkMode
-                ? Colors.black.withOpacity(0.5)
-                : color.withOpacity(0.1),
+                ? Colors.black.withValues(alpha: 0.5)
+                : color.withValues(alpha: 0.1),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -306,7 +306,7 @@ class _WalletContentState extends State<WalletContent>
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 20),

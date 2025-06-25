@@ -143,7 +143,7 @@ class ProfileContent extends StatelessWidget {
                     value: authController.isDarkMode.value,
                     onChanged: (value) => authController.toggleTheme(),
                     activeColor: AppColors.primaryGreen,
-                    activeTrackColor: AppColors.primaryGreen.withOpacity(0.5),
+                    activeTrackColor: AppColors.primaryGreen.withValues(alpha: 0.5),
                   ),
                   onTap: () => authController.toggleTheme(),
                 )),

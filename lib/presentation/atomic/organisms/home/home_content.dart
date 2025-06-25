@@ -95,21 +95,21 @@ class _HomeContentState extends State<HomeContent>
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: isDarkMode
-                        ? AppColors.darkSurface.withOpacity(0.8)
+                        ? AppColors.darkSurface.withValues(alpha: 0.8)
                         : Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
                         color: isDarkMode
-                            ? Colors.black.withOpacity(0.5)
-                            : Colors.grey.withOpacity(0.1),
+                            ? Colors.black.withValues(alpha: 0.5)
+                            : Colors.grey.withValues(alpha: 0.1),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
                     ],
                     border: Border.all(
                       color: isDarkMode
-                          ? Colors.white.withOpacity(0.1)
+                          ? Colors.white.withValues(alpha: 0.1)
                           : Colors.transparent,
                     ),
                   ),
@@ -136,8 +136,8 @@ class _HomeContentState extends State<HomeContent>
                                     horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
                                   color: isDarkMode
-                                      ? Colors.white.withOpacity(0.1)
-                                      : AppColors.primaryGreen.withOpacity(0.1),
+                                      ? Colors.white.withValues(alpha: 0.1)
+                                      : AppColors.primaryGreen.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Row(
@@ -170,9 +170,9 @@ class _HomeContentState extends State<HomeContent>
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
                                     color: isDarkMode
-                                        ? Colors.white.withOpacity(0.1)
+                                        ? Colors.white.withValues(alpha: 0.1)
                                         : AppColors.primaryGreen
-                                            .withOpacity(0.1),
+                                            .withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Icon(
@@ -232,8 +232,8 @@ class _HomeContentState extends State<HomeContent>
                             Icons.account_balance_wallet_outlined,
                             size: 48,
                             color: isDarkMode
-                                ? Colors.white.withOpacity(0.5)
-                                : AppColors.textSecondary.withOpacity(0.5),
+                                ? Colors.white.withValues(alpha: 0.5)
+                                : AppColors.textSecondary.withValues(alpha: 0.5),
                           ),
                           const SizedBox(height: 16),
                           Text(
@@ -262,7 +262,7 @@ class _HomeContentState extends State<HomeContent>
                           alignment: Alignment.centerRight,
                           padding: const EdgeInsets.only(right: 20.0),
                           decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.8),
+                            color: Colors.red.withValues(alpha: 0.8),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(
@@ -338,10 +338,10 @@ class _HomeContentState extends State<HomeContent>
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: isDarkMode
-                                  ? Colors.white.withOpacity(0.1)
+                                  ? Colors.white.withValues(alpha: 0.1)
                                   : isIncome
-                                      ? AppColors.primaryGreen.withOpacity(0.1)
-                                      : Colors.red.withOpacity(0.1),
+                                      ? AppColors.primaryGreen.withValues(alpha: 0.1)
+                                      : Colors.red.withValues(alpha: 0.1),
                               width: 1,
                             ),
                           ),
@@ -357,7 +357,7 @@ class _HomeContentState extends State<HomeContent>
                                 color: (isIncome
                                         ? AppColors.primaryGreen
                                         : Colors.red)
-                                    .withOpacity(isDarkMode ? 0.2 : 0.1),
+                                    .withValues(alpha:    isDarkMode ? 0.2 : 0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Icon(

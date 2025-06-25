@@ -15,6 +15,8 @@ import 'presentation/controllers/connectivity_controller.dart';
 import 'presentation/atomic/pages/no_connection_page.dart';
 //services
 import 'services/ad_service.dart';
+// Importar para la inicialización de localización de fechas
+import 'package:intl/date_symbol_data_local.dart';
 
 // Crear una instancia global del servicio de anuncios
 final adService = AdService();
@@ -24,6 +26,10 @@ Future<void> main() async {
     // Asegurarse de que Flutter esté inicializado
     WidgetsFlutterBinding.ensureInitialized();
     debugPrint('🚀 Flutter inicializado correctamente');
+
+    // Inicializar datos de localización para español
+    await initializeDateFormatting('es_ES', null);
+    debugPrint('✅ Localización de fechas inicializada para es_ES');
 
     // Inicializar Firebase
     await Firebase.initializeApp(

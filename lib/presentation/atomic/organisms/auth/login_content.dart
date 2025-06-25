@@ -64,15 +64,15 @@ class _LoginContentState extends State<LoginContent> {
     // Obtener información de la pantalla y fuente
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height;
-    final textScaleFactor = mediaQuery.textScaleFactor;
+    final textScaleFactor = mediaQuery.textScaler;
 
     // Espaciados dinámicos basados en el tamaño de pantalla y fuente
     final dynamicSpacing =
-        screenHeight < 700 || textScaleFactor > 1.2 ? 12.0 : 16.0;
+        screenHeight < 700 || textScaleFactor.scale(1.2) > 1.2 ? 12.0 : 16.0;
     final headerSpacing =
-        screenHeight < 700 || textScaleFactor > 1.2 ? 16.0 : 24.0;
+        screenHeight < 700 || textScaleFactor.scale(1.2) > 1.2 ? 16.0 : 24.0;
     final sectionSpacing =
-        screenHeight < 700 || textScaleFactor > 1.2 ? 16.0 : 24.0;
+        screenHeight < 700 || textScaleFactor.scale(1.2) > 1.2 ? 16.0 : 24.0;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
@@ -97,7 +97,7 @@ class _LoginContentState extends State<LoginContent> {
                                     .textTheme
                                     .displayMedium!
                                     .fontSize! *
-                                (textScaleFactor > 1.3 ? 0.9 : 1.0)
+                                (textScaleFactor.scale(1.3) > 1.3 ? 0.9 : 1.0)
                             : null,
                       ),
                 ),
@@ -154,7 +154,7 @@ class _LoginContentState extends State<LoginContent> {
                         style: TextStyle(
                           color: AppColors.primaryGreen,
                           fontWeight: FontWeight.w600,
-                          fontSize: textScaleFactor > 1.3 ? 13 : 14,
+                          fontSize: textScaleFactor.scale(1.3) > 1.3 ? 13 : 14,
                         ),
                       ),
                     ),
@@ -172,7 +172,7 @@ class _LoginContentState extends State<LoginContent> {
                           'O inicia sesión con',
                           style: TextStyle(
                             color: AppColors.textSecondary,
-                            fontSize: textScaleFactor > 1.3 ? 11 : 12,
+                            fontSize: textScaleFactor.scale(1.3) > 1.3 ? 11 : 12,
                           ),
                         ),
                       ),
@@ -192,18 +192,18 @@ class _LoginContentState extends State<LoginContent> {
                           },
                           icon: Image.asset(
                             'lib/assets/icons/others/googleIcon.png',
-                            height: textScaleFactor > 1.3 ? 20 : 24,
+                            height: textScaleFactor.scale(1.3) > 1.3 ? 20 : 24,
                           ),
                           label: Text(
                             'Google',
                             style: TextStyle(
                               color: AppColors.textPrimary,
-                              fontSize: textScaleFactor > 1.3 ? 13 : 14,
+                              fontSize: textScaleFactor.scale(1.3) > 1.3 ? 13 : 14,
                             ),
                           ),
                           style: OutlinedButton.styleFrom(
                             padding: EdgeInsets.symmetric(
-                              vertical: textScaleFactor > 1.2 ? 10 : 12,
+                                vertical: textScaleFactor.scale(1.2) > 1.2 ? 10 : 12,
                             ),
                             side: BorderSide(color: AppColors.lightGray),
                             backgroundColor: AppColors.surfaceLight,
@@ -222,18 +222,18 @@ class _LoginContentState extends State<LoginContent> {
                             },
                             icon: Image.asset(
                               'lib/assets/icons/others/apple.png',
-                              height: textScaleFactor > 1.3 ? 20 : 24,
+                              height: textScaleFactor.scale(1.3) > 1.3 ? 20 : 24,
                             ),
                             label: Text(
                               'Apple',
                               style: TextStyle(
                                 color: AppColors.textPrimary,
-                                fontSize: textScaleFactor > 1.3 ? 13 : 14,
+                                fontSize: textScaleFactor.scale(1.3) > 1.3 ? 13 : 14,
                               ),
                             ),
                             style: OutlinedButton.styleFrom(
                               padding: EdgeInsets.symmetric(
-                                vertical: textScaleFactor > 1.2 ? 10 : 12,
+                                vertical: textScaleFactor.scale(1.2) > 1.2 ? 10 : 12,
                               ),
                               side: BorderSide(color: AppColors.lightGray),
                               backgroundColor: AppColors.surfaceLight,

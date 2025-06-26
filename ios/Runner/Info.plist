@@ -29,6 +29,13 @@
 		<string>Para proteger tus datos, necesitamos autenticar tu identidad.</string>
 		<!-- end of local auth -->
 
+		<!-- Camera and Photo Library Permissions -->
+		<key>NSCameraUsageDescription</key>
+		<string>Necesitamos acceso a la cámara para que puedas tomar fotos de perfil.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Necesitamos acceso a tu galería para que puedas seleccionar fotos de perfil.</string>
+		<!-- End of Camera and Photo Library Permissions -->
+
 		<!-- AdMob Configuration -->
 		<key>GADApplicationIdentifier</key>
 		<string>ca-app-pub-6468767225905546~1283581526</string>

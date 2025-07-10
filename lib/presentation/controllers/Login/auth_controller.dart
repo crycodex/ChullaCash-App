@@ -751,23 +751,149 @@ class AuthController extends GetxController {
 
   Future<void> deleteAccount() async {
     try {
-      // Aquí implementarías la lógica para eliminar la cuenta en Firebase
-      // Por ahora solo cerramos sesión
-      await logout();
+      if (uid.value.isEmpty) {
+        throw Exception('No hay usuario autenticado para eliminar');
+      }
+
+      final user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('No hay usuario autenticado');
+      }
+
+      debugPrint('Iniciando eliminación de cuenta para usuario: ${uid.value}');
+
+      // 1. Eliminar todos los datos del usuario en Firestore
+      await _deleteUserData(uid.value);
+
+      // 2. Eliminar la cuenta de Firebase Authentication
+      await user.delete();
+
+      debugPrint('Cuenta eliminada exitosamente');
+
+      // 3. Limpiar estado local
+      _clearUserState();
+
+      // 4. Mostrar mensaje de éxito y redirigir
       Get.snackbar(
-        'Éxito',
-        'Cuenta eliminada correctamente',
+        'Cuenta eliminada',
+        'Tu cuenta ha sido eliminada permanentemente',
         backgroundColor: AppColors.primaryGreen,
         colorText: Colors.white,
+        duration: const Duration(seconds: 3),
       );
-    } catch (e) {
+
+      // 5. Redirigir a la página de bienvenida
+      Get.offAllNamed('/welcome');
+    } on FirebaseAuthException catch (e) {
+      debugPrint('Error de FirebaseAuth al eliminar cuenta: ${e.code}');
+      String errorMessage;
+      
+      switch (e.code) {
+        case 'requires-recent-login':
+          errorMessage = 'Por razones de seguridad, debes iniciar sesión nuevamente antes de eliminar tu cuenta.';
+          // Cerrar sesión para que el usuario tenga que volver a autenticarse
+          await logout();
+          break;
+        case 'user-not-found':
+          errorMessage = 'No se encontró la cuenta del usuario.';
+          break;
+        default:
+          errorMessage = 'Error al eliminar la cuenta: ${e.message}';
+      }
+      
       Get.snackbar(
         'Error',
-        'No se pudo eliminar la cuenta',
+        errorMessage,
         backgroundColor: Colors.red,
         colorText: Colors.white,
+        duration: const Duration(seconds: 5),
+      );
+    } catch (e) {
+      debugPrint('Error inesperado al eliminar cuenta: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo eliminar la cuenta. Inténtalo de nuevo.',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 5),
       );
     }
+  }
+
+  Future<void> _deleteUserData(String userId) async {
+    try {
+      debugPrint('Eliminando datos del usuario: $userId');
+      final batch = _firestore.batch();
+
+      // Eliminar documento del usuario
+      batch.delete(_firestore.collection('users').doc(userId));
+
+      // Eliminar transacciones del usuario
+      final transactionsQuery = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('transactions')
+          .get();
+      
+      for (final doc in transactionsQuery.docs) {
+        batch.delete(doc.reference);
+      }
+
+      // Eliminar movimientos del usuario
+      final movementsQuery = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('movements')
+          .get();
+      
+      for (final doc in movementsQuery.docs) {
+        batch.delete(doc.reference);
+      }
+
+      // Eliminar metas del usuario
+      final goalsQuery = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('goals')
+          .get();
+      
+      for (final doc in goalsQuery.docs) {
+        batch.delete(doc.reference);
+      }
+
+      // Ejecutar todas las eliminaciones en lote
+      await batch.commit();
+      debugPrint('Datos del usuario eliminados exitosamente');
+    } catch (e) {
+      debugPrint('Error al eliminar datos del usuario: $e');
+      throw Exception('Error al eliminar datos del usuario');
+    }
+  }
+
+  void _clearUserState() {
+    // Limpiar todas las variables observables
+    uid.value = '';
+    userName.value = 'Usuario';
+    userEmail.value = 'usuario@example.com';
+    profileImage.value = null;
+    name.value = '';
+    email.value = '';
+    profilePicture.value = '';
+    theme.value = '';
+    language.value = '';
+    userType.value = '';
+    
+    // Limpiar configuraciones de seguridad
+    isAppLockEnabled.value = false;
+    isBiometricEnabled.value = false;
+    lockTimeout.value = 'immediately';
+    pin.value = '';
+    
+    // Resetear tema
+    isDarkMode.value = false;
+    
+    // Resetear estado de autenticación
+    authStatus.value = AuthStatus.unauthenticated;
   }
 
   Future<void> _loadSecuritySettings() async {

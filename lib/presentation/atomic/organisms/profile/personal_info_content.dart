@@ -13,12 +13,21 @@ class PersonalInfoContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final authController = Get.put(AuthController());
     final userController = Get.put(UserController());
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Información Personal'),
+        title: Text(
+          'Información Personal',
+          style: TextStyle(
+            color: isDarkMode ? AppColors.textLight : AppColors.textPrimary,
+          ),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        iconTheme: IconThemeData(
+          color: isDarkMode ? AppColors.textLight : AppColors.textPrimary,
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -31,7 +40,9 @@ class PersonalInfoContent extends StatelessWidget {
                 children: [
                   Obx(() => CircleAvatar(
                         radius: 60,
-                        backgroundColor: AppColors.lightGray,
+                        backgroundColor: isDarkMode
+                            ? AppColors.darkSurface
+                            : AppColors.lightGray,
                         backgroundImage:
                             userController.photoUrl.value.isNotEmpty
                                 ? NetworkImage(userController.photoUrl.value)
@@ -42,10 +53,12 @@ class PersonalInfoContent extends StatelessWidget {
                                     AppColors.primaryGreen),
                               )
                             : (userController.photoUrl.value.isEmpty
-                                ? const Icon(
+                                ? Icon(
                                     Icons.person,
                                     size: 60,
-                                    color: AppColors.primaryGreen,
+                                    color: isDarkMode
+                                        ? AppColors.textLight
+                                        : AppColors.primaryGreen,
                                   )
                                 : null),
                       )),
@@ -54,7 +67,7 @@ class PersonalInfoContent extends StatelessWidget {
                     right: 0,
                     child: Obx(() => userController.isLoading.value
                         ? const SizedBox.shrink()
-                        : _buildImagePickerButton(userController)),
+                        : _buildImagePickerButton(userController, isDarkMode)),
                   ),
                 ],
               ),
@@ -64,17 +77,20 @@ class PersonalInfoContent extends StatelessWidget {
             // Información del usuario
             _buildSection(
               title: 'Datos personales',
+              isDarkMode: isDarkMode,
               children: [
                 _buildEditableField(
                   label: 'Nombre',
                   value: authController.userName,
                   onEdit: () => _showEditNameDialog(context, authController),
+                  isDarkMode: isDarkMode,
                 ),
                 const SizedBox(height: 16),
                 _buildEditableField(
                   label: 'Correo electrónico',
                   value: authController.userEmail,
                   isEditable: false,
+                  isDarkMode: isDarkMode,
                 ),
               ],
             ),
@@ -83,6 +99,7 @@ class PersonalInfoContent extends StatelessWidget {
             // Zona de peligro
             _buildSection(
               title: 'Zona de peligro',
+              isDarkMode: isDarkMode,
               children: [
                 CustomButton(
                   text: 'Eliminar cuenta',
@@ -98,17 +115,20 @@ class PersonalInfoContent extends StatelessWidget {
     );
   }
 
-  Widget _buildImagePickerButton(UserController controller) {
+  Widget _buildImagePickerButton(UserController controller, bool isDarkMode) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.primaryGreen,
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 2),
+        border: Border.all(
+          color: isDarkMode ? AppColors.darkSurface : Colors.white,
+          width: 2,
+        ),
       ),
       child: IconButton(
         icon: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
         onPressed: () async {
-          final source = await _showImageSourceDialog();
+          final source = await _showImageSourceDialog(isDarkMode);
           if (source != null) {
             final ImagePicker picker = ImagePicker();
             final XFile? image = await picker.pickImage(
@@ -126,21 +146,45 @@ class PersonalInfoContent extends StatelessWidget {
     );
   }
 
-  Future<ImageSource?> _showImageSourceDialog() async {
+  Future<ImageSource?> _showImageSourceDialog(bool isDarkMode) async {
     return await Get.dialog<ImageSource>(
       AlertDialog(
-        title: const Text('Seleccionar imagen'),
+        backgroundColor: isDarkMode ? AppColors.darkSurface : null,
+        title: Text(
+          'Seleccionar imagen',
+          style: TextStyle(
+            color: isDarkMode ? AppColors.textLight : AppColors.textPrimary,
+          ),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.camera),
-              title: const Text('Tomar foto'),
+              leading: Icon(
+                Icons.camera,
+                color: isDarkMode ? AppColors.textLight : AppColors.textPrimary,
+              ),
+              title: Text(
+                'Tomar foto',
+                style: TextStyle(
+                  color:
+                      isDarkMode ? AppColors.textLight : AppColors.textPrimary,
+                ),
+              ),
               onTap: () => Get.back(result: ImageSource.camera),
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text('Galería'),
+              leading: Icon(
+                Icons.photo_library,
+                color: isDarkMode ? AppColors.textLight : AppColors.textPrimary,
+              ),
+              title: Text(
+                'Galería',
+                style: TextStyle(
+                  color:
+                      isDarkMode ? AppColors.textLight : AppColors.textPrimary,
+                ),
+              ),
               onTap: () => Get.back(result: ImageSource.gallery),
             ),
           ],
@@ -149,17 +193,20 @@ class PersonalInfoContent extends StatelessWidget {
     );
   }
 
-  Widget _buildSection(
-      {required String title, required List<Widget> children}) {
+  Widget _buildSection({
+    required String title,
+    required List<Widget> children,
+    required bool isDarkMode,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: isDarkMode ? AppColors.textLight : AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 16),
@@ -173,13 +220,16 @@ class PersonalInfoContent extends StatelessWidget {
     required RxString value,
     bool isEditable = true,
     VoidCallback? onEdit,
+    required bool isDarkMode,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: isDarkMode ? AppColors.darkSurface : Colors.grey[100],
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.lightGray),
+        border: Border.all(
+          color: isDarkMode ? AppColors.darkSurface : AppColors.lightGray,
+        ),
       ),
       child: Row(
         children: [
@@ -191,15 +241,20 @@ class PersonalInfoContent extends StatelessWidget {
                   label,
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.textSecondary,
+                    color: isDarkMode
+                        ? AppColors.textLight
+                        : AppColors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Obx(() => Text(
                       value.value,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
+                        color: isDarkMode
+                            ? AppColors.textLight
+                            : AppColors.textPrimary,
                       ),
                     )),
               ],
@@ -207,7 +262,12 @@ class PersonalInfoContent extends StatelessWidget {
           ),
           if (isEditable)
             IconButton(
-              icon: const Icon(Icons.edit, color: AppColors.primaryGreen),
+              icon: Icon(
+                Icons.edit,
+                color: isDarkMode
+                    ? AppColors.primaryGreen
+                    : AppColors.primaryGreen,
+              ),
               onPressed: onEdit,
             ),
         ],
@@ -219,21 +279,54 @@ class PersonalInfoContent extends StatelessWidget {
     final TextEditingController nameController = TextEditingController(
       text: controller.userName.value,
     );
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     Get.dialog(
       AlertDialog(
-        title: const Text('Editar nombre'),
+        backgroundColor: isDarkMode ? AppColors.darkSurface : null,
+        title: Text(
+          'Editar nombre',
+          style: TextStyle(
+            color: isDarkMode ? AppColors.textLight : AppColors.textPrimary,
+          ),
+        ),
         content: TextField(
           controller: nameController,
-          decoration: const InputDecoration(
+          style: TextStyle(
+            color: isDarkMode ? AppColors.textLight : AppColors.textPrimary,
+          ),
+          decoration: InputDecoration(
             labelText: 'Nombre',
-            border: OutlineInputBorder(),
+            labelStyle: TextStyle(
+              color: isDarkMode ? AppColors.textLight : AppColors.textSecondary,
+            ),
+            border: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: isDarkMode ? AppColors.textLight : AppColors.lightGray,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: isDarkMode ? AppColors.textLight : AppColors.lightGray,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: AppColors.primaryGreen,
+              ),
+            ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('Cancelar'),
+            child: Text(
+              'Cancelar',
+              style: TextStyle(
+                color:
+                    isDarkMode ? AppColors.textLight : AppColors.textSecondary,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -242,7 +335,10 @@ class PersonalInfoContent extends StatelessWidget {
                 Get.back();
               }
             },
-            child: const Text('Guardar'),
+            child: const Text(
+              'Guardar',
+              style: TextStyle(color: AppColors.primaryGreen),
+            ),
           ),
         ],
       ),
@@ -251,25 +347,106 @@ class PersonalInfoContent extends StatelessWidget {
 
   void _showDeleteAccountDialog(
       BuildContext context, AuthController controller) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     Get.dialog(
       AlertDialog(
-        title: const Text('Eliminar cuenta'),
-        content: const Text(
-          '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.',
+        backgroundColor: isDarkMode ? AppColors.darkSurface : null,
+        title: Text(
+          'Eliminar cuenta permanentemente',
+          style: TextStyle(
+            color: isDarkMode ? AppColors.textLight : AppColors.textPrimary,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '¿Estás seguro de que deseas eliminar tu cuenta?',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? AppColors.textLight : AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Esta acción eliminará permanentemente:',
+              style: TextStyle(
+                fontSize: 14,
+                color: isDarkMode ? AppColors.textLight : AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '• Todos tus datos personales',
+              style: TextStyle(
+                fontSize: 13,
+                color: isDarkMode
+                    ? AppColors.textLight.withOpacity(0.7)
+                    : Colors.grey,
+              ),
+            ),
+            Text(
+              '• Historial de transacciones',
+              style: TextStyle(
+                fontSize: 13,
+                color: isDarkMode
+                    ? AppColors.textLight.withOpacity(0.7)
+                    : Colors.grey,
+              ),
+            ),
+            Text(
+              '• Metas financieras',
+              style: TextStyle(
+                fontSize: 13,
+                color: isDarkMode
+                    ? AppColors.textLight.withOpacity(0.7)
+                    : Colors.grey,
+              ),
+            ),
+            Text(
+              '• Configuraciones de la aplicación',
+              style: TextStyle(
+                fontSize: 13,
+                color: isDarkMode
+                    ? AppColors.textLight.withOpacity(0.7)
+                    : Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Esta acción no se puede deshacer.',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.red,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('Cancelar'),
+            child: Text(
+              'Cancelar',
+              style: TextStyle(
+                color:
+                    isDarkMode ? AppColors.textLight : AppColors.textSecondary,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () {
-              controller.deleteAccount();
               Get.back();
+              controller.deleteAccount();
             },
             child: const Text(
-              'Eliminar',
-              style: TextStyle(color: Colors.red),
+              'Eliminar cuenta',
+              style: TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],

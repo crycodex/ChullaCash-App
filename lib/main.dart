@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:get/get.dart';
@@ -175,6 +176,16 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
           themeMode: Get.put(UserController()).isDarkMode.value
               ? ThemeMode.dark
               : ThemeMode.light,
+          locale: const Locale('es', 'ES'),
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('es', 'ES'),
+            Locale('en', 'US'),
+          ],
           home: NoConnectionPage(
             onRetry: () {
               debugPrint('Intentando reconectar...');
@@ -194,6 +205,16 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
         themeMode: Get.put(UserController()).isDarkMode.value
             ? ThemeMode.dark
             : ThemeMode.light,
+        locale: const Locale('es', 'ES'),
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('es', 'ES'),
+          Locale('en', 'US'),
+        ],
         initialRoute: widget.initialRoute,
         getPages: Routes.routes,
       );

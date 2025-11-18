@@ -29,17 +29,21 @@ class _HistoryContentState extends State<HistoryContent> {
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
       locale: const Locale('es', 'ES'),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primaryGreen,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: AppColors.textPrimary,
+      builder: (BuildContext context, Widget? child) {
+        return Localizations.override(
+          context: context,
+          locale: const Locale('es', 'ES'),
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: ColorScheme.light(
+                primary: AppColors.primaryGreen,
+                onPrimary: Colors.white,
+                surface: Colors.white,
+                onSurface: AppColors.textPrimary,
+              ),
             ),
+            child: child!,
           ),
-          child: child!,
         );
       },
     );
@@ -99,7 +103,8 @@ class _HistoryContentState extends State<HistoryContent> {
                               : AppColors.primaryGreen.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: AppColors.primaryGreen.withValues(alpha: 0.3),
+                            color:
+                                AppColors.primaryGreen.withValues(alpha: 0.3),
                             width: 1,
                           ),
                         ),
@@ -238,7 +243,8 @@ class _HistoryContentState extends State<HistoryContent> {
                             size: 64,
                             color: isDarkMode
                                 ? Colors.white.withValues(alpha: 0.2)
-                                : AppColors.textSecondary.withValues(alpha: 0.5),
+                                : AppColors.textSecondary
+                                    .withValues(alpha: 0.5),
                           ),
                           const SizedBox(height: 16),
                           Text(
